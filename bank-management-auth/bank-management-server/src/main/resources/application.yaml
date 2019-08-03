@@ -1,0 +1,26 @@
+server:
+  port: 8085      #端口号
+
+spring:
+  application:
+    name: auth-service    #服务名
+#注册中心
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:10081/eureka
+    registry-fetch-interval-seconds: 10
+  instance:
+    lease-renewal-interval-in-seconds: 5 # 每隔5秒发送一次心跳
+    lease-expiration-duration-in-seconds: 10 # 10秒不发送就过期
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    instance-id: ${spring.application.name}:${server.port}
+
+#自定义内容
+sc:
+  jwt:
+    secret: sc@Login(Auth}*^31)&czxy% # 登录校验的密钥
+    pubKeyPath: D:/rsa/rsa.pub      # 公钥地址
+    priKeyPath: D:/rsa/rsa.pri      # 私钥地址
+    expire: 30 # 过期时间,单位分钟

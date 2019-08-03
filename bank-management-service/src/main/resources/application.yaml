@@ -1,0 +1,51 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: web-service
+  datasource:
+    url: jdbc:mysql://10.1.12.77/bank_management?useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true
+    username: root
+    password: 123
+    driver-class-name: com.mysql.jdbc.Driver
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 1000
+      test-on-borrow: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+  redis:
+    password: 123
+      #Redis数据库索引（默认为0）
+    spring-redis-database: 0
+      #Redis服务器地址（默认为localhost）
+    spring-redis-host: 10.1.12.77
+      #Redis服务器连接端口（默认为6379）
+    spring-redis-port: 6379
+
+#  security:
+#    user:
+#      name: admin
+#      password: admin
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:10081/eureka
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    instance-id: ${eureka.instance.ip-address}.${server.port}
+    lease-renewal-interval-in-seconds: 3
+    lease-expiration-duration-in-seconds: 10
+
+mybatis:
+  type-aliases-package: com.zl.dc.pojo
+mapper:
+  not-empty: false
+  identity: mysql
+preread:
+  uploadPath: D:/image/ #设置图片访问路径映射
