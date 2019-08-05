@@ -144,16 +144,19 @@
         </dependency>
 
         <!--短信-->
+
+        <!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-core -->
         <dependency>
-            <groupId>com.aliyuncs</groupId>
+            <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-core</artifactId>
-            <version>${core.version}</version>
+            <version>3.3.1</version>
         </dependency>
         <!--阿里云-->
+        <!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-dysmsapi -->
         <dependency>
-            <groupId>com.aliyuncs.dysmsapi</groupId>
+            <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
-            <version>${dysmsapi.version}</version>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

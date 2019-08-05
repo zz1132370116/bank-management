@@ -30,6 +30,7 @@ public class BankUser {
         super();
     }
 
+
     public Integer getUserId() {
         return userId;
     }

@@ -41,4 +41,9 @@ sc:
     pubKeyPath: D:/rsa/rsa.pub # 公钥地址
   filter:
     allowPaths:
-      - /regist
+      - /addRegist
+      - /sendSms
+      - /getLogin
+      - /GetUserList
+      - /GetRecords
+      - /GetAbnormals

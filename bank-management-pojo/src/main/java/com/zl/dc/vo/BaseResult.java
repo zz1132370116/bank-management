@@ -25,12 +25,7 @@ public class BaseResult {
         data.put("errmsg" , errmsg);
     }
 
-    /**
-     * 追加其他参数，支持链式
-     * @param key
-     * @param msg
-     * @return
-     */
+
     public BaseResult append(String key , Object msg){
         data.put(key , msg);
         return this;
