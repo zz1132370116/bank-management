@@ -42,8 +42,9 @@ sc:
   filter:
     allowPaths:
       - /addRegist
-      - /sendSms
+      - /loginBySendSms
       - /getLogin
       - /GetUserList
       - /GetRecords
       - /GetAbnormals
+      - /sendSms
