@@ -22,6 +22,7 @@ zuul:
   routes:
     web-service: /web/**
     auth-service: /auth/**
+    admin-service: /admin/**
   sensitive-headers: Cookie,Set-Cookie
 ribbon:
   ConnectTimeout: 100
