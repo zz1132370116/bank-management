@@ -13,6 +13,7 @@ public class PreReadUploadConfig {
     //上传路径
     private String uploadPath;
 
+
     public String getUploadPath() {
         return uploadPath;
     }
