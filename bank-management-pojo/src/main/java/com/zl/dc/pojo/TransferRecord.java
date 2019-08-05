@@ -1,5 +1,6 @@
 package com.zl.dc.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.ToString;
 
@@ -34,6 +35,7 @@ public class TransferRecord {
      * 转账时间
      */
     @Column(name = "transfer_record_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",  timezone="GMT+8")
     private Timestamp transferRecordTime;
     /**
      * 订单状态
@@ -66,15 +68,15 @@ public class TransferRecord {
      * 转出卡
      * @return
      */
-    @Transient
-    private BankCard outBankCard;
+//    @Transient
+//    private BankCard outBankCard;
 
     /**
      * 转入卡
      * @return
      */
-    @Transient
-    private BankCard inBankCard;
+//    @Transient
+//    private BankCard inBankCard;
 
 
 }

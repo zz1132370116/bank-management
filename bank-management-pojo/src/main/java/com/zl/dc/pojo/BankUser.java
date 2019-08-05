@@ -1,8 +1,12 @@
 package com.zl.dc.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.sql.Timestamp;
 
 @Table(name = "bank_user")
 public class BankUser {
@@ -12,11 +16,22 @@ public class BankUser {
     @Column(name = "user_name")
     private String userName;
     @Column(name = "user_phone")
-    private String userPhone;
+        private String userPhone;
     @Column(name = "user_password")
     private String userPassword;
     @Column(name = "id_card")
     private String idCard;
+    @Transient
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",  timezone="GMT+8")
+    private Timestamp loginDate;
+
+    public Timestamp getLoginDate() {
+        return loginDate;
+    }
+
+    public void setLoginDate(Timestamp loginDate) {
+        this.loginDate = loginDate;
+    }
 
     public BankUser(Integer userId, String userName, String userPhone, String userPassword, String idCard) {
         this.userId = userId;

@@ -25,7 +25,7 @@ import java.util.Random;
  * 备注:Demo工程编码采用UTF-8
  * 国际短信发送请勿参照此DEMO
  */
-public class SmsUtil {
+public class SmsRegist {
 
     //产品名称:云通信短信API产品,开发者无需替换
     static final String product = "Dysmsapi";
@@ -35,8 +35,8 @@ public class SmsUtil {
     // TODO 此处需要替换成开发者自己的AK(在阿里云访问控制台寻找)
 //    static final String accessKeyId = "LTAIjJJe67SlCCLL";//
 //    static final String accessKeySecret = "B3BZSQDnuUnfZXf22bbovyPaJmCNDt";
-    static final String accessKeyId = "LTAIHU3MeedhXhG7";//
-    static final String accessKeySecret = "LIlvC12xo5iAzLaeBR2Wp4HxrE4po6";
+    static final String accessKeyId = "LTAIQVpJ2CR7bzE3";//
+    static final String accessKeySecret = "DPWaMwr2LTc33XSdeBX3bpkOsLqVBz";
 
     public static SendSmsResponse sendSms(String telephone, String code ) throws ClientException {
 
@@ -54,9 +54,9 @@ public class SmsUtil {
         //必填:待发送手机号
         request.setPhoneNumbers(telephone); 		//15000000000
         //必填:短信签名-可在短信控制台中找到
-        request.setSignName("百鲜网");			//老袁a洗脚6
+        request.setSignName("五仁");			//老袁a洗脚6
         //必填:短信模板-可在短信控制台中找到
-        request.setTemplateCode("SMS_169902396"); 	//SMS_85550034
+        request.setTemplateCode("SMS_171859776"); 	//SMS_85550034
         //可选:模板中的变量替换JSON串,如模板内容为"亲爱的${name},您的验证码为${code}"时,此处的值为
         //${name}您好，请凭取件码：${code}，至${address}取件，若有问题请咨询${phone}。
         request.setTemplateParam("{\"code\":\""+code+"\"}");
