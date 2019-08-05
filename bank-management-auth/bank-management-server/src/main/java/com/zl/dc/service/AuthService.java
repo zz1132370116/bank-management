@@ -46,5 +46,27 @@ public class AuthService {
         //没有登录成功
         return null;
     }
-
+    /**
+     * @author: zhanglei
+     * @param: [userPhone, userPassword]
+     * @return:java.lang.String
+     * @description: 功能描述
+     * @data: 2019/8/5 19:15
+     */
+    public String loginBySendSms(String userPhone, String userPassword) {
+        try {
+            //1 登录--查询
+            BankUser user = userClient.loginBySendSms( userPhone ,userPassword ).getBody();
+            //2 如果不为空，生产token
+            if(user != null){
+                return JwtUtils.generateToken(new UserInfo( user.getUserId() ,user.getUserName() ) , jwtProperties.getPrivateKey() ,  jwtProperties.getExpire() );
+            }
+            //3 如果为空
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //没有登录成功
+        return null;
+    }
 }
