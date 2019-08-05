@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 /**
- *
  * @author 舍頭襘游泳
  * @date 2018/12/13
  */
@@ -26,7 +25,8 @@ public interface UserClient {
      */
     @PostMapping("query")
     ResponseEntity<BankUser> queryUser(@RequestParam("userPhone") String mobile,
-                                       @RequestParam("userPassword") String password,@RequestParam("idCard") String idCard);
+                                       @RequestParam("userPassword") String password, @RequestParam("idCard") String idCard);
+
     /**
      * @author: zhanglei
      * @param: [userPhone, userPassword]
@@ -35,5 +35,5 @@ public interface UserClient {
      * @data: 2019/8/5 19:16
      */
     @PostMapping("loginBySendSms")
-    ResponseEntity<BankUser> loginBySendSms(@RequestParam("userPhone")String userPhone,@RequestParam("userPassword") String userPassword);
+    ResponseEntity<BankUser> loginBySendSms(@RequestParam("userPhone") String userPhone, @RequestParam("userPassword") String userPassword);
 }

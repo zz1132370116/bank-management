@@ -34,7 +34,7 @@ public class UserController {
      * @author: zhanglei
      * @param: [bankUser]
      * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
-     * @description: 功能描述
+     * @description: 通过手机号或身份证号登录
      * @data: 2019/8/5 17:05
      */
     @PostMapping("/query")
@@ -72,7 +72,7 @@ public class UserController {
     public ResponseEntity<BaseResult> loginBySendSms(@RequestBody BankUser bankUser) {
         //通过手机号获取验证码
         String s = redisTemplate.opsForValue().get(bankUser.getUserPhone());
-        if (!s.equals("")){
+        if (!s.equals("")) {
             //通过手机号查询用户信息
             BankUser bankUserByUserPhone = userService.getBankUserByUserPhone(bankUser.getUserPhone());
             //将用户信息存到redis

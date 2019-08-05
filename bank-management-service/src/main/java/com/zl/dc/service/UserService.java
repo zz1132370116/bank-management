@@ -31,7 +31,9 @@ public class UserService {
       //创建条件
         Example example = new Example(BankUser.class);
         Example.Criteria criteria = example.createCriteria();
+        //拼接条件
         criteria.andEqualTo("idCard",idCard);
+        //根据条件查询一个
         return userMapper.selectOneByExample(example);
     }
     /**
@@ -45,7 +47,9 @@ public class UserService {
         //创建条件
         Example example = new Example(BankUser.class);
         Example.Criteria criteria = example.createCriteria();
+        //拼接条件
         criteria.andEqualTo("userPhone",userPhone);
+        //通过条件查询一个
         return userMapper.selectOneByExample(example);
     }
 }

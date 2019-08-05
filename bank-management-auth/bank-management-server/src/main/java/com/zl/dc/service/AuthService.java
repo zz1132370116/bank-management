@@ -26,17 +26,18 @@ public class AuthService {
 
     /**
      * 登录操作
-     * @param phone  手机号
+     *
+     * @param phone    手机号
      * @param password 密码
-     * @return  token值
+     * @return token值
      */
-    public String login(String phone , String password,String idCard ){
+    public String login(String phone, String password, String idCard) {
         try {
             //1 登录--查询
-            BankUser user = userClient.queryUser( phone ,password ,idCard).getBody();
+            BankUser user = userClient.queryUser(phone, password, idCard).getBody();
             //2 如果不为空，生产token
-            if(user != null){
-                return JwtUtils.generateToken(new UserInfo( user.getUserId() ,user.getUserName() ) , jwtProperties.getPrivateKey() ,  jwtProperties.getExpire() );
+            if (user != null) {
+                return JwtUtils.generateToken(new UserInfo(user.getUserId(), user.getUserName()), jwtProperties.getPrivateKey(), jwtProperties.getExpire());
             }
             //3 如果为空
             return null;
@@ -46,20 +47,21 @@ public class AuthService {
         //没有登录成功
         return null;
     }
+
     /**
      * @author: zhanglei
      * @param: [userPhone, userPassword]
      * @return:java.lang.String
-     * @description: 功能描述
+     * @description: 通过验证码登录
      * @data: 2019/8/5 19:15
      */
     public String loginBySendSms(String userPhone, String userPassword) {
         try {
             //1 登录--查询
-            BankUser user = userClient.loginBySendSms( userPhone ,userPassword ).getBody();
+            BankUser user = userClient.loginBySendSms(userPhone, userPassword).getBody();
             //2 如果不为空，生产token
-            if(user != null){
-                return JwtUtils.generateToken(new UserInfo( user.getUserId() ,user.getUserName() ) , jwtProperties.getPrivateKey() ,  jwtProperties.getExpire() );
+            if (user != null) {
+                return JwtUtils.generateToken(new UserInfo(user.getUserId(), user.getUserName()), jwtProperties.getPrivateKey(), jwtProperties.getExpire());
             }
             //3 如果为空
             return null;
