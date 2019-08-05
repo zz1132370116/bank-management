@@ -6,10 +6,11 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Table(name = "bank_user")
-public class BankUser {
+public class BankUser implements Serializable {
     @Id
     @Column(name = "user_id")
     private Integer userId;
