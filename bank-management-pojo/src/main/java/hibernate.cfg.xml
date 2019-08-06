@@ -10,6 +10,13 @@
       <mapping class="com.zl.dc.pojo.OtherBankCard"/>
       <mapping class="com.zl.dc.pojo.SubordinateBanks"/>
       <mapping class="com.zl.dc.pojo.TransferRecord"/>
+      <mapping class="com.zl.dc.pojo.BankManager"/>
+      <mapping class="com.zl.dc.pojo.BankUser"/>
+      <mapping class="com.zl.dc.pojo.FundCollectionPlan"/>
+      <mapping class="com.zl.dc.pojo.ManagerTranscation"/>
+      <mapping class="com.zl.dc.pojo.SubordinateBank"/>
+      <mapping class="com.zl.dc.pojo.UserPayee"/>
+      <mapping class="com.zl.dc.pojo.UserPayeeGroup"/>
       <!-- <property name="connection.username"/> -->
     <!-- <property name="connection.password"/> -->
 

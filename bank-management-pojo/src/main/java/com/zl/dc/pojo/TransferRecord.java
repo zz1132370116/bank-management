@@ -1,0 +1,55 @@
+package com.zl.dc.pojo;
+
+import lombok.Data;
+import lombok.ToString;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.Objects;
+/**
+* @version: V1.0
+* @author: lu
+* @className: 转账记录
+* @description:
+* @data: 2019/8/6 10:02
+*/
+@Data
+@ToString
+@Table(name = "transfer_record")
+public class TransferRecord {
+    //    主键
+    @Id
+    @Column(name = "transfer_record_id")
+    private int transferRecordId;
+    //    转账记录编号
+    @Column(name = "transfer_record_uuid")
+    private String transferRecordUuid;
+    //    交易额
+    @Column(name = "transfer_record_amount")
+    private BigDecimal transferRecordAmount;
+    //    订单时间
+    @Column(name = "transfer_record_time")
+    private Date transferRecordTime;
+    //    交易状态
+    @Column(name = "transaction_status")
+    private byte transactionStatus;
+    //    用户id
+    @Column(name = "user_id")
+    private int userId;
+    //    转出卡
+    @Column(name = "bank_out_card")
+    private String bankOutCard;
+    //    转入卡
+    @Column(name = "bank_in_card")
+    private String bankInCard;
+    //    创建时间
+    @Column(name = "gmt_create")
+    private Date gmtCreate;
+    //    修改时间
+    @Column(name = "gmt_modified")
+    private Date gmtModified;
+
+
+}
