@@ -49,3 +49,4 @@ sc:
       - /GetAbnormals #查询异常数
       - /sendSms  #发送短信(用户登录)
       - /login #用户登录(手机号/身份证号)
+      - /getTransferRecords #查询所有订单(管理员)

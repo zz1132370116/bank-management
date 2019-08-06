@@ -45,19 +45,64 @@ public class TransferRecord {
     //    转出卡
     @Column(name = "bank_out_card")
     private String bankOutCard;
-    //    转入卡
+ /**
+  * @author: zhanglei
+  * @param:
+  * @return:
+  * @description: 转入卡
+  * @data: 2019/8/6 19:05
+  */
     @Column(name = "bank_in_card")
     private String bankInCard;
-    //    创建时间
+ /**
+  * @author: zhanglei
+  * @param:
+  * @return:
+  * @description: 创建时间
+  * @data: 2019/8/6 19:05
+  */
     @Column(name = "gmt_create")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date gmtCreate;
-    //    修改时间
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 修改时间
+      * @data: 2019/8/6 19:05
+      */
     @Column(name = "gmt_modified")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date gmtModified;
+
+    @Transient
+    private BankUser bankUser;
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 开始时间(用于条件查询)
+      * @data: 2019/8/6 19:04
+      */
+    @Transient
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startDate;
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 结束时间(用于条件查询)
+      * @data: 2019/8/6 19:04
+      */
+    @Transient
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endDate;
+    @Transient
+    private String idCard;
 
 
 }

@@ -7,6 +7,7 @@ import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.TransferRecord;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -78,5 +79,16 @@ public class AdminService {
     public BankManager GetUserByRedis() {
         BankManager bankManagers = adminClient.GetUserByRedis().getBody();
         return bankManagers;
+    }
+    /**
+     * @author: zhanglei
+     * @param: [idCard, startDate, endDate]
+     * @return:java.util.List<com.zl.dc.pojo.TransferRecord>
+     * @description: 条件查询记录
+     * @data: 2019/8/6 19:11
+     */
+    public List<TransferRecord> getRecordsByParams(String idCard, Date startDate, Date endDate) {
+        List<TransferRecord> transferRecords =adminClient.getRecordsByParams(idCard,startDate,endDate);
+        return transferRecords;
     }
 }

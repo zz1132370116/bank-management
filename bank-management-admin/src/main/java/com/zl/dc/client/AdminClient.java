@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -70,4 +71,14 @@ public interface AdminClient {
      */
     @GetMapping("/GetUserByRedis")
     ResponseEntity<BankManager> GetUserByRedis();
+
+    /**
+     * @author: zhanglei
+     * @param: [idCard, startDate, endDate]
+     * @return:java.util.List<com.zl.dc.pojo.TransferRecord>
+     * @description: 条件查询记录
+     * @data: 2019/8/6 19:11
+     */
+    @PostMapping("/getRecordsByParams")
+    List<TransferRecord> getRecordsByParams(@RequestParam("idCard") String idCard,@RequestParam("startDate") Date startDate, @RequestParam("endDate")Date endDate);
 }

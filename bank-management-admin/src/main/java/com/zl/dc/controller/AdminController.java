@@ -95,4 +95,25 @@ public class AdminController {
         List<ManagerTranscation> managerTranscations = adminService.GetAbnormals();
         return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",managerTranscations.size()));
     }
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description: 查询所有订单
+     * @data: 2019/8/6 18:57
+     */
+    @PostMapping("/getTransferRecords")
+    public ResponseEntity<BaseResult> getTransferRecords(@RequestBody TransferRecord transferRecord){
+        //校验是否有条件
+        if (transferRecord.getBankUser().getIdCard().equals("") || transferRecord.getStartDate().equals("")||transferRecord.getEndDate().equals("")){
+            //查询所有记录
+            List<TransferRecord> transferRecords = adminService.GetRecords();
+            return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",transferRecords));
+        }else{
+            //进行条件查询
+            List<TransferRecord> transferRecords =adminService.getRecordsByParams(transferRecord.getBankUser().getIdCard(),transferRecord.getStartDate(),transferRecord.getEndDate());
+            return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",transferRecords));
+        }
+
+    }
 }
