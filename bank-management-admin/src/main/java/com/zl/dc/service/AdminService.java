@@ -15,4 +15,5 @@ import javax.annotation.Resource;
 public class AdminService {
      @Resource
     private AdminClient adminClient;
+
 }

@@ -22,6 +22,7 @@ public class AdminController {
      @Resource
     private AdminService adminService;
 
+
     /**
      * @author: zhanglei
      * @param: []

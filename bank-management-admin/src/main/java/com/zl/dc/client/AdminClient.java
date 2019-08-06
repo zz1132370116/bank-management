@@ -12,4 +12,5 @@ import org.springframework.cloud.openfeign.FeignClient;
  @FeignClient("web-service")
 public interface AdminClient {
 
+
 }
