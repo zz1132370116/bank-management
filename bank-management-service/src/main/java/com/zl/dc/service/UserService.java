@@ -1,6 +1,7 @@
 package com.zl.dc.service;
 
 import com.zl.dc.mapper.UserMapper;
+import com.zl.dc.pojo.BankUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;

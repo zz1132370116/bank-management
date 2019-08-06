@@ -28,8 +28,12 @@ public class AdminService {
      * @data: 2019/8/6 11:25
      */
     public BankManager getLogin(BankManager bankManager) {
-       BankManager bankManager1 = adminClient.getLogin(bankManager.getManagerName(),bankManager.getManagerPassword()).getBody();
-       return bankManager1;
+        if (!bankManager.getManagerPassword().equals("") && !bankManager.getManagerName().equals("")){
+            BankManager bankManager1 = adminClient.getLogin(bankManager.getManagerName(),bankManager.getManagerPassword()).getBody();
+            return bankManager1;
+        }
+
+       return null;
     }
     /**
      * @author: zhanglei

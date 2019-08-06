@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.zl.dc.config.SmsLogin;
+import com.zl.dc.pojo.BankUser;
 import com.zl.dc.service.UserService;
 import com.zl.dc.vo.BaseResult;
 import org.apache.commons.lang3.RandomStringUtils;

@@ -5,9 +5,9 @@ import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.service.BankManagerService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.zl.dc.vo.BaseResult;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -24,6 +24,15 @@ import java.util.List;
 public class BankManagerController {
      @Resource
     private BankManagerService bankManagerService;
+
+     @PostMapping("/getLogin")
+     public ResponseEntity<BankManager> getLogin(@RequestBody BankManager bankManager){
+         BankManager bankManager1 =bankManagerService.getLogin(bankManager);
+         return ResponseEntity.ok(bankManager1);
+     }
+
+
+
 
     /**
      * @author: zhanglei

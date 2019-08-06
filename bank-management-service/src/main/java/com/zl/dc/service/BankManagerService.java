@@ -10,6 +10,7 @@ import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.TransferRecord;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -30,6 +31,8 @@ public class BankManagerService {
      private TransferRecordMapper transferRecordMapper;
      @Resource
      private ManagerTranscationMapper managerTranscationMapper;
+     @Resource
+     private BankManagerMapper bankManagerMapper;
     /**
      * @author: zhanglei
      * @param: []
@@ -59,5 +62,19 @@ public class BankManagerService {
      */
     public List<ManagerTranscation> GetAbnormals() {
         return managerTranscationMapper.selectAll();
+    }
+    /**
+     * @author: zhanglei
+     * @param: [bankManager]
+     * @return:com.zl.dc.pojo.BankManager
+     * @description: 功能描述
+     * @data: 2019/8/6 14:43
+     */
+    public BankManager getLogin(BankManager bankManager) {
+        //创建条件
+        Example example = new Example(BankManager.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("managerName",bankManager.getManagerName());
+        return bankManagerMapper.selectOneByExample(example);
     }
 }
