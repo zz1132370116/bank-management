@@ -70,11 +70,14 @@ public class BankManagerService {
      * @description: 功能描述
      * @data: 2019/8/6 14:43
      */
-    public BankManager getLogin(BankManager bankManager) {
+    public BankManager getLogin(String managerName) {
         //创建条件
         Example example = new Example(BankManager.class);
         Example.Criteria criteria = example.createCriteria();
-        criteria.andEqualTo("managerName",bankManager.getManagerName());
+        criteria.andEqualTo("managerName",managerName);
         return bankManagerMapper.selectOneByExample(example);
     }
+
+
+
 }

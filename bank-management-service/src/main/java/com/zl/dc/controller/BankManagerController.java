@@ -26,9 +26,17 @@ public class BankManagerController {
     private BankManagerService bankManagerService;
 
      @PostMapping("/getLogin")
-     public ResponseEntity<BankManager> getLogin(@RequestBody BankManager bankManager){
-         BankManager bankManager1 =bankManagerService.getLogin(bankManager);
-         return ResponseEntity.ok(bankManager1);
+     public ResponseEntity<BankManager> getLogin(@RequestParam(value = "managerName", required = false) String managerName,
+                                                 @RequestParam(value = "managerPassword", required = false) String managerPassword){
+         BankManager bankManager1 =bankManagerService.getLogin(managerName);
+         if (bankManager1 !=null){
+             if (managerPassword.equals(bankManager1.getManagerPassword())){
+                 return ResponseEntity.ok(bankManager1);
+             }else{
+                 return ResponseEntity.ok(null);
+             }
+         }
+         return ResponseEntity.ok(null);
      }
 
 
