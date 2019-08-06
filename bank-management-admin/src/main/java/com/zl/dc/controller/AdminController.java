@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,6 +39,7 @@ public class AdminController {
         if (!bankManager.getManagerName().equals("") && !bankManager.getManagerPassword().equals("")) {
             //根据service进行操作
             BankManager login = adminService.getLogin(bankManager);
+            login.setLoginDate(new Date());
             if (login != null) {
                 return ResponseEntity.ok(new BaseResult(0, "成功").append("data", login));
             }
