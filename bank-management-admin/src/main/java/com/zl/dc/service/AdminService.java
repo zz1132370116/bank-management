@@ -1,10 +1,7 @@
 package com.zl.dc.service;
 
 import com.zl.dc.client.AdminClient;
-import com.zl.dc.config.JwtProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 
 /**

@@ -21,6 +21,14 @@ import javax.annotation.Resource;
 public class AdminController {
      @Resource
     private AdminService adminService;
+
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description: 管理员登录
+     * @data: 2019/8/6 9:15
+     */
      @PostMapping("/getLogin")
     public ResponseEntity<BaseResult> getLogin(){
          return ResponseEntity.ok(new BaseResult(0,"成功"));
