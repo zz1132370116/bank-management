@@ -1,5 +1,6 @@
 package com.zl.dc.mapper;
 
+import com.zl.dc.pojo.BankUser;
 import tk.mybatis.mapper.common.Mapper;
 /**
  * @version: V1.0

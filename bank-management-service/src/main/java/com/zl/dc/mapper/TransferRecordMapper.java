@@ -1,5 +1,6 @@
 package com.zl.dc.mapper;
 
+import com.zl.dc.pojo.TransferRecord;
 import tk.mybatis.mapper.common.Mapper;
 
 /**

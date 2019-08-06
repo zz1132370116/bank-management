@@ -42,10 +42,10 @@ sc:
     pubKeyPath: D:/rsa/rsa.pub # 公钥地址
   filter:
     allowPaths:
-      - /addRegist  #注册
-      - /loginBySendSms #根据验证码登录
-      - /getLogin #登录
+      - /loginBySendSms #根据验证码登录(用户)
+      - /getLogin #登录(管理员)
       - /GetUserList  #查询用户数量
       - /GetRecords #查询记录数
       - /GetAbnormals #查询异常数
-      - /sendSms  #发送短信(登录)
+      - /sendSms  #发送短信(用户登录)
+      - /login #用户登录(手机号/身份证号)
