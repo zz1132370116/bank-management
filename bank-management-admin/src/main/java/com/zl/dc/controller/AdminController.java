@@ -26,7 +26,6 @@ public class AdminController {
     @Resource
     private AdminService adminService;
 
-
     /**
      * @author: zhanglei
      * @param: []
@@ -39,14 +38,27 @@ public class AdminController {
         if (!bankManager.getManagerName().equals("") && !bankManager.getManagerPassword().equals("")) {
             //根据service进行操作
             BankManager login = adminService.getLogin(bankManager);
-            login.setLoginDate(new Date());
+
             if (login != null) {
+                login.setLoginDate(new Date());
                 return ResponseEntity.ok(new BaseResult(0, "成功").append("data", login));
             }
         }
         return ResponseEntity.ok(new BaseResult(1, "失败"));
     }
 
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description: 管理员登录
+     * @data: 2019/8/6 9:15
+     */
+    @GetMapping("/GetUserByRedis")
+    public ResponseEntity<BaseResult> GetUserByRedis() {
+        BankManager bankManagers =adminService.GetUserByRedis();
+        return ResponseEntity.ok(new BaseResult(0, "成功").append("data",bankManagers));
+    }
     /**
      * @author: zhanglei
      * @param: []

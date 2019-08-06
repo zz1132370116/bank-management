@@ -61,4 +61,13 @@ public interface AdminClient {
      */
     @GetMapping("/GetAbnormals")
     List<ManagerTranscation> GetAbnormals();
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.BankManager>
+     * @description: 通过redis获取用户登录信息
+     * @data: 2019/8/6 15:21
+     */
+    @GetMapping("/GetUserByRedis")
+    ResponseEntity<BankManager> GetUserByRedis();
 }

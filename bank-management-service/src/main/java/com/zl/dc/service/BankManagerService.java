@@ -16,23 +16,24 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
-  * @version: V1.0
-  * @author: zhanglei
-  * @className: BankManagerService
-  * @description: 管理员操作层
-  * @data: 2019/8/6 13:48
-  */
- @Service
- @Transactional
+ * @version: V1.0
+ * @author: zhanglei
+ * @className: BankManagerService
+ * @description: 管理员操作层
+ * @data: 2019/8/6 13:48
+ */
+@Service
+@Transactional
 public class BankManagerService {
-     @Resource
+    @Resource
     private UserMapper userMapper;
-     @Resource
-     private TransferRecordMapper transferRecordMapper;
-     @Resource
-     private ManagerTranscationMapper managerTranscationMapper;
-     @Resource
-     private BankManagerMapper bankManagerMapper;
+    @Resource
+    private TransferRecordMapper transferRecordMapper;
+    @Resource
+    private ManagerTranscationMapper managerTranscationMapper;
+    @Resource
+    private BankManagerMapper bankManagerMapper;
+
     /**
      * @author: zhanglei
      * @param: []
@@ -43,6 +44,7 @@ public class BankManagerService {
     public List<BankUser> GetUserList() {
         return userMapper.selectAll();
     }
+
     /**
      * @author: zhanglei
      * @param: []
@@ -53,6 +55,7 @@ public class BankManagerService {
     public List<TransferRecord> GetRecords() {
         return transferRecordMapper.selectAll();
     }
+
     /**
      * @author: zhanglei
      * @param: []
@@ -63,6 +66,7 @@ public class BankManagerService {
     public List<ManagerTranscation> GetAbnormals() {
         return managerTranscationMapper.selectAll();
     }
+
     /**
      * @author: zhanglei
      * @param: [bankManager]
@@ -74,10 +78,18 @@ public class BankManagerService {
         //创建条件
         Example example = new Example(BankManager.class);
         Example.Criteria criteria = example.createCriteria();
-        criteria.andEqualTo("managerName",managerName);
+        criteria.andEqualTo("managerName", managerName);
         return bankManagerMapper.selectOneByExample(example);
     }
 
-
-
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.BankManager>
+     * @description: 通过redis查询管理员信息
+     * @data: 2019/8/6 15:27
+     */
+    public List<BankManager> GetUserByRedis() {
+        return bankManagerMapper.selectAll();
+    }
 }
