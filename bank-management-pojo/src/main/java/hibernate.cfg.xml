@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD//EN"
+    "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <property name="connection.url">jdbc:mysql://10.1.12.77:3306/bank_management</property>
+    <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+      <mapping class="com.zl.dc.pojo.BankCard"/>
+      <mapping class="com.zl.dc.pojo.OtherBankCard"/>
+      <mapping class="com.zl.dc.pojo.SubordinateBanks"/>
+      <mapping class="com.zl.dc.pojo.TransferRecord"/>
+      <mapping class="com.zl.dc.pojo.BankManager"/>
+      <mapping class="com.zl.dc.pojo.BankUser"/>
+      <mapping class="com.zl.dc.pojo.FundCollectionPlan"/>
+      <mapping class="com.zl.dc.pojo.ManagerTranscation"/>
+      <mapping class="com.zl.dc.pojo.SubordinateBank"/>
+      <mapping class="com.zl.dc.pojo.UserPayee"/>
+      <mapping class="com.zl.dc.pojo.UserPayeeGroup"/>
+      <!-- <property name="connection.username"/> -->
+    <!-- <property name="connection.password"/> -->
+
+    <!-- DB schema will be updated if needed -->
+    <!-- <property name="hibernate.hbm2ddl.auto">update</property> -->
+  </session-factory>
+</hibernate-configuration>

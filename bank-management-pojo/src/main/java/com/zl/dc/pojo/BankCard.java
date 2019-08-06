@@ -1,97 +1,54 @@
 package com.zl.dc.pojo;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import lombok.Data;
+import lombok.ToString;
 
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.util.Date;
+
+/**
+ * @version: V1.0
+ * @author: lu
+ * @className: 银行卡
+ * @description:
+ * @data: 2019/8/6 9:32
+ */
+@Data
+@ToString
 @Table(name = "bank_card")
 public class BankCard {
+    //银行卡id
     @Id
     @Column(name = "bank_card_id")
-    private Integer bankCardId;
-@Column(name = "bank_card_number")
+    private int bankCardId;
+    //银行卡卡号
+    @Column(name = "bank_card_number")
     private String bankCardNumber;
-@Column(name = "bank_card_password")
+    //    银行卡密码加密
+    @Column(name = "bank_card_password")
     private String bankCardPassword;
-@Column(name = "user_id")
-    private Integer userId;
-@Transient
-    private BankUser bankUser;
-@Column(name = "bank_card_balance")
-    private Double bankCardBalance;
-@Column(name = "subordinate_banks_id")
-    private Integer subordinateBanksId;
-@Column(name = "bank_card_status")
-    private Integer bankCardStatus;
+    //    所属用户
+    @Column(name = "user_id")
+    private int userId;
+    //    银行卡余额
+    @Column(name = "bank_card_balance")
+    private BigDecimal bankCardBalance;
+    //    银行卡状态
+    @Column(name = "bank_card_status")
+    private byte bankCardStatus;
+    //    银行卡预留手机号码
+    @Column(name = "bank_card_phone")
+    private String bankCardPhone;
+    //    交易限额
+    @Column(name = "bank_card_transfer_limit")
+    private int bankCardTransferLimit;
+    //    创建时间
+    @Column(name = "gmt_create")
+    private Date gmtCreate;
+    //    修改时间
+    @Column(name = "gmt_modified")
+    private Date gmtModified;
 
-    public BankCard(Integer bankCardId, String bankCardNumber, String bankCardPassword, Integer userId, Double bankCardBalance, Integer subordinateBanksId, Integer bankCardStatus) {
-        this.bankCardId = bankCardId;
-        this.bankCardNumber = bankCardNumber;
-        this.bankCardPassword = bankCardPassword;
-        this.userId = userId;
-        this.bankCardBalance = bankCardBalance;
-        this.subordinateBanksId = subordinateBanksId;
-        this.bankCardStatus = bankCardStatus;
-    }
 
-    public BankCard() {
-        super();
-    }
-
-    public Integer getBankCardId() {
-        return bankCardId;
-    }
-
-    public void setBankCardId(Integer bankCardId) {
-        this.bankCardId = bankCardId;
-    }
-
-    public String getBankCardNumber() {
-        return bankCardNumber;
-    }
-
-    public void setBankCardNumber(String bankCardNumber) {
-        this.bankCardNumber = bankCardNumber == null ? null : bankCardNumber.trim();
-    }
-
-    public String getBankCardPassword() {
-        return bankCardPassword;
-    }
-
-    public void setBankCardPassword(String bankCardPassword) {
-        this.bankCardPassword = bankCardPassword == null ? null : bankCardPassword.trim();
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Double getBankCardBalance() {
-        return bankCardBalance;
-    }
-
-    public void setBankCardBalance(Double bankCardBalance) {
-        this.bankCardBalance = bankCardBalance;
-    }
-
-    public Integer getSubordinateBanksId() {
-        return subordinateBanksId;
-    }
-
-    public void setSubordinateBanksId(Integer subordinateBanksId) {
-        this.subordinateBanksId = subordinateBanksId;
-    }
-
-    public Integer getBankCardStatus() {
-        return bankCardStatus;
-    }
-
-    public void setBankCardStatus(Integer bankCardStatus) {
-        this.bankCardStatus = bankCardStatus;
-    }
 }

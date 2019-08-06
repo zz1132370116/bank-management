@@ -25,7 +25,7 @@ import java.util.Random;
  * 备注:Demo工程编码采用UTF-8
  * 国际短信发送请勿参照此DEMO
  */
-public class SmsLogin {
+public class SmsRegist {
 
     //产品名称:云通信短信API产品,开发者无需替换
     static final String product = "Dysmsapi";
@@ -56,7 +56,7 @@ public class SmsLogin {
         //必填:短信签名-可在短信控制台中找到
         request.setSignName("五仁");			//老袁a洗脚6
         //必填:短信模板-可在短信控制台中找到
-        request.setTemplateCode("SMS_171854862"); 	//SMS_85550034
+        request.setTemplateCode("SMS_171859776"); 	//SMS_85550034
         //可选:模板中的变量替换JSON串,如模板内容为"亲爱的${name},您的验证码为${code}"时,此处的值为
         //${name}您好，请凭取件码：${code}，至${address}取件，若有问题请咨询${phone}。
         request.setTemplateParam("{\"code\":\""+code+"\"}");

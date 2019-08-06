@@ -19,10 +19,13 @@ spring:
     multipart:
       max-file-size: 5MB
   redis:
-    host: 10.1.12.77
-    port: 6379
-    timeout: 20000
     password: 123
+      #Redis数据库索引（默认为0）
+    spring-redis-database: 0
+      #Redis服务器地址（默认为localhost）
+    spring-redis-host: 10.1.12.77
+      #Redis服务器连接端口（默认为6379）
+    spring-redis-port: 6379
 
 #  security:
 #    user:

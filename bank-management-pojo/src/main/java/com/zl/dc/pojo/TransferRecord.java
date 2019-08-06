@@ -1,82 +1,55 @@
 package com.zl.dc.pojo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
-
+import java.util.Date;
+import java.util.Objects;
 /**
- * @author 舌頭會游泳
- * @Auther: 舌頭會游泳
- * @Date: 2019/8/3 15:43
- * @Description:
- */
-@Table(name = "transfer_record")
+* @version: V1.0
+* @author: lu
+* @className: 转账记录
+* @description:
+* @data: 2019/8/6 10:02
+*/
 @Data
 @ToString
+@Table(name = "transfer_record")
 public class TransferRecord {
-    /**
-     * 转账单号UUID
-     */
+    //    主键
     @Id
+    @Column(name = "transfer_record_id")
+    private int transferRecordId;
+    //    转账记录编号
     @Column(name = "transfer_record_uuid")
     private String transferRecordUuid;
-    /**
-     * 转账金额
-     */
+    //    交易额
     @Column(name = "transfer_record_amount")
-    private Double transferRecordAmount;
-    /**
-     * 转账时间
-     */
+    private BigDecimal transferRecordAmount;
+    //    订单时间
     @Column(name = "transfer_record_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",  timezone="GMT+8")
-    private Timestamp transferRecordTime;
-    /**
-     * 订单状态
-     */
+    private Date transferRecordTime;
+    //    交易状态
     @Column(name = "transaction_status")
-    private Integer transactionStatus;
-    /**
-     * 转出银行卡id
-     */
-    @Column(name = "bank_out_card_id")
-    private Integer bankOutCardId;
-    /**
-     * 转入银行卡id
-     */
-    @Column(name = "bank_in_card_id")
-    private Integer bankInCardId;
-    /**
-     * 备注
-     */
-    @Column(name = "remarks")
-    private String remarks;
-    /**
-     * 到账时间
-     */
-    @Column(name = "payment_date")
-    private Timestamp paymentDate;
-
-
-    /**
-     * 转出卡
-     * @return
-     */
-//    @Transient
-//    private BankCard outBankCard;
-
-    /**
-     * 转入卡
-     * @return
-     */
-//    @Transient
-//    private BankCard inBankCard;
+    private byte transactionStatus;
+    //    用户id
+    @Column(name = "user_id")
+    private int userId;
+    //    转出卡
+    @Column(name = "bank_out_card")
+    private String bankOutCard;
+    //    转入卡
+    @Column(name = "bank_in_card")
+    private String bankInCard;
+    //    创建时间
+    @Column(name = "gmt_create")
+    private Date gmtCreate;
+    //    修改时间
+    @Column(name = "gmt_modified")
+    private Date gmtModified;
 
 
 }

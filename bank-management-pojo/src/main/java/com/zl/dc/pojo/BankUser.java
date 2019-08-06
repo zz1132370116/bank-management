@@ -1,89 +1,47 @@
 package com.zl.dc.pojo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import java.io.Serializable;
-import java.sql.Timestamp;
+import javax.persistence.*;
+import java.util.Date;
 
+/**
+ * @version: V1.0
+ * @author: lu
+ * @className: 用户
+ * @description:
+ * @data: 2019/8/6 9:38
+ */
+@Data
+@ToString
 @Table(name = "bank_user")
-public class BankUser implements Serializable {
+public class BankUser {
+    //    主键自增
     @Id
     @Column(name = "user_id")
-    private Integer userId;
+    private int userId;
+    //    用户姓名
     @Column(name = "user_name")
     private String userName;
+    //    用户电话
     @Column(name = "user_phone")
-        private String userPhone;
+    private String userPhone;
+    //    用户密码
     @Column(name = "user_password")
     private String userPassword;
+    //    用户状态
+    @Column(name = "user_status")
+    private byte userStatus;
+    //    用户身份证号
     @Column(name = "id_card")
     private String idCard;
-    @Transient
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",  timezone="GMT+8")
-    private Timestamp loginDate;
-
-    public Timestamp getLoginDate() {
-        return loginDate;
-    }
-
-    public void setLoginDate(Timestamp loginDate) {
-        this.loginDate = loginDate;
-    }
-
-    public BankUser(Integer userId, String userName, String userPhone, String userPassword, String idCard) {
-        this.userId = userId;
-        this.userName = userName;
-        this.userPhone = userPhone;
-        this.userPassword = userPassword;
-        this.idCard = idCard;
-    }
-
-    public BankUser() {
-        super();
-    }
+    //    创建时间
+    @Column(name = "gmt_create")
+    private Date gmtCreate;
+    //    修改时间
+    @Column(name = "gmt_modified")
+    private Date gmtModified;
 
 
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName == null ? null : userName.trim();
-    }
-
-    public String getUserPhone() {
-        return userPhone;
-    }
-
-    public void setUserPhone(String userPhone) {
-        this.userPhone = userPhone == null ? null : userPhone.trim();
-    }
-
-    public String getUserPassword() {
-        return userPassword;
-    }
-
-    public void setUserPassword(String userPassword) {
-        this.userPassword = userPassword == null ? null : userPassword.trim();
-    }
-
-    public String getIdCard() {
-        return idCard;
-    }
-
-    public void setIdCard(String idCard) {
-        this.idCard = idCard == null ? null : idCard.trim();
-    }
 }
