@@ -56,9 +56,10 @@ public class AdminController {
      */
     @GetMapping("/GetUserByRedis")
     public ResponseEntity<BaseResult> GetUserByRedis() {
-        BankManager bankManagers =adminService.GetUserByRedis();
-        return ResponseEntity.ok(new BaseResult(0, "成功").append("data",bankManagers));
+        BankManager bankManagers = adminService.GetUserByRedis();
+        return ResponseEntity.ok(new BaseResult(0, "成功").append("data", bankManagers));
     }
+
     /**
      * @author: zhanglei
      * @param: []
@@ -67,10 +68,11 @@ public class AdminController {
      * @data: 2019/8/6 13:34
      */
     @GetMapping("/GetUserList")
-    public ResponseEntity<BaseResult> GetUserList(){
+    public ResponseEntity<BaseResult> GetUserList() {
         List<BankUser> bankUsers = adminService.GetUserList();
-        return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",bankUsers.size()));
+        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", bankUsers.size()));
     }
+
     /**
      * @author: zhanglei
      * @param: []
@@ -79,10 +81,11 @@ public class AdminController {
      * @data: 2019/8/6 13:40
      */
     @GetMapping("/GetRecords")
-    public ResponseEntity<BaseResult>GetRecords(){
+    public ResponseEntity<BaseResult> GetRecords() {
         List<TransferRecord> transferRecords = adminService.GetRecords();
-        return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",transferRecords.size()));
+        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", transferRecords.size()));
     }
+
     /**
      * @author: zhanglei
      * @param: []
@@ -91,10 +94,11 @@ public class AdminController {
      * @data: 2019/8/6 13:40
      */
     @GetMapping("/GetAbnormals")
-    public ResponseEntity<BaseResult>GetAbnormals(){
+    public ResponseEntity<BaseResult> GetAbnormals() {
         List<ManagerTranscation> managerTranscations = adminService.GetAbnormals();
-        return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",managerTranscations.size()));
+        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", managerTranscations.size()));
     }
+
     /**
      * @author: zhanglei
      * @param: []
@@ -103,17 +107,19 @@ public class AdminController {
      * @data: 2019/8/6 18:57
      */
     @PostMapping("/getTransferRecords")
-    public ResponseEntity<BaseResult> getTransferRecords(@RequestBody TransferRecord transferRecord){
-        //校验是否有条件
-        if (transferRecord.getBankUser().getIdCard().equals("") || transferRecord.getStartDate().equals("")||transferRecord.getEndDate().equals("")){
-            //查询所有记录
-            List<TransferRecord> transferRecords = adminService.GetRecords();
-            return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",transferRecords));
-        }else{
-            //进行条件查询
-            List<TransferRecord> transferRecords =adminService.getRecordsByParams(transferRecord.getBankUser().getIdCard(),transferRecord.getStartDate(),transferRecord.getEndDate());
-            return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",transferRecords));
-        }
+    public ResponseEntity<BaseResult> getTransferRecords(@RequestBody TransferRecord transferRecord) {
+
+            //校验是否有条件
+            if ((transferRecord.getIdCard()!=null && !transferRecord.getIdCard().equals("")) || (transferRecord.getStartDate() !=null && !transferRecord.getStartDate().equals("")) || (transferRecord.getEndDate()!=null && !transferRecord.getEndDate().equals(""))) {
+                //进行条件查询
+                List<TransferRecord> transferRecords = adminService.getRecordsByParams(transferRecord.getBankUser().getIdCard(), transferRecord.getStartDate(), transferRecord.getEndDate());
+                return ResponseEntity.ok(new BaseResult(0, "条件查询成功").append("data", transferRecords));
+            }
+
+
+        //查询所有记录
+        List<TransferRecord> transferRecords = adminService.GetRecords();
+        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", transferRecords));
 
     }
 }
