@@ -68,7 +68,8 @@ public class BankManagerController {
         List<BankManager> bankManagers = bankManagerService.GetUserByRedis();
         for (BankManager bankManager : bankManagers) {
             String s = redisTemplate.opsForValue().get(bankManager.getManagerName());
-            if (!s.equals("")) {
+            if (s!=null) {
+                bankManager.setLoginDate(new Date());
                 return ResponseEntity.ok(bankManager);
             }
         }
