@@ -46,19 +46,22 @@ public class TransferRecordService {
         //创建银行卡条件
         Example example = new Example(SubordinateBank.class);
         Example.Criteria criteria = example.createCriteria();
+        //创建记录条件
+        Example example1 = new Example(TransferRecord.class);
+        Example.Criteria criteria1 = example1.createCriteria();
         //非空判断
         if (!idCard.equals("")) {
-            //赋值
-            transferRecord.setIdCard(idCard);
+            //拼接条件
+            criteria1.andEqualTo("idCard",idCard);
         } else if (startDate != null) {
-            //赋值
-            transferRecord.setStartDate(startDate);
+            //拼接条件
+            criteria1.andGreaterThan("gmt_create",startDate);
         } else if (endDate != null) {
-            //赋值
-            transferRecord.setEndDate(endDate);
+            //拼接条件
+            criteria1.andLessThan("gmt_create",endDate);
         }
         //条件查询
-        List<TransferRecord> transferRecords = transferRecordMapper.getRecordsByParams(transferRecord);
+        List<TransferRecord> transferRecords = transferRecordMapper.selectByExample(example1);
         //遍历
         for (TransferRecord record : transferRecords) {
             //通过用户id查询当前用户信息
