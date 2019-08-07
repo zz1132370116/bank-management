@@ -81,4 +81,33 @@ public interface AdminClient {
      */
     @PostMapping("/getRecordsByParams")
     List<TransferRecord> getRecordsByParams(@RequestParam("idCard") String idCard,@RequestParam("startDate") Date startDate, @RequestParam("endDate")Date endDate);
+    /**
+     * @author: zhanglei
+     * @param: [userName, idCard]
+     * @return:java.util.List<com.zl.dc.pojo.BankUser>
+     * @description: 通过条件查询用户
+     * @data: 2019/8/7 14:32
+     */
+    @PostMapping("/getUserListByParams")
+    List<BankUser> getUserListByParams(@RequestParam("userName") String userName, @RequestParam("idCard") String idCard);
+
+    /**
+     * @author: zhanglei
+     * @param: [userId]
+     * @return:void
+     * @description: 修改用户状态(启用)
+     * @data: 2019/8/7 14:46
+     */
+    @GetMapping("/memberStart")
+    void memberStart(@RequestParam("userId") Integer userId);
+
+    /**
+     * @author: zhanglei
+     * @param: [userId]
+     * @return:void
+     * @description: 修改用户状态(停用)
+     * @data: 2019/8/7 14:46
+     */
+    @GetMapping("/memberStop")
+    void memberStop(@RequestParam("userId") Integer userId);
 }

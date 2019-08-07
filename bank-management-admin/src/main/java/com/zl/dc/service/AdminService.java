@@ -6,6 +6,8 @@ import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.TransferRecord;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
@@ -90,5 +92,36 @@ public class AdminService {
     public List<TransferRecord> getRecordsByParams(String idCard, Date startDate, Date endDate) {
         List<TransferRecord> transferRecords =adminClient.getRecordsByParams(idCard,startDate,endDate);
         return transferRecords;
+    }
+    /**
+     * @author: zhanglei
+     * @param: [userName, idCard]
+     * @return:java.util.List<com.zl.dc.pojo.BankUser>
+     * @description: 通过条件查询用户
+     * @data: 2019/8/7 14:32
+     */
+    public List<BankUser> getUserListByParams(String userName, String idCard) {
+        List<BankUser> users =adminClient.getUserListByParams(userName,idCard);
+        return users;
+    }
+    /**
+     * @author: zhanglei
+     * @param: [userId]
+     * @return:void
+     * @description: 修改用户状态(启用)
+     * @data: 2019/8/7 14:46
+     */
+    public void memberStart(Integer userId) {
+        adminClient.memberStart(userId);
+    }
+    /**
+     * @author: zhanglei
+     * @param: [userId]
+     * @return:void
+     * @description: 修改用户状态(停用)
+     * @data: 2019/8/7 14:46
+     */
+    public void memberStop(Integer userId) {
+        adminClient.memberStop(userId);
     }
 }

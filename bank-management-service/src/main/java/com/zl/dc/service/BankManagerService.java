@@ -120,13 +120,13 @@ public class BankManagerService {
         //非空判断
         if (!idCard.equals("")) {
             //拼接条件
-            criteria1.andEqualTo("idCard",idCard);
+            criteria1.andEqualTo("idCard", idCard);
         } else if (startDate != null) {
             //拼接条件
-            criteria1.andGreaterThan("gmt_create",startDate);
+            criteria1.andGreaterThan("gmt_create", startDate);
         } else if (endDate != null) {
             //拼接条件
-            criteria1.andLessThan("gmt_create",endDate);
+            criteria1.andLessThan("gmt_create", endDate);
         }
         //条件查询
         List<TransferRecord> transferRecords = transferRecordMapper.selectByExample(example1);
@@ -154,6 +154,7 @@ public class BankManagerService {
         }
         return transferRecords;
     }
+
     /**
      * @author: zhanglei
      * @param: [idcard]
@@ -161,10 +162,56 @@ public class BankManagerService {
      * @description: 处理身份证号码
      * @data: 2019/8/7 11:25
      */
-    public String handlingIdCards(String idcard){
+    public String handlingIdCards(String idcard) {
         //处理身份证号
         StringBuilder sb = new StringBuilder(idcard);
         sb.replace(6, 14, "****");
         return sb.toString();
+    }
+
+    /**
+     * @author: zhanglei
+     * @param: [userName, idCard]
+     * @return:java.util.List<com.zl.dc.pojo.BankUser>
+     * @description: 条件查询所有用户
+     * @data: 2019/8/7 14:39
+     */
+    public List<BankUser> getUserListByParams(String userName, String idCard) {
+        Example example = new Example(BankUser.class);
+        Example.Criteria criteria = example.createCriteria();
+        if (userName != null && !"".equals(userName)) {
+            criteria.andEqualTo("userName", userName);
+        } else if (idCard != null && !"".equals(idCard)) {
+            criteria.andEqualTo("idCard", idCard);
+        }
+        return bankUserMapper.selectByExample(example);
+    }
+    /**
+     * @author: zhanglei
+     * @param: [userId]
+     * @return:void
+     * @description: 修改用户状态(启用)
+     * @data: 2019/8/7 14:57
+     */
+    public void memberStart(Integer userId) {
+
+        BankUser bankUser = new BankUser();
+        bankUser.setUserId(userId);
+        bankUser.setUserStatus(Byte.parseByte("0"));
+        bankUserMapper.updateByPrimaryKeySelective(bankUser);
+    }
+    /**
+     * @author: zhanglei
+     * @param: [userId]
+     * @return:void
+     * @description: 修改用户状态(停用)
+     * @data: 2019/8/7 14:57
+     */
+    public void memberStop(Integer userId) {
+
+        BankUser bankUser = new BankUser();
+        bankUser.setUserId(userId);
+        bankUser.setUserStatus(Byte.parseByte("1"));
+        bankUserMapper.updateByPrimaryKeySelective(bankUser);
     }
 }

@@ -44,9 +44,12 @@ sc:
     allowPaths:
       - /loginBySendSms #根据验证码登录(用户)
       - /getLogin #登录(管理员)
-      - /GetUserList  #查询用户数量
-      - /GetRecords #查询记录数
-      - /GetAbnormals #查询异常数
+      - /GetUserList  #查询用户数量(管理员)
+      - /GetRecords #查询记录数(管理员)
+      - /GetAbnormals #查询异常数(管理员)
       - /sendSms  #发送短信(用户登录)
       - /login #用户登录(手机号/身份证号)
       - /getTransferRecords #查询所有订单(管理员)
+      - /getBankUserList #管理员查询所有用户(带条件)
+      - /memberStart #启用用户状态(管理员)
+      - /memberStop #停用用户状态(管理员)
