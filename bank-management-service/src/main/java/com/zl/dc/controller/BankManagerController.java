@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,6 +29,7 @@ public class BankManagerController {
     private BankManagerService bankManagerService;
     @Resource
     private StringRedisTemplate redisTemplate;
+
 
     /**
      * @author: zhanglei
@@ -105,5 +107,10 @@ public ResponseEntity<BankManager> GetUserByRedis(){
     public List<ManagerTranscation> GetAbnormals(){
         List<ManagerTranscation> list= bankManagerService. GetAbnormals();
         return list;
+    }
+    @PostMapping("/getRecordsByParams")
+    public List<TransferRecord> getRecordsByParams(@RequestParam("idCard") String idCard, @RequestParam("startDate") Date startDate, @RequestParam("endDate")Date endDate){
+        return bankManagerService.getRecordsByParams(idCard,startDate,endDate);
+
     }
 }

@@ -87,7 +87,7 @@ public class UserController {
      * @author: zhanglei
      * @param: []
      * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
-     * @description: 功能描述
+     * @description: 发短信
      * @data: 2019/8/5 19:21
      */
     @PostMapping("/sendSms")
