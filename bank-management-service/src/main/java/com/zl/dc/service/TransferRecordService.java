@@ -66,6 +66,10 @@ public class TransferRecordService {
         for (TransferRecord record : transferRecords) {
             //通过用户id查询当前用户信息
             BankUser bankUser = bankUserMapper.selectByPrimaryKey(record.getUserId());
+            //处理身份证号
+            StringBuilder sb = new StringBuilder(bankUser.getIdCard());
+            sb.replace(6, 14, "****");
+            bankUser.setIdCard(sb.toString());
             //赋值
             record.setBankUser(bankUser);
             //获取转出卡所属银行
