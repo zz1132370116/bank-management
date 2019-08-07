@@ -6,6 +6,7 @@ import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.service.BankManagerService;
+import com.zl.dc.util.MD5;
 import com.zl.dc.vo.BaseResult;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +44,8 @@ public class BankManagerController {
                                                 @RequestParam(value = "managerPassword", required = false) String managerPassword) {
         BankManager bankManager1 = bankManagerService.getLogin(managerName);
         if (bankManager1 != null) {
+            //比较用户密码
+            managerPassword= MD5.GetMD5Code(managerPassword);
             if (managerPassword.equals(bankManager1.getManagerPassword())) {
                 redisTemplate.opsForValue().set(bankManager1.getManagerName(), bankManager1.getManagerPassword());
                 return ResponseEntity.ok(bankManager1);
