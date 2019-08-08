@@ -49,5 +49,9 @@ public class BankUser {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date gmtModified;
 
-
+    /**
+     * 接收验证码
+     */
+    @Transient
+    private String code;
 }
