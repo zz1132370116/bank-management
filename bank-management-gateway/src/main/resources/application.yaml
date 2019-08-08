@@ -25,8 +25,8 @@ zuul:
     admin-service: /admin/**
   sensitive-headers: Cookie,Set-Cookie
 ribbon:
-  ConnectTimeout: 100
-  ReadTimeout: 600
+  ConnectTimeout: 60000
+  ReadTimeout: 60000
   OkToRetryOnAllOperations: true
   MaxAutoRetriesNextServer: 2
   MaxAutoRetries: 1
@@ -36,7 +36,7 @@ hystrix:
       execution:
         isolation:
           thread:
-            timeoutInMilliseconds: 6000
+            timeoutInMilliseconds: 60000
 sc:
   jwt:
     pubKeyPath: D:/rsa/rsa.pub # 公钥地址

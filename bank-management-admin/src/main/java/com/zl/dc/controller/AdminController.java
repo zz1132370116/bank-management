@@ -112,10 +112,9 @@ public class AdminController {
             //校验是否有条件
             if ((transferRecord.getIdCard()!=null && !transferRecord.getIdCard().equals("")) || (transferRecord.getStartDate() !=null && !transferRecord.getStartDate().equals("")) || (transferRecord.getEndDate()!=null && !transferRecord.getEndDate().equals(""))) {
                 //进行条件查询
-                List<TransferRecord> transferRecords = adminService.getRecordsByParams(transferRecord.getBankUser().getIdCard(), transferRecord.getStartDate(), transferRecord.getEndDate());
+                List<TransferRecord> transferRecords = adminService.getRecordsByParams(transferRecord);
                 return ResponseEntity.ok(new BaseResult(0, "条件查询成功").append("data", transferRecords));
             }
-
 
         //查询所有记录
         List<TransferRecord> transferRecords = adminService.GetRecords();
@@ -133,7 +132,7 @@ public class AdminController {
     public ResponseEntity<BaseResult> getBankUserList(@RequestBody BankUser bankUser){
         //校验条件
         if ((bankUser.getUserName()!=null && !bankUser.getUserName().equals("")) ||(bankUser.getIdCard()!=null && !bankUser.getIdCard().equals(""))){
-           List<BankUser> users = adminService.getUserListByParams(bankUser.getUserName(),bankUser.getIdCard());
+           List<BankUser> users = adminService.getUserListByParams(bankUser);
             return ResponseEntity.ok(new BaseResult(0,"条件查询成功").append("data",users));
         }
         //查询所有
@@ -163,6 +162,18 @@ public class AdminController {
     public ResponseEntity<BaseResult> memberStop(@PathVariable("userId")Integer userId){
         adminService.memberStop(userId);
         return ResponseEntity.ok(new BaseResult(0,"停用成功"));
+    }
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description: 功能描述
+     * @data: 2019/8/8 11:22
+     */
+    @PostMapping("/loginOut/{userName}")
+    public ResponseEntity<BaseResult>loginOut(@PathVariable("userName")String userName){
+        adminService.loginOut(userName);
+        return ResponseEntity.ok(new BaseResult(0,"成功"));
     }
 
 

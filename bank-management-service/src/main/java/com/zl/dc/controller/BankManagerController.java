@@ -123,8 +123,8 @@ public class BankManagerController {
      * @data: 2019/8/7 14:42
      */
     @PostMapping("/getRecordsByParams")
-    public List<TransferRecord> getRecordsByParams(@RequestParam("idCard") String idCard, @RequestParam("startDate") Date startDate, @RequestParam("endDate") Date endDate) {
-        return bankManagerService.getRecordsByParams(idCard, startDate, endDate);
+    public List<TransferRecord> getRecordsByParams(@RequestBody TransferRecord transferRecord) {
+        return bankManagerService.getRecordsByParams(transferRecord);
 
     }
     /**
@@ -135,8 +135,8 @@ public class BankManagerController {
      * @data: 2019/8/7 14:42
      */
     @PostMapping("/getUserListByParams")
-    public List<BankUser> getUserListByParams(@RequestParam("userName") String userName, @RequestParam("idCard") String idCard) {
-        List<BankUser> users = bankManagerService.getUserListByParams(userName, idCard);
+    public List<BankUser> getUserListByParams(@RequestBody BankUser bankUser) {
+        List<BankUser> users = bankManagerService.getUserListByParams(bankUser.getUserName(), bankUser.getIdCard());
         return users;
     }
     /**
@@ -160,5 +160,9 @@ public class BankManagerController {
     @GetMapping("/memberStop")
     public void memberStop(@RequestParam("userId")Integer userId){
         bankManagerService.memberStop(userId);
+    }
+    @GetMapping("/loginOut")
+    public void loginOut(@RequestParam("userName")String userName){
+        redisTemplate.delete(userName);
     }
 }

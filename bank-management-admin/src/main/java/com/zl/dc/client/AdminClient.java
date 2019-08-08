@@ -80,7 +80,7 @@ public interface AdminClient {
      * @data: 2019/8/6 19:11
      */
     @PostMapping("/getRecordsByParams")
-    List<TransferRecord> getRecordsByParams(@RequestParam("idCard") String idCard,@RequestParam("startDate") Date startDate, @RequestParam("endDate")Date endDate);
+    List<TransferRecord> getRecordsByParams(@RequestBody TransferRecord transferRecord);
     /**
      * @author: zhanglei
      * @param: [userName, idCard]
@@ -89,7 +89,7 @@ public interface AdminClient {
      * @data: 2019/8/7 14:32
      */
     @PostMapping("/getUserListByParams")
-    List<BankUser> getUserListByParams(@RequestParam("userName") String userName, @RequestParam("idCard") String idCard);
+    List<BankUser> getUserListByParams(@RequestBody BankUser bankUser);
 
     /**
      * @author: zhanglei
@@ -110,4 +110,13 @@ public interface AdminClient {
      */
     @GetMapping("/memberStop")
     void memberStop(@RequestParam("userId") Integer userId);
+    /**
+     * @author: zhanglei
+     * @param: [userName]
+     * @return:void
+     * @description: 管理员退出
+     * @data: 2019/8/8 11:28
+     */
+    @GetMapping("/loginOut")
+    void loginOut(@RequestParam("userName") String userName);
 }

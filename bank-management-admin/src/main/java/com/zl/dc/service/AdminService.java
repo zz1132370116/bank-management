@@ -7,6 +7,7 @@ import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.TransferRecord;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -89,8 +90,8 @@ public class AdminService {
      * @description: 条件查询记录
      * @data: 2019/8/6 19:11
      */
-    public List<TransferRecord> getRecordsByParams(String idCard, Date startDate, Date endDate) {
-        List<TransferRecord> transferRecords =adminClient.getRecordsByParams(idCard,startDate,endDate);
+    public List<TransferRecord> getRecordsByParams(@RequestBody TransferRecord transferRecord) {
+        List<TransferRecord> transferRecords =adminClient.getRecordsByParams(transferRecord);
         return transferRecords;
     }
     /**
@@ -100,8 +101,8 @@ public class AdminService {
      * @description: 通过条件查询用户
      * @data: 2019/8/7 14:32
      */
-    public List<BankUser> getUserListByParams(String userName, String idCard) {
-        List<BankUser> users =adminClient.getUserListByParams(userName,idCard);
+    public List<BankUser> getUserListByParams(BankUser bankuser) {
+        List<BankUser> users =adminClient.getUserListByParams(bankuser);
         return users;
     }
     /**
@@ -123,5 +124,16 @@ public class AdminService {
      */
     public void memberStop(Integer userId) {
         adminClient.memberStop(userId);
+    }
+    /**
+     * @author: zhanglei
+     * @param: [userName]
+     * @return:void
+     * @description: 管理员退出
+     * @data: 2019/8/8 11:28
+     */
+    public void loginOut(String userName) {
+
+        adminClient.loginOut(userName);
     }
 }

@@ -108,6 +108,15 @@ public class TransferRecord {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endDate;
+    /**
+     * @author: zhanglei
+     * @param:
+     * @return:
+     * @description: 转入银行标识
+     * @data: 2019/8/7 9:29
+     */
+    @Column(name = "bank_in_identification")
+    private String bankInIdentification;
      /**
       * @author: zhanglei
       * @param:
@@ -135,5 +144,7 @@ public class TransferRecord {
       */
      @Transient
      private String bankInCardName;
+     @Transient
+    private String userName;
 
 }

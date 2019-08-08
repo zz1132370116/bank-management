@@ -57,5 +57,11 @@ public class AccessBank {
         }
         return sb.toString();
     }
+    public static String getSubordinateBank(String cardNo){
+        String cardDetail = getCardDetail(cardNo);
+        JSONObject json = JSONObject.parseObject(cardDetail);
+        System.out.println(json.toJSONString());
+       return json.get("bank").toString();
+    }
 
 }
