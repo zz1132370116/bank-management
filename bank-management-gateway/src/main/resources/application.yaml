@@ -54,4 +54,7 @@ sc:
       - /memberStart #启用用户状态(管理员)
       - /memberStop #停用用户状态(管理员)
       - /GetUserByRedis #从redis查询用户信息
+      - /updatePasswordSms  #修改密码----获取验证码
+      - /updatePasswordVerify  #修改密码----验证验证码是否正确
+      - /updateBankUserPassword    #修改密码----修改密码
       - /loginOut #退出(管理员)

@@ -52,4 +52,18 @@ public class UserService {
         //通过条件查询一个
         return userMapper.selectOneByExample(example);
     }
+
+    /**
+     * @author: pds
+     * @params:  [user]
+     * @return: com.zl.dc.pojo.BankUser
+     * @description: 功能描述
+     * @data: 2019/8/8 10:14
+     */
+    public BankUser updateBankUserPassword(BankUser user) {
+        BankUser bankUserByUserPhone = this.getBankUserByUserPhone(user.getUserPhone());
+        bankUserByUserPhone.setUserPassword(user.getUserPassword());
+        userMapper.updateByPrimaryKeySelective(bankUserByUserPhone);
+        return bankUserByUserPhone;
+    }
 }
