@@ -54,3 +54,4 @@ sc:
       - /memberStart #启用用户状态(管理员)
       - /memberStop #停用用户状态(管理员)
       - /GetUserByRedis #从redis查询用户信息
+      - /loginOut #退出(管理员)
