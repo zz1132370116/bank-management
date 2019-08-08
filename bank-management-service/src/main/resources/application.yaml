@@ -23,6 +23,19 @@ spring:
     port: 6379
     timeout: 20000
     password: 123
+ribbon:
+  ConnectTimeout: 60000
+  ReadTimeout: 60000
+  OkToRetryOnAllOperations: true
+  MaxAutoRetriesNextServer: 2
+  MaxAutoRetries: 1
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 60000
 
 #  security:
 #    user:

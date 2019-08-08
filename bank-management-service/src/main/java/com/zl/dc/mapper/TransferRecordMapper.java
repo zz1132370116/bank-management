@@ -14,18 +14,25 @@ import java.util.List;
  */
 @org.apache.ibatis.annotations.Mapper
 public interface TransferRecordMapper extends Mapper<TransferRecord> {
-    @Select("SELECT tr.* FROM transfer_record tr,bank_user us WHERE #{idCard}=us.id_card AND tr.gmt_create >= #{startDate} AND tr.gmt_create <= #{endDate}")
-    @Results({
-            @Result(column = "transfer_record_id",property = "transferRecordId"),
-            @Result(column = "transfer_record_uuid",property = "transferRecordUuid"),
-            @Result(column = "transfer_record_amount",property = "transferRecordAmount"),
-            @Result(column = "transfer_record_time",property = "transferRecordTime"),
-            @Result(column = "transaction_status",property = "transactionStatus"),
-            @Result(column = "user_id",property = "userId"),
-            @Result(column = "bank_out_card",property = "bankOutCard"),
-            @Result(column = "bank_in_card",property = "bankInCard"),
-            @Result(column = "gmt_create",property = "gmtCreate"),
-            @Result(column = "gmt_modified",property = "gmtModified")
-    })
-    List<TransferRecord> getRecordsByParams( TransferRecord transferRecord);
+/*    @Select("SELECT\n" +
+            "transfer_record_uuid,\n" +
+            "transfer_record_amount,\n" +
+            "transfer_status,\n" +
+            "bank_out_card,\n" +
+            "in_card_user_name,\n" +
+            "bank_name,\n" +
+            "bank_in_card\n" +
+            "FROM(\n" +
+            "SELECT \n" +
+            "transfer_record_uuid,\n" +
+            "transfer_record_amount,\n" +
+            "transfer_status,\n" +
+            "bank_out_card,\n" +
+            "in_card_user_name,\n" +
+            "bank_in_identification,\n" +
+            "bank_in_card\n" +
+            "FROM transfer_record WHERE user_id = 1 limit 10,20) t,\n" +
+            "subordinate_bank s\n" +
+            "WHERE s.bank_identification = t.bank_in_identification")
+    List<TransferRecord> getRecordsByParams(String idCard, Date startDate, Date endDate);*/
 }

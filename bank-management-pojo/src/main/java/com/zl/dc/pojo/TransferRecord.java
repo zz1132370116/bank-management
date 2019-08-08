@@ -37,8 +37,14 @@ public class TransferRecord {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date transferRecordTime;
     //    交易状态
-    @Column(name = "transaction_status")
-    private byte transactionStatus;
+    @Column(name = "transfer_status")
+    private byte transferStatus;
+    //备注
+    @Column(name = "transfer_note")
+    private String transferNote;
+    //收账人姓名
+    @Column(name = "in_card_user_name")
+    private String inCardUserName;
     //    用户id
     @Column(name = "user_id")
     private int userId;
@@ -90,6 +96,7 @@ public class TransferRecord {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date startDate;
+
      /**
       * @author: zhanglei
       * @param:
@@ -101,6 +108,15 @@ public class TransferRecord {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endDate;
+    /**
+     * @author: zhanglei
+     * @param:
+     * @return:
+     * @description: 转入银行标识
+     * @data: 2019/8/7 9:29
+     */
+    @Column(name = "bank_in_identification")
+    private String bankInIdentification;
      /**
       * @author: zhanglei
       * @param:
@@ -128,5 +144,7 @@ public class TransferRecord {
       */
      @Transient
      private String bankInCardName;
+     @Transient
+    private String userName;
 
 }

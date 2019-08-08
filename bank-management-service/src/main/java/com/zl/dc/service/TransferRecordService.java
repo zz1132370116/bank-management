@@ -33,53 +33,7 @@ public class TransferRecordService {
     @Resource
     private SubordinateBankMapper subordinateBankMapper;
 
-    /**
-     * @author: zhanglei
-     * @param: [idCard, startDate, endDate]
-     * @return:java.util.List<com.zl.dc.pojo.TransferRecord>
-     * @description: 条件查询记录
-     * @data: 2019/8/6 19:18
-     */
-    public List<TransferRecord> getRecordsByParams(String idCard, Date startDate, Date endDate) {
-        //创建空对象
-        TransferRecord transferRecord = new TransferRecord();
-        //创建银行卡条件
-        Example example = new Example(SubordinateBank.class);
-        Example.Criteria criteria = example.createCriteria();
-        //非空判断
-        if (!idCard.equals("")) {
-            //赋值
-            transferRecord.setIdCard(idCard);
-        } else if (startDate != null) {
-            //赋值
-            transferRecord.setStartDate(startDate);
-        } else if (endDate != null) {
-            //赋值
-            transferRecord.setEndDate(endDate);
-        }
-        //条件查询
-        List<TransferRecord> transferRecords = transferRecordMapper.getRecordsByParams(transferRecord);
-        //遍历
-        for (TransferRecord record : transferRecords) {
-            //通过用户id查询当前用户信息
-            BankUser bankUser = bankUserMapper.selectByPrimaryKey(record.getUserId());
-            //赋值
-            record.setBankUser(bankUser);
-            //获取转出卡所属银行
-            String bankOut = AccessBank.getCardDetail(record.getBankOutCard());
-            JSONObject jsonOut = JSONObject.parseObject(bankOut);
-            criteria.andEqualTo("bankIdentification", jsonOut.get("bank"));
-            SubordinateBank subordinateBank = subordinateBankMapper.selectOneByExample(example);
-            record.setBankOutCardName(subordinateBank.getBankName());
-            //获取转入卡所属银行
-            String bankIn = AccessBank.getCardDetail(record.getBankInCard());
-            JSONObject jsonIn = JSONObject.parseObject(bankIn);
-            criteria.andEqualTo("bankIdentification", jsonIn.get("bank"));
-            SubordinateBank selectOneByExample = subordinateBankMapper.selectOneByExample(example);
-            record.setBankInCardName(selectOneByExample.getBankName());
-        }
-        return transferRecords;
-    }
+
 
 
 }

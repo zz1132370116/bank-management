@@ -30,9 +30,5 @@ public class TransferRecordController {
      * @description: 条件查询记录
      * @data: 2019/8/6 19:18
      */
-     @PostMapping("/getRecordsByParams")
-    public List<TransferRecord> getRecordsByParams(@RequestParam("idCard") String idCard, @RequestParam("startDate")Date startDate,@RequestParam("endDate")Date endDate){
-         return transferRecordService.getRecordsByParams(idCard,startDate,endDate);
 
-     }
  }
