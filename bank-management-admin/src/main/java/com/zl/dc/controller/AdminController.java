@@ -148,8 +148,11 @@ public class AdminController {
      */
     @GetMapping("/memberStart/{userId}")
     public ResponseEntity<BaseResult> memberStart(@PathVariable("userId")Integer userId){
-        adminService.memberStart(userId);
-    return ResponseEntity.ok(new BaseResult(0,"启用成功"));
+        if (userId !=null) {
+            adminService.memberStart(userId);
+            return ResponseEntity.ok(new BaseResult(0, "启用成功"));
+        }
+        return ResponseEntity.ok(new BaseResult(1, "启用失败"));
     }
     /**
      * @author: zhanglei
@@ -160,8 +163,11 @@ public class AdminController {
      */
     @GetMapping("/memberStop/{userId}")
     public ResponseEntity<BaseResult> memberStop(@PathVariable("userId")Integer userId){
-        adminService.memberStop(userId);
-        return ResponseEntity.ok(new BaseResult(0,"停用成功"));
+        if (userId !=null){
+            adminService.memberStop(userId);
+            return ResponseEntity.ok(new BaseResult(0,"停用成功"));
+        }
+        return ResponseEntity.ok(new BaseResult(1,"停用失败"));
     }
     /**
      * @author: zhanglei
@@ -172,8 +178,11 @@ public class AdminController {
      */
     @GetMapping("/loginOut/{userName}")
     public ResponseEntity<BaseResult>loginOut(@PathVariable("userName")String userName){
-        adminService.loginOut(userName);
-        return ResponseEntity.ok(new BaseResult(0,"成功"));
+        if (userName !=null && userName.equals("")){
+            adminService.loginOut(userName);
+            return ResponseEntity.ok(new BaseResult(0,"成功"));
+        }
+        return ResponseEntity.ok(new BaseResult(1,"失败"));
     }
     /**
      * @author: zhanglei
@@ -199,8 +208,11 @@ public class AdminController {
      */
     @GetMapping("/adopt/{transcationId}")
     public ResponseEntity<BaseResult> adopt(@PathVariable("transcationId") Integer transcationId){
-        adminService.adopt(transcationId);
-        return ResponseEntity.ok(new BaseResult(0,"成功"));
+        if (transcationId !=null) {
+            adminService.adopt(transcationId);
+            return ResponseEntity.ok(new BaseResult(0, "成功"));
+        }
+        return ResponseEntity.ok(new BaseResult(1, "失败"));
     }
     /**
      * @author: zhanglei
@@ -211,8 +223,11 @@ public class AdminController {
      */
     @GetMapping("/NoPassage/{transcationId}")
     public ResponseEntity<BaseResult> NoPassage(@PathVariable("transcationId") Integer transcationId){
-        adminService.NoPassage(transcationId);
-        return ResponseEntity.ok(new BaseResult(0,"成功"));
+        if (transcationId !=null){
+            adminService.NoPassage(transcationId);
+            return ResponseEntity.ok(new BaseResult(0,"成功"));
+        }
+        return ResponseEntity.ok(new BaseResult(1,"失败"));
     }
 
 }
