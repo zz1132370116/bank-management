@@ -1,6 +1,6 @@
 package com.zl.dc.controller;
 
-import com.zl.dc.pojo.BankManager;
+
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.TransferRecord;

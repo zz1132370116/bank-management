@@ -1,10 +1,8 @@
 package com.zl.dc.service;
 
-import com.zl.dc.mapper.BankManagerMapper;
 import com.zl.dc.mapper.ManagerTranscationMapper;
 import com.zl.dc.mapper.TransferRecordMapper;
 import com.zl.dc.mapper.UserMapper;
-import com.zl.dc.pojo.BankManager;
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.TransferRecord;
