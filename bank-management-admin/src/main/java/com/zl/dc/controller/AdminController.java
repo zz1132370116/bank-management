@@ -179,7 +179,7 @@ public class AdminController {
      * @author: zhanglei
      * @param: []
      * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
-     * @description: 查询申请中的提额信息
+     * @description: 查询申请中的提卡信息
      * @data: 2019/8/9 14:55
      */
     @GetMapping("/getManagerTranscations")
@@ -194,7 +194,7 @@ public class AdminController {
      * @author: zhanglei
      * @param: [transcationId]
      * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
-     * @description: 提额申请(通过)
+     * @description: 提卡申请(通过)
      * @data: 2019/8/9 15:11
      */
     @GetMapping("/adopt/{transcationId}")
@@ -206,7 +206,7 @@ public class AdminController {
      * @author: zhanglei
      * @param: [transcationId]
      * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
-     * @description: 提额申请(不通过)
+     * @description: 提卡申请(不通过)
      * @data: 2019/8/9 15:11
      */
     @GetMapping("/NoPassage/{transcationId}")
