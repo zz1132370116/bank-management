@@ -61,3 +61,6 @@ sc:
       - /getManagerTranscations #查询用户申请中的提卡信息(管理员)
       - /adopt #提升卡种通过(管理员)
       - /NoPassage #提升卡种不通过(管理员)
+      - /updatePhoneSms      #修改手机----获取验证码
+      - /updatePhoneVerify   #修改手机----验证验证码是否正确
+      - /updatePhone         #修改手机----修改手机

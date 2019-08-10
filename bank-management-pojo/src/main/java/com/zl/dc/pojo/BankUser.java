@@ -57,4 +57,14 @@ public class BankUser {
      */
     @Transient
     private String code;
+    /**
+     * 修改手机功能的原手机号
+     */
+    @Transient
+    private String oldPhone;
+    /**
+     * 修改密码功能的确认密码
+     */
+    @Transient
+    private String passwordConfig;
 }
