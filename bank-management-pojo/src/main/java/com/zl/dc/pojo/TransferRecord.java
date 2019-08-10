@@ -73,16 +73,34 @@ public class TransferRecord {
     private Date gmtModified;
 
     //用户省份证号，自定义属性
+    /**
+     * @author: zhanglei
+     * @param:
+     * @return:
+     * @description: 身份证号
+     * @data: 2019/8/7 9:28
+     */
     @Transient
     private String idCard;
-    //自定义属性，作为条件查询依据
+    /**
+     * @author: zhanglei
+     * @param:
+     * @return:
+     * @description: 转出银行
+     * @data: 2019/8/7 9:29
+     */
     @Transient
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date startDate;
-    //自定义属性，作为条件查询依据
+    private String bankOutCardName;
+    /**
+     * @author: zhanglei
+     * @param:
+     * @return:
+     * @description: 转入银行
+     * @data: 2019/8/7 9:29
+     */
     @Transient
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date endDate;
+    private String bankInCardName;
+    @Transient
+    private String userName;
+
 }
