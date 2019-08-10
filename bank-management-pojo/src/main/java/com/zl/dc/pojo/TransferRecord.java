@@ -102,5 +102,27 @@ public class TransferRecord {
     private String bankInCardName;
     @Transient
     private String userName;
+    /**
+     * @author: zhanglei
+     * @param:
+     * @return:
+     * @description: 开始时间(用于条件查询)
+     * @data: 2019/8/6 19:04
+     */
+    @Transient
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startDate;
+    /**
+     * @author: zhanglei
+     * @param:
+     * @return:
+     * @description: 结束时间(用于条件查询)
+     * @data: 2019/8/6 19:04
+     */
+    @Transient
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endDate;
 
 }
