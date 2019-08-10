@@ -8,6 +8,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -60,4 +61,89 @@ public interface AdminClient {
      */
     @GetMapping("/GetAbnormals")
     List<ManagerTranscation> GetAbnormals();
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.BankManager>
+     * @description: 通过redis获取用户登录信息
+     * @data: 2019/8/6 15:21
+     */
+    @GetMapping("/GetUserByRedis")
+    ResponseEntity<BankManager> GetUserByRedis();
+
+    /**
+     * @author: zhanglei
+     * @param: [idCard, startDate, endDate]
+     * @return:java.util.List<com.zl.dc.pojo.TransferRecord>
+     * @description: 条件查询记录
+     * @data: 2019/8/6 19:11
+     */
+    @PostMapping("/getRecordsByParams")
+    List<TransferRecord> getRecordsByParams(@RequestBody TransferRecord transferRecord);
+    /**
+     * @author: zhanglei
+     * @param: [userName, idCard]
+     * @return:java.util.List<com.zl.dc.pojo.BankUser>
+     * @description: 通过条件查询用户
+     * @data: 2019/8/7 14:32
+     */
+    @PostMapping("/getUserListByParams")
+    List<BankUser> getUserListByParams(@RequestBody BankUser bankUser);
+
+    /**
+     * @author: zhanglei
+     * @param: [userId]
+     * @return:void
+     * @description: 修改用户状态(启用)
+     * @data: 2019/8/7 14:46
+     */
+    @GetMapping("/memberStart")
+    void memberStart(@RequestParam("userId") Integer userId);
+
+    /**
+     * @author: zhanglei
+     * @param: [userId]
+     * @return:void
+     * @description: 修改用户状态(停用)
+     * @data: 2019/8/7 14:46
+     */
+    @GetMapping("/memberStop")
+    void memberStop(@RequestParam("userId") Integer userId);
+    /**
+     * @author: zhanglei
+     * @param: [userName]
+     * @return:void
+     * @description: 管理员退出
+     * @data: 2019/8/8 11:28
+     */
+    @GetMapping("/loginOut")
+    void loginOut(@RequestParam("userName") String userName);
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.ManagerTranscation>
+     * @description: 查询用户申请中的提额信息
+     * @data: 2019/8/9 14:59
+     */
+    @GetMapping("/getManagerTranscations")
+    List<ManagerTranscation> getManagerTranscations();
+
+    /**
+     * @author: zhanglei
+     * @param: [transcationId]
+     * @return:void
+     * @description: 提额申请(通过)
+     * @data: 2019/8/9 15:12
+     */
+    @GetMapping("/adopt")
+    void adopt(@RequestParam("transcationId") Integer transcationId);
+    /**
+     * @author: zhanglei
+     * @param: [transcationId]
+     * @return:void
+     * @description: 提额申请(通过)
+     * @data: 2019/8/9 15:12
+     */
+    @GetMapping("/NoPassage")
+    void NoPassage(@RequestParam("transcationId") Integer transcationId);
 }

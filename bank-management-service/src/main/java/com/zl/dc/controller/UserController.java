@@ -1,9 +1,12 @@
 package com.zl.dc.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
+import com.zl.dc.config.SmsChangePassword;
 import com.zl.dc.config.SmsLogin;
+import com.zl.dc.pojo.BankUser;
 import com.zl.dc.service.UserService;
 import com.zl.dc.vo.BaseResult;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -86,7 +89,7 @@ public class UserController {
      * @author: zhanglei
      * @param: []
      * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
-     * @description: 功能描述
+     * @description: 发短信
      * @data: 2019/8/5 19:21
      */
     @PostMapping("/sendSms")
@@ -113,5 +116,89 @@ public class UserController {
             e.printStackTrace();
             return ResponseEntity.ok(new BaseResult(1, "发送失败"));
         }
+    }
+
+    /**
+     * @author: pds
+     * @params:  [user]
+     * @return: org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description: 修改密码----获取验证码
+     * @data: 2019/8/7 16:28
+     */
+    @PostMapping("/updatePasswordSms")
+    public ResponseEntity<BaseResult> updatePasswordSms(@RequestBody BankUser user){
+        System.out.println(user.getUserPhone());
+        if (user.getUserPhone() != null && !"".equals(user.getUserPhone())){
+            BankUser bankUser = userService.getBankUserByUserPhone(user.getUserPhone());
+            if (bankUser == null){
+                return ResponseEntity.ok(new BaseResult(1, "该手机未注册账号，请重新输入"));
+            }
+            //发送短信
+            //1、生成验证码
+            String code = RandomStringUtils.randomNumeric(4);
+            //2、存redis中5分钟
+            redisTemplate.opsForValue().set(user.getUserPhone(),code,5,TimeUnit.MINUTES);
+            //3、发送短信
+            SendSmsResponse smsResponse;
+            try {
+                smsResponse = SmsChangePassword.sendSms(user.getUserPhone(), code);
+            }catch (ClientException e){
+                e.printStackTrace();
+                return ResponseEntity.ok(new BaseResult(1, "发送失败"));
+            }
+            String smsStatus = "OK";
+            if (smsStatus.equalsIgnoreCase(smsResponse.getCode())) {
+                return ResponseEntity.ok(new BaseResult(0, "发送成功"));
+            } else {
+                return ResponseEntity.ok(new BaseResult(0, smsResponse.getMessage()));
+            }
+        }
+
+        return ResponseEntity.ok(new BaseResult(1, "请稍后再点"));
+    }
+
+    /**
+     * @author: pds
+     * @params:  [user]
+     * @return: org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description: 修改密码----验证验证码是否正确
+     * @data: 2019/8/7 16:28
+     */
+    @PostMapping("/updatePasswordVerify")
+    public ResponseEntity<BaseResult> updatePasswordVerify(@RequestBody BankUser user){
+        System.out.println(user.getUserPhone()+"   "+user.getCode());
+        boolean isPhone = user.getUserPhone() != null && !"".equals(user.getUserPhone());
+        boolean isCode = user.getCode() != null && !"".equals(user.getCode());
+        if (isPhone && isCode){
+            //通过手机号获取验证码
+            String code = redisTemplate.opsForValue().get(user.getUserPhone());
+            if(user.getCode().equals(code)){
+                return ResponseEntity.ok(new BaseResult(0, "验证码正确"));
+            }
+            return ResponseEntity.ok(new BaseResult(1, "验证码错误或验证码已经过时"));
+        }
+
+        return ResponseEntity.ok(new BaseResult(1, "验证码错误或验证码已经过时"));
+    }
+
+    /**
+     * @author: pds
+     * @params:  [user]
+     * @return: org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description: 修改密码----修改密码
+     * @data: 2019/8/7 16:32
+     */
+    @PostMapping("/updateBankUserPassword")
+    public ResponseEntity<BaseResult> updateBankUserPassword(@RequestBody BankUser user){
+        System.out.println(user.getUserPhone()+"  "+user.getUserPassword());
+        boolean isPhone = user.getUserPhone() != null && !"".equals(user.getUserPhone());
+        boolean isPassword = user.getUserPassword() != null && !"".equals(user.getUserPassword());
+
+        if (isPhone && isPassword){
+            BankUser bankUser = userService.updateBankUserPassword(user);
+            redisTemplate.opsForValue().set(bankUser.getUserPhone(),JSONObject.toJSONString(bankUser));
+        }
+
+        return ResponseEntity.ok(new BaseResult(0, "密码修改成功"));
     }
 }

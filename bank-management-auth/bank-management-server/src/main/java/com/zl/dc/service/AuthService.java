@@ -4,6 +4,7 @@ package com.zl.dc.service;
 import com.zl.dc.client.UserClient;
 import com.zl.dc.config.JwtProperties;
 import com.zl.dc.entity.UserInfo;
+import com.zl.dc.pojo.BankUser;
 import com.zl.dc.util.JwtUtils;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;

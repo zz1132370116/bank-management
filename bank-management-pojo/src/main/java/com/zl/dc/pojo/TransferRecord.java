@@ -33,7 +33,7 @@ public class TransferRecord {
     @Column(name = "transfer_record_amount")
     private BigDecimal transferRecordAmount;
     //    订单时间
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "transfer_record_time")
     private Date transferRecordTime;
@@ -62,13 +62,27 @@ public class TransferRecord {
     @Column(name = "bank_in_card")
     private String bankInCard;
     //    创建时间
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "gmt_create")
     private Date gmtCreate;
     //    修改时间
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "gmt_modified")
     private Date gmtModified;
+
+    //用户省份证号，自定义属性
+    @Transient
+    private String idCard;
+    //自定义属性，作为条件查询依据
+    @Transient
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startDate;
+    //自定义属性，作为条件查询依据
+    @Transient
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endDate;
 }
