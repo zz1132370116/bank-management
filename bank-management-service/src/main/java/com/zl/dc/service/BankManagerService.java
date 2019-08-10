@@ -227,7 +227,7 @@ public class BankManagerService {
      * @author: zhanglei
      * @param: []
      * @return:java.util.List<com.zl.dc.pojo.ManagerTranscation>
-     * @description: 查询用户申请中的提额信息
+     * @description: 查询用户申请中的提卡信息
      * @data: 2019/8/9 15:03
      */
     public List<ManagerTranscation> getManagerTranscations() {
@@ -245,7 +245,7 @@ public class BankManagerService {
      * @author: zhanglei
      * @param: [transcationId]
      * @return:void
-     * @description: 提额申请(通过)
+     * @description: 提卡申请(通过)
      * @data: 2019/8/9 15:17
      */
     public void adopt(Integer transcationId) {
@@ -258,7 +258,7 @@ public class BankManagerService {
      * @author: zhanglei
      * @param: [transcationId]
      * @return:void
-     * @description: 提额申请(不通过)
+     * @description: 提卡申请(不通过)
      * @data: 2019/8/9 15:17
      */
     public void NoPassage(Integer transcationId) {

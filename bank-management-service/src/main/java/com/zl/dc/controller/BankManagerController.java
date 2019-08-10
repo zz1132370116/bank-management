@@ -171,6 +171,13 @@ public class BankManagerController {
     public void loginOut(@RequestParam("userName")String userName){
         redisTemplate.delete(userName);
     }
+    /**
+     * @version: V1.0
+     * @author: zhanglei
+     * @className: BankManagerController
+     * @description: 查询用户的提卡申请
+     * @data: 2019/8/10 14:35
+     */
     @GetMapping("/getManagerTranscations")
     public List<ManagerTranscation> getManagerTranscations(){
         return bankManagerService.getManagerTranscations();
@@ -179,7 +186,7 @@ public class BankManagerController {
      * @author: zhanglei
      * @param: [transcationId]
      * @return:void
-     * @description: 提额申请(通过)
+     * @description: 提卡申请(通过)
      * @data: 2019/8/9 15:17
      */
     @GetMapping("/adopt")
@@ -190,7 +197,7 @@ public class BankManagerController {
      * @author: zhanglei
      * @param: [transcationId]
      * @return:void
-     * @description: 提额申请(不通过)
+     * @description: 提卡申请(不通过)
      * @data: 2019/8/9 15:17
      */
     @GetMapping("/NoPassage")
