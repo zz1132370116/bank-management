@@ -36,6 +36,9 @@ public class BankCard {
     //    银行卡余额
     @Column(name = "bank_card_balance")
     private BigDecimal bankCardBalance;
+    //    银行卡类型
+    @Column(name = "bank_card_type")
+    private String bankCardType;
     //    银行卡状态
     @Column(name = "bank_card_status")
     private byte bankCardStatus;
