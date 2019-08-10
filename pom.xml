@@ -15,6 +15,7 @@
         <module>bank-management-gateway</module>
         <module>bank-management-service</module>
         <module>bank-management-admin</module>
+        <module>bank-management-utils</module>
     </modules>
 
     <parent>

@@ -11,7 +11,7 @@ import java.util.Date;
 /**
  * @version: V1.0
  * @author: lu
- * @className: 基金收集
+ * @className: 基金归集
  * @description:
  * @data: 2019/8/6 9:48
  */
@@ -23,6 +23,12 @@ public class FundCollectionPlan {
     @Id
     @Column(name = "plan_id")
     private int planId;
+    //      资金归集计划名称
+    @Column(name = "plan_name")
+    private String planName;
+    //    资金归集计划的状态
+    @Column(name = "plan_status")
+    private byte planStatus;
     //    用户id
     @Column(name = "user_id")
     private int userId;
@@ -43,12 +49,12 @@ public class FundCollectionPlan {
     private byte failTime;
     //    行创建时间
     @Column(name = "gmt_create")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date gmtCreate;
     //    行修改时间
     @Column(name = "gmt_modified")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date gmtModified;
 

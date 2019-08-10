@@ -23,12 +23,6 @@ import java.util.List;
 public class TransferRecordController {
      @Resource
     private TransferRecordService transferRecordService;
-    /**
-     * @author: zhanglei
-     * @param: [idCard, startDate, endDate]
-     * @return:java.util.List<com.zl.dc.pojo.TransferRecord>
-     * @description: 条件查询记录
-     * @data: 2019/8/6 19:18
-     */
+
 
  }

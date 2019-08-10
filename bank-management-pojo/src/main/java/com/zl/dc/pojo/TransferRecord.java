@@ -10,13 +10,14 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Objects;
+
 /**
-* @version: V1.0
-* @author: lu
-* @className: 转账记录
-* @description:
-* @data: 2019/8/6 10:02
-*/
+ * @version: V1.0
+ * @author: lu
+ * @className: 转账记录表
+ * @description:
+ * @data: 2019/8/10 13:46
+ */
 @Data
 @ToString
 @Table(name = "transfer_record")
@@ -25,126 +26,103 @@ public class TransferRecord {
     @Id
     @Column(name = "transfer_record_id")
     private int transferRecordId;
-    //    转账记录编号
+    //    转账记录流水号
     @Column(name = "transfer_record_uuid")
     private String transferRecordUuid;
     //    交易额
     @Column(name = "transfer_record_amount")
     private BigDecimal transferRecordAmount;
     //    订单时间
-    @Column(name = "transfer_record_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "transfer_record_time")
     private Date transferRecordTime;
+    //    转账备注
+    @Column(name = "transfer_note")
+    private String transferNote;
     //    交易状态
     @Column(name = "transfer_status")
     private byte transferStatus;
-    //备注
-    @Column(name = "transfer_note")
-    private String transferNote;
-    //收账人姓名
-    @Column(name = "in_card_user_name")
-    private String inCardUserName;
+    //    转账类型
+    @Column(name = "transfer_type")
+    private byte transferType;
     //    用户id
     @Column(name = "user_id")
     private int userId;
     //    转出卡
     @Column(name = "bank_out_card")
     private String bankOutCard;
- /**
-  * @author: zhanglei
-  * @param:
-  * @return:
-  * @description: 转入卡
-  * @data: 2019/8/6 19:05
-  */
+    //    收款人姓名
+    @Column(name = "in_card_user_name")
+    private String inCardUserName;
+    //    转入卡的银行标识码
+    @Column(name = "bank_in_identification")
+    private String bankInIdentification;
+    //    转入卡
     @Column(name = "bank_in_card")
     private String bankInCard;
- /**
-  * @author: zhanglei
-  * @param:
-  * @return:
-  * @description: 创建时间
-  * @data: 2019/8/6 19:05
-  */
+    //    创建时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "gmt_create")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date gmtCreate;
-     /**
-      * @author: zhanglei
-      * @param:
-      * @return:
-      * @description: 修改时间
-      * @data: 2019/8/6 19:05
-      */
-    @Column(name = "gmt_modified")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    //    修改时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "gmt_modified")
     private Date gmtModified;
 
-    @Transient
-    private BankUser bankUser;
-     /**
-      * @author: zhanglei
-      * @param:
-      * @return:
-      * @description: 开始时间(用于条件查询)
-      * @data: 2019/8/6 19:04
-      */
-    @Transient
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date startDate;
-
-     /**
-      * @author: zhanglei
-      * @param:
-      * @return:
-      * @description: 结束时间(用于条件查询)
-      * @data: 2019/8/6 19:04
-      */
-    @Transient
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date endDate;
+    //用户省份证号，自定义属性
     /**
      * @author: zhanglei
      * @param:
      * @return:
-     * @description: 转入银行标识
-     * @data: 2019/8/7 9:29
+     * @description: 身份证号
+     * @data: 2019/8/7 9:28
      */
-    @Column(name = "bank_in_identification")
-    private String bankInIdentification;
-     /**
-      * @author: zhanglei
-      * @param:
-      * @return:
-      * @description: 身份证号
-      * @data: 2019/8/7 9:28
-      */
     @Transient
     private String idCard;
-     /**
-      * @author: zhanglei
-      * @param:
-      * @return:
-      * @description: 转出银行
-      * @data: 2019/8/7 9:29
-      */
+    /**
+     * @author: zhanglei
+     * @param:
+     * @return:
+     * @description: 转出银行
+     * @data: 2019/8/7 9:29
+     */
     @Transient
     private String bankOutCardName;
-     /**
-      * @author: zhanglei
-      * @param:
-      * @return:
-      * @description: 转入银行
-      * @data: 2019/8/7 9:29
-      */
-     @Transient
-     private String bankInCardName;
-     @Transient
+    /**
+     * @author: zhanglei
+     * @param:
+     * @return:
+     * @description: 转入银行
+     * @data: 2019/8/7 9:29
+     */
+    @Transient
+    private String bankInCardName;
+    @Transient
     private String userName;
+    /**
+     * @author: zhanglei
+     * @param:
+     * @return:
+     * @description: 开始时间(用于条件查询)
+     * @data: 2019/8/6 19:04
+     */
+    @Transient
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startDate;
+    /**
+     * @author: zhanglei
+     * @param:
+     * @return:
+     * @description: 结束时间(用于条件查询)
+     * @data: 2019/8/6 19:04
+     */
+    @Transient
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endDate;
 
 }

@@ -167,14 +167,52 @@ public class AdminController {
      * @author: zhanglei
      * @param: []
      * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
-     * @description: 功能描述
+     * @description: 退出
      * @data: 2019/8/8 11:22
      */
-    @PostMapping("/loginOut/{userName}")
+    @GetMapping("/loginOut/{userName}")
     public ResponseEntity<BaseResult>loginOut(@PathVariable("userName")String userName){
         adminService.loginOut(userName);
         return ResponseEntity.ok(new BaseResult(0,"成功"));
     }
-
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description: 查询申请中的提卡信息
+     * @data: 2019/8/9 14:55
+     */
+    @GetMapping("/getManagerTranscations")
+    public ResponseEntity<BaseResult> getManagerTranscations(){
+        List<ManagerTranscation> managerTranscations =adminService.getManagerTranscations();
+        if (managerTranscations != null){
+            return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",managerTranscations));
+        }
+        return ResponseEntity.ok(new BaseResult(1,"查询失败"));
+    }
+    /**
+     * @author: zhanglei
+     * @param: [transcationId]
+     * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description: 提卡申请(通过)
+     * @data: 2019/8/9 15:11
+     */
+    @GetMapping("/adopt/{transcationId}")
+    public ResponseEntity<BaseResult> adopt(@PathVariable("transcationId") Integer transcationId){
+        adminService.adopt(transcationId);
+        return ResponseEntity.ok(new BaseResult(0,"成功"));
+    }
+    /**
+     * @author: zhanglei
+     * @param: [transcationId]
+     * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description: 提卡申请(不通过)
+     * @data: 2019/8/9 15:11
+     */
+    @GetMapping("/NoPassage/{transcationId}")
+    public ResponseEntity<BaseResult> NoPassage(@PathVariable("transcationId") Integer transcationId){
+        adminService.NoPassage(transcationId);
+        return ResponseEntity.ok(new BaseResult(0,"成功"));
+    }
 
 }

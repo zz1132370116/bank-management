@@ -1,13 +1,12 @@
 package com.zl.dc.controller;
 
-import com.alibaba.fastjson.JSON;
+
 import com.zl.dc.pojo.BankManager;
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.service.BankManagerService;
 import com.zl.dc.util.MD5;
-import com.zl.dc.vo.BaseResult;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +29,7 @@ public class BankManagerController {
     private BankManagerService bankManagerService;
     @Resource
     private StringRedisTemplate redisTemplate;
+
 
 
     /**
@@ -161,8 +161,48 @@ public class BankManagerController {
     public void memberStop(@RequestParam("userId")Integer userId){
         bankManagerService.memberStop(userId);
     }
+    /**
+     * @author: zhanglei
+     * @param: [userName]
+     * @return:void
+     * @description: 退出
+     * @data: 2019/8/9 15:01
+     */
     @GetMapping("/loginOut")
     public void loginOut(@RequestParam("userName")String userName){
         redisTemplate.delete(userName);
+    }
+    /**
+     * @version: V1.0
+     * @author: zhanglei
+     * @className: BankManagerController
+     * @description: 查询用户的提卡申请
+     * @data: 2019/8/10 14:35
+     */
+    @GetMapping("/getManagerTranscations")
+    public List<ManagerTranscation> getManagerTranscations(){
+        return bankManagerService.getManagerTranscations();
+    }
+    /**
+     * @author: zhanglei
+     * @param: [transcationId]
+     * @return:void
+     * @description: 提卡申请(通过)
+     * @data: 2019/8/9 15:17
+     */
+    @GetMapping("/adopt")
+    public void adopt(@RequestParam("transcationId") Integer transcationId){
+        bankManagerService.adopt(transcationId);
+    }
+    /**
+     * @author: zhanglei
+     * @param: [transcationId]
+     * @return:void
+     * @description: 提卡申请(不通过)
+     * @data: 2019/8/9 15:17
+     */
+    @GetMapping("/NoPassage")
+    public void NoPassage(@RequestParam("transcationId") Integer transcationId){
+        bankManagerService.adopt(transcationId);
     }
 }
