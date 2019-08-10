@@ -57,12 +57,26 @@ public class UserService {
      * @author: pds
      * @params:  [user]
      * @return: com.zl.dc.pojo.BankUser
-     * @description: 功能描述
+     * @description: 修改密码
      * @data: 2019/8/8 10:14
      */
     public BankUser updateBankUserPassword(BankUser user) {
         BankUser bankUserByUserPhone = this.getBankUserByUserPhone(user.getUserPhone());
         bankUserByUserPhone.setUserPassword(user.getUserPassword());
+        userMapper.updateByPrimaryKeySelective(bankUserByUserPhone);
+        return bankUserByUserPhone;
+    }
+
+    /**
+     * @author: pds
+     * @params:  [user]
+     * @return: com.zl.dc.pojo.BankUser
+     * @description: 修改手机
+     * @data: 2019/8/10 10:21
+     */
+    public BankUser updateBankUserPhone(BankUser user){
+        BankUser bankUserByUserPhone = this.getBankUserByUserPhone(user.getOldPhone());
+        bankUserByUserPhone.setUserPhone(user.getUserPhone());
         userMapper.updateByPrimaryKeySelective(bankUserByUserPhone);
         return bankUserByUserPhone;
     }
