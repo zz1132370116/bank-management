@@ -223,5 +223,49 @@ public class BankManagerService {
         bankUser.setUserStatus(Byte.parseByte("1"));
         bankUserMapper.updateByPrimaryKeySelective(bankUser);
     }
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.ManagerTranscation>
+     * @description: 查询用户申请中的提额信息
+     * @data: 2019/8/9 15:03
+     */
+    public List<ManagerTranscation> getManagerTranscations() {
+        Example example = new Example(ManagerTranscation.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("transcationStatus",0);
+        List<ManagerTranscation> managerTranscations = managerTranscationMapper.selectByExample(example);
+        for (ManagerTranscation managerTranscation : managerTranscations) {
+            BankUser bankUser = bankUserMapper.selectByPrimaryKey(managerTranscation.getUserId());
+            managerTranscation.setBankUser(bankUser);
+        }
+        return managerTranscations;
+    }
+    /**
+     * @author: zhanglei
+     * @param: [transcationId]
+     * @return:void
+     * @description: 提额申请(通过)
+     * @data: 2019/8/9 15:17
+     */
+    public void adopt(Integer transcationId) {
+        ManagerTranscation managerTranscation = new ManagerTranscation();
+        managerTranscation.setTranscationId(transcationId);
+        managerTranscation.setTranscationStatus(Byte.parseByte("1"));
+        managerTranscationMapper.updateByPrimaryKeySelective(managerTranscation);
+    }
+    /**
+     * @author: zhanglei
+     * @param: [transcationId]
+     * @return:void
+     * @description: 提额申请(不通过)
+     * @data: 2019/8/9 15:17
+     */
+    public void NoPassage(Integer transcationId) {
+        ManagerTranscation managerTranscation = new ManagerTranscation();
+        managerTranscation.setTranscationId(transcationId);
+        managerTranscation.setTranscationStatus(Byte.parseByte("2"));
+        managerTranscationMapper.updateByPrimaryKeySelective(managerTranscation);
+    }
 
 }

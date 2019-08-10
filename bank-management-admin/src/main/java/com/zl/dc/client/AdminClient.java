@@ -119,4 +119,32 @@ public interface AdminClient {
      */
     @GetMapping("/loginOut")
     void loginOut(@RequestParam("userName") String userName);
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.ManagerTranscation>
+     * @description: 查询用户申请中的提额信息
+     * @data: 2019/8/9 14:59
+     */
+    @GetMapping("/getManagerTranscations")
+    List<ManagerTranscation> getManagerTranscations();
+
+    /**
+     * @author: zhanglei
+     * @param: [transcationId]
+     * @return:void
+     * @description: 提额申请(通过)
+     * @data: 2019/8/9 15:12
+     */
+    @GetMapping("/adopt")
+    void adopt(@RequestParam("transcationId") Integer transcationId);
+    /**
+     * @author: zhanglei
+     * @param: [transcationId]
+     * @return:void
+     * @description: 提额申请(通过)
+     * @data: 2019/8/9 15:12
+     */
+    @GetMapping("/NoPassage")
+    void NoPassage(@RequestParam("transcationId") Integer transcationId);
 }

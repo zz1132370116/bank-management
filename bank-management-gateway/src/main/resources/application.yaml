@@ -58,3 +58,6 @@ sc:
       - /updatePasswordVerify  #修改密码----验证验证码是否正确
       - /updateBankUserPassword    #修改密码----修改密码
       - /loginOut #退出(管理员)
+      - /getManagerTranscations #查询用户申请中的提额信息(管理员)
+      - /adopt #提额通过(管理员)
+      - /NoPassage #提额不通过(管理员)
