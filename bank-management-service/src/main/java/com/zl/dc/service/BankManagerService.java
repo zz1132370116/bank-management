@@ -32,6 +32,8 @@ public class BankManagerService {
     private BankManagerMapper bankManagerMapper;
     @Resource
     private SubordinateBankMapper subordinateBankMapper;
+    @Resource
+    private BankCardMapper bankCardMapper;
 
     /**
      * @author: zhanglei
@@ -249,10 +251,26 @@ public class BankManagerService {
      * @data: 2019/8/9 15:17
      */
     public void adopt(Integer transcationId) {
+        //创建事务实体类
         ManagerTranscation managerTranscation = new ManagerTranscation();
         managerTranscation.setTranscationId(transcationId);
         managerTranscation.setTranscationStatus(Byte.parseByte("1"));
+        //修改状态
         managerTranscationMapper.updateByPrimaryKeySelective(managerTranscation);
+        //修改银行卡类型
+        //通过主键查询事务
+        ManagerTranscation managerTranscation1 = managerTranscationMapper.selectByPrimaryKey(transcationId);
+        BankCard bankCard = bankCardMapper.selectByPrimaryKey(managerTranscation1.getBankCard());
+        //如果类型是普通卡则升级为钻石卡
+        if (bankCard.getBankCardType().equals("普通卡")){
+            bankCard.setBankCardType("钻石卡");
+        }
+        //如果类型是钻石卡则升级为黑卡
+        if ("钻石卡".equals(bankCard.getBankCardType())){
+            bankCard.setBankCardType("黑卡");
+        }
+
+        bankCardMapper.updateByPrimaryKeySelective(bankCard);
     }
     /**
      * @author: zhanglei

@@ -203,6 +203,6 @@ public class BankManagerController {
      */
     @GetMapping("/NoPassage")
     public void NoPassage(@RequestParam("transcationId") Integer transcationId){
-        bankManagerService.adopt(transcationId);
+        bankManagerService.NoPassage(transcationId);
     }
 }
