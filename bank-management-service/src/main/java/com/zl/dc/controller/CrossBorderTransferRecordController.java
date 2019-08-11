@@ -1,9 +1,10 @@
 package com.zl.dc.controller;
 
+import com.zl.dc.pojo.CrossBorderTransferRecord;
 import com.zl.dc.service.CrossBorderTransferRecordService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.zl.dc.vo.BaseResult;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 /**
   * @version: V1.0
@@ -17,5 +18,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class CrossBorderTransferRecordController {
 
      private CrossBorderTransferRecordService crossBorderTransferRecordService;
+    /**
+     * @author: zhanglei
+     * @param: [crossBorderTransferRecord]
+     * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description: 根据条件查询汇率
+     * @data: 2019/8/11 9:48
+     */
+    @PostMapping("/getExchangeRate")
+    public ResponseEntity<BaseResult> getExchangeRate(@RequestBody CrossBorderTransferRecord crossBorderTransferRecord){
 
+        if (crossBorderTransferRecord !=null){
+            CrossBorderTransferRecord crossBorderTransferRecord1 =crossBorderTransferRecordService.getExchangeRate(crossBorderTransferRecord);
+            return ResponseEntity.ok(new BaseResult(0,"成功").append("data",crossBorderTransferRecord1));
+        }
+        return ResponseEntity.ok(new BaseResult(1,"失败"));
+    }
 }
