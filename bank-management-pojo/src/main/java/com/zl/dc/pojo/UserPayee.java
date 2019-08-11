@@ -10,12 +10,12 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Objects;
 /**
-* @version: V1.0
-* @author: lu
-* @className: 用户收款人
-* @description:
-* @data: 2019/8/6 10:11
-*/
+ * @version: V1.0
+ * @author: lu
+ * @className: 用户收款人
+ * @description:
+ * @data: 2019/8/6 10:11
+ */
 @Data
 @ToString
 @Table(name = "user_payee")
@@ -38,13 +38,16 @@ public class UserPayee {
     private int payeeGroupId;
     //    添加时间
     @Column(name = "gmt_create")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date gmtCreate;
     //    修改时间
     @Column(name = "gmt_modified")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date gmtModified;
 
+    //自定义标签，银行的名字
+    @Transient
+    private String bankName;
 }
