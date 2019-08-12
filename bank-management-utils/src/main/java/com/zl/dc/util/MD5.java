@@ -2,6 +2,7 @@ package com.zl.dc.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 /*
  * MD5 算法
 */
