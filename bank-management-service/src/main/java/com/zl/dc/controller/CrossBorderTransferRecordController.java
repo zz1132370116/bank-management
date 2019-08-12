@@ -6,6 +6,8 @@ import com.zl.dc.vo.BaseResult;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+
 /**
   * @version: V1.0
   * @author: zhanglei
@@ -16,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
  @RestController
  @RequestMapping
 public class CrossBorderTransferRecordController {
-
+    @Resource
      private CrossBorderTransferRecordService crossBorderTransferRecordService;
     /**
      * @author: zhanglei
