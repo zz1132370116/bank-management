@@ -9,17 +9,18 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
 /**
-  * @version: V1.0
-  * @author: zhanglei
-  * @className: CrossBorderTransferRecordController
-  * @description: 跨境转账控制层
-  * @data: 2019/8/10 16:43
-  */
- @RestController
- @RequestMapping
+ * @version: V1.0
+ * @author: zhanglei
+ * @className: CrossBorderTransferRecordController
+ * @description: 跨境转账控制层
+ * @data: 2019/8/10 16:43
+ */
+@RestController
+@RequestMapping
 public class CrossBorderTransferRecordController {
     @Resource
-     private CrossBorderTransferRecordService crossBorderTransferRecordService;
+    private CrossBorderTransferRecordService crossBorderTransferRecordService;
+
     /**
      * @author: zhanglei
      * @param: [crossBorderTransferRecord]
@@ -28,12 +29,12 @@ public class CrossBorderTransferRecordController {
      * @data: 2019/8/11 9:48
      */
     @PostMapping("/getExchangeRate")
-    public ResponseEntity<BaseResult> getExchangeRate(@RequestBody CrossBorderTransferRecord crossBorderTransferRecord){
+    public ResponseEntity<BaseResult> getExchangeRate(@RequestBody CrossBorderTransferRecord crossBorderTransferRecord) {
 
-        if (crossBorderTransferRecord !=null){
-            CrossBorderTransferRecord crossBorderTransferRecord1 =crossBorderTransferRecordService.getExchangeRate(crossBorderTransferRecord);
-            return ResponseEntity.ok(new BaseResult(0,"成功").append("data",crossBorderTransferRecord1));
+        if (crossBorderTransferRecord != null) {
+            CrossBorderTransferRecord crossBorderTransferRecord1 = crossBorderTransferRecordService.getExchangeRate(crossBorderTransferRecord);
+            return ResponseEntity.ok(new BaseResult(0, "成功").append("data", crossBorderTransferRecord1));
         }
-        return ResponseEntity.ok(new BaseResult(1,"失败"));
+        return ResponseEntity.ok(new BaseResult(1, "失败"));
     }
 }
