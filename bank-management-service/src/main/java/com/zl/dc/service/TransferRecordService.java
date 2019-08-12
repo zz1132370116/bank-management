@@ -1,14 +1,7 @@
 package com.zl.dc.service;
 
-import com.alibaba.fastjson.JSONObject;
-import com.zl.dc.mapper.SubordinateBankMapper;
 import com.zl.dc.mapper.TransferRecordMapper;
-import com.zl.dc.mapper.UserMapper;
-import com.zl.dc.pojo.BankManager;
-import com.zl.dc.pojo.BankUser;
-import com.zl.dc.pojo.SubordinateBank;
 import com.zl.dc.pojo.TransferRecord;
-import com.zl.dc.util.AccessBank;
 import com.zl.dc.vo.TransferValueVo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +9,6 @@ import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -95,7 +87,7 @@ public class TransferRecordService {
         transferRecord.setTransferStatus(Byte.parseByte("120"));
         transferRecord.setTransferRecordTime(new Date());
         transferRecord.setGmtModified(new Date());
-        int status = transferRecordMapper.updateByExample(transferRecord, TransferRecord.class);
+        int status = transferRecordMapper.updateByPrimaryKeySelective(transferRecord);
         if (status > 0) {
             return true;
         } else {
