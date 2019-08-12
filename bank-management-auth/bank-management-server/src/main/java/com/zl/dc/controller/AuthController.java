@@ -3,6 +3,7 @@ package com.zl.dc.controller;
 
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.service.AuthService;
+import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.BaseResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 /**
  * Created by 舍頭襘游泳 on 2018/12/13.
@@ -24,42 +26,71 @@ public class AuthController {
 
     /**
      * @author: zhanglei
-     * @param: [user]
+     * @param: [bankUser]
      * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
      * @description: 根据密码登录
      * @data: 2019/8/5 20:12
      */
     @PostMapping("/login")
-    public ResponseEntity<BaseResult> login(@RequestBody BankUser user) {
-        if (user != null) {
-            //1登录操作--获得token
-            String token = this.authService.login(user.getUserPhone(), user.getUserPassword(), user.getIdCard());
+    public ResponseEntity<BaseResult> login(@RequestBody BankUser bankUser) {
+        if (bankUser != null) {
+            //如果是使用手机加密码登录
+            if (bankUser.getUserPassword() != null && !"".equals(bankUser.getUserPhone())){
+                //验证手机号是否正确
+                String regex = "^[1][3,4,5,7,8][0-9]{9}$";
+                if (!bankUser.getUserPhone().matches(regex)){
+                    return ResponseEntity.ok(new BaseResult(1, "该手机号不正确"));
+                }
+            }else if(bankUser.getIdCard() != null && !"".equals(bankUser.getIdCard())){
+                //验证身份证是否正确
+                String regex = "(^\\d{18}$)|(^\\d{15}$)";
+                if (!bankUser.getIdCard().matches(regex)){
+                    return ResponseEntity.ok(new BaseResult(1, "该身份证号不正确"));
+                }
+            }
+            //1登录操作--获得token和用户信息
+            Map<String, Object> map = this.authService.login(bankUser);
+            String token = (String) map.get("token");
+            BankUser user = (BankUser) map.get("user");
             //2 有token，返回
             if (StringUtils.isNotBlank(token)) {
-                BaseResult baseResult = new BaseResult(0, "登录成功").append("token", token);
+                BaseResult baseResult = new BaseResult(0, "登录成功").append("token", token).append("user",user);
                 return ResponseEntity.ok(baseResult);
             }
         }
-
         //3 没有token，失败
         return ResponseEntity.ok(new BaseResult(1, "登录失败"));
     }
 
     /**
      * @author: zhanglei
-     * @param: [user]
+     * @param: [bankUser]
      * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
      * @description: 根据验证码登录
      * @data: 2019/8/5 19:14
      */
     @PostMapping("/loginBySendSms")
-    public ResponseEntity<BaseResult> loginBySendSms(@RequestBody BankUser user) {
-        if (user != null) {
-            //1登录操作--获得token
-            String token = this.authService.loginBySendSms(user.getUserPhone(), user.getUserPassword());
+    public ResponseEntity<BaseResult> loginBySendSms(@RequestBody BankUserVo bankUser) {
+        if (bankUser != null) {
+            if (bankUser.getUserPassword() != null && !"".equals(bankUser.getUserPhone())){
+                //验证手机号是否正确
+                String regex = "^[1][3,4,5,7,8][0-9]{9}$";
+                if (!bankUser.getUserPhone().matches(regex)){
+                    return ResponseEntity.ok(new BaseResult(1, "该手机号不正确"));
+                }
+            }
+            //判断验证码是否为空
+            if (bankUser.getCode() == null || "".equals(bankUser.getCode())) {
+                return ResponseEntity.ok(new BaseResult(1, "验证码不能为空"));
+            }
+            //1登录操作--获得token和用户信息
+            Map<String, Object> map = this.authService.loginBySendSms(bankUser);
+            BankUser user = (BankUser) map.get("user");
+            String token = (String) map.get("token");
             //2 有token，返回
             if (StringUtils.isNotBlank(token)) {
-                BaseResult baseResult = new BaseResult(0, "登录成功").append("token", token);
+                BaseResult baseResult = new BaseResult(0, "登录成功")
+                        .append("token", token).append("user",user);
                 return ResponseEntity.ok(baseResult);
             }
         }

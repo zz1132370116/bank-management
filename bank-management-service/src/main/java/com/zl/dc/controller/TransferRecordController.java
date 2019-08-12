@@ -10,17 +10,17 @@ import javax.annotation.Resource;
 
 
 /**
-  * @version: V1.0
-  * @author: zhanglei
-  * @className: TransferRecordController
-  * @description: 转账记录控制层
-  * @data: 2019/8/6 19:14
-  */
- @RestController
- @RequestMapping
+ * @version: V1.0
+ * @author: Redsheep
+ * @className: TransferRecordController
+ * @description: 转账记录控制层
+ * @data: 2019/8/6 19:14
+ */
+@RestController
+@RequestMapping
 public class TransferRecordController {
-     @Resource
+    @Resource
     private TransferRecordService transferRecordService;
 
 
- }
+}
