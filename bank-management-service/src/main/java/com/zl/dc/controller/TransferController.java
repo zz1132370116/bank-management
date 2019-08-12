@@ -1,15 +1,20 @@
 package com.zl.dc.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.netflix.discovery.converters.Auto;
+import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.SubordinateBank;
+import com.zl.dc.service.BankCardService;
 import com.zl.dc.service.SubordinateBankService;
 import com.zl.dc.vo.BaseResult;
+import com.zl.dc.vo.transferValueVo;
 import org.bouncycastle.util.StringList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -31,8 +36,9 @@ public class TransferController {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
     @Autowired
-    private RedisTemplate redisTemplate;
+    private BankCardService bankCardService;
 
     /**
      * @author: lu
@@ -59,6 +65,27 @@ public class TransferController {
         return ResponseEntity.ok(new BaseResult(0, "成功").append("data", subordinateBanks));
     }
 
+    /**
+     * @author: lu
+     * @param: * @Param null:
+     * @return: * @return: null
+     * @description: 功能描述
+     * @data: 2019/8/12 14:13
+     */
+    public ResponseEntity<BaseResult> verifyBankCardForVo(@RequestBody transferValueVo transferValueVo) {
+
+        BankCard bankCard = bankCardService.verifyBankCardForVo(transferValueVo);
+        if (bankCard == null) {
+            return ResponseEntity.ok(new BaseResult(666, "密码错误"));
+        }
+        if (bankCard.getBankCardBalance().compareTo(transferValueVo.getMuchMoney()) != -1) {
+            return ResponseEntity.ok(new BaseResult(666, "余额不足，操作失败"));
+        }
+
+//TODO 添加转账记录操作~~~~~为完成
+
+
+    }
 
 
 }
