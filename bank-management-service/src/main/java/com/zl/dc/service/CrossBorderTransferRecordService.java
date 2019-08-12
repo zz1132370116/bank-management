@@ -1,13 +1,14 @@
 package com.zl.dc.service;
 
 import com.zl.dc.api.exchangeRateApi;
+import com.zl.dc.mapper.BankCardMapper;
 import com.zl.dc.mapper.CrossBorderTransferRecordMapper;
 import com.zl.dc.pojo.CrossBorderTransferRecord;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+
 
 /**
  * @version: V1.0
@@ -31,10 +32,11 @@ public class CrossBorderTransferRecordService {
      */
     public CrossBorderTransferRecord getExchangeRate(CrossBorderTransferRecord crossBorderTransferRecord) {
 
-        String amount = "10";
+        String amount = "100";
         String from = "CNY";
         String to = null;
-        if (crossBorderTransferRecord.getCurrencyType().equals("") && crossBorderTransferRecord.getCurrencyType() != null) {
+        if (!crossBorderTransferRecord.getCurrencyType().equals("") && crossBorderTransferRecord.getCurrencyType() != null) {
+            to = crossBorderTransferRecord.getCurrencyType();
             String s = exchangeRateApi.exChangeRate(amount, from, to);
             crossBorderTransferRecord.setRate(s);
         }
@@ -73,4 +75,5 @@ public class CrossBorderTransferRecordService {
             return crossBorderTransferRecord;
         }
     }
+
 }
