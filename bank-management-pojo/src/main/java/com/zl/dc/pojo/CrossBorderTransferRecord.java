@@ -75,4 +75,8 @@ public class CrossBorderTransferRecord {
     @Column(name = "gmt_modified")
     private Date gmtModified;
 
+    //汇率
+    @Transient
+    private String rate;
+
 }
