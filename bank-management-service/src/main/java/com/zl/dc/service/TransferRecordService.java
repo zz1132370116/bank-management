@@ -18,7 +18,7 @@ import java.util.List;
 
 /**
  * @version: V1.0
- * @author: zhanglei
+ * @author: Redsheep
  * @className: TransferRecordService
  * @description: 转账记录操作层
  * @data: 2019/8/6 19:15
@@ -32,6 +32,7 @@ public class TransferRecordService {
     private UserMapper bankUserMapper;
     @Resource
     private SubordinateBankMapper subordinateBankMapper;
+
 
 
 

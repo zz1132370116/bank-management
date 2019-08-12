@@ -13,115 +13,136 @@ import java.util.Objects;
 
 /**
  * @version: V1.0
- * @author: lu
- * @className: 转账记录表
- * @description:
- * @data: 2019/8/10 13:46
+ * @author: redsheep
+ * @className: TransferRecord
+ * @description: 转账记录表
+ * @data: 2019/8/12 9:53
  */
 @Data
 @ToString
 @Table(name = "transfer_record")
 public class TransferRecord {
-    //    主键
+    /**
+     * 主键
+     */
     @Id
     @Column(name = "transfer_record_id")
-    private int transferRecordId;
-    //    转账记录流水号
+    private Integer transferRecordId;
+    /**
+     * 转账记录流水号
+     */
     @Column(name = "transfer_record_uuid")
     private String transferRecordUuid;
-    //    交易额
+    /**
+     * 交易额
+     */
     @Column(name = "transfer_record_amount")
     private BigDecimal transferRecordAmount;
-    //    订单时间
+    /**
+     * 订单时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "transfer_record_time")
     private Date transferRecordTime;
-    //    转账备注
+    /**
+     * 转账备注
+     */
     @Column(name = "transfer_note")
     private String transferNote;
-    //    交易状态
+    /**
+     * 交易状态
+     * 110 交易中
+     * 120 成功
+     * 130 失败
+     */
     @Column(name = "transfer_status")
-    private byte transferStatus;
-    //    转账类型
+    private Byte transferStatus;
+    /**
+     * 转账类型
+     * 100 单次转账
+     * 110 批量转账
+     * 120 跨境转账
+     * 130 主动收款
+     * 140 手机转账
+     * 150 企业=>个人转账
+     * 160 个人=>企业转账
+     */
     @Column(name = "transfer_type")
-    private byte transferType;
-    //    用户id
+    private Byte transferType;
+    /**
+     * 用户id
+     */
     @Column(name = "user_id")
-    private int userId;
-    //    转出卡
+    private Integer userId;
+    /**
+     * 用户自己的卡
+     */
     @Column(name = "bank_out_card")
     private String bankOutCard;
-    //    收款人姓名
+    /**
+     * 收款人姓名
+     */
     @Column(name = "in_card_user_name")
     private String inCardUserName;
-    //    转入卡的银行标识码
+    /**
+     * 转入卡的银行标识码
+     */
     @Column(name = "bank_in_identification")
     private String bankInIdentification;
-    //    转入卡
+    /**
+     * 转入卡
+     */
     @Column(name = "bank_in_card")
     private String bankInCard;
-    //    创建时间
+    /**
+     * 创建时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "gmt_create")
     private Date gmtCreate;
-    //    修改时间
+    /**
+     * 修改时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "gmt_modified")
     private Date gmtModified;
 
-    //用户省份证号，自定义属性
     /**
-     * @author: zhanglei
-     * @param:
-     * @return:
-     * @description: 身份证号
-     * @data: 2019/8/7 9:28
+     * 自定义属性
+     */
+
+    /**
+     * 用户身份证
      */
     @Transient
     private String idCard;
     /**
-     * @author: zhanglei
-     * @param:
-     * @return:
-     * @description: 转出银行
-     * @data: 2019/8/7 9:29
+     * 转出卡银行
      */
     @Transient
     private String bankOutCardName;
     /**
-     * @author: zhanglei
-     * @param:
-     * @return:
-     * @description: 转入银行
-     * @data: 2019/8/7 9:29
+     * 转入卡银行
      */
     @Transient
     private String bankInCardName;
+    /**
+     * 用户姓名
+     */
     @Transient
     private String userName;
     /**
-     * @author: zhanglei
-     * @param:
-     * @return:
-     * @description: 开始时间(用于条件查询)
-     * @data: 2019/8/6 19:04
+     * 查询时间
      */
     @Transient
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date startDate;
-    /**
-     * @author: zhanglei
-     * @param:
-     * @return:
-     * @description: 结束时间(用于条件查询)
-     * @data: 2019/8/6 19:04
-     */
     @Transient
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endDate;
 
