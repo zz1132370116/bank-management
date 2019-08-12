@@ -29,8 +29,9 @@
         </dependency>
         <dependency>
             <groupId>com.zl</groupId>
-            <artifactId>bank-management-common</artifactId>
+            <artifactId>bank-management-utils</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
     </dependencies>
 </project>

@@ -51,7 +51,7 @@ public class AdminController {
      * @author: zhanglei
      * @param: []
      * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
-     * @description: 管理员登录
+     * @description: Redis获取登录信息
      * @data: 2019/8/6 9:15
      */
     @GetMapping("/GetUserByRedis")

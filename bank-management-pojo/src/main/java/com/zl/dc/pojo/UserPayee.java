@@ -47,7 +47,5 @@ public class UserPayee {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date gmtModified;
 
-    //自定义标签，银行的名字
-    @Transient
-    private String bankName;
+
 }
