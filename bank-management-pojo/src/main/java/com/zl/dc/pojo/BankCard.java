@@ -28,6 +28,7 @@ public class BankCard {
     private Integer bankCardId;
     /**
      * 银行卡卡号
+     * 9999 **** **** ****
      */
     @Column(name = "bank_card_number")
     private String bankCardNumber;
@@ -48,10 +49,10 @@ public class BankCard {
     private BigDecimal bankCardBalance;
     /**
      * 银行卡类型
-     * "普通卡"
-     * "钻石卡"
-     * "黑卡"
-     * "企业卡"
+     * 普通卡 ￥500,000
+     * 钻石卡 ￥1,000,000
+     * 黑卡 ￥10,000,000
+     * 企业卡 ￥100,000,000
      */
     @Column(name = "bank_card_type")
     private String bankCardType;
@@ -70,7 +71,9 @@ public class BankCard {
     @Column(name = "bank_card_phone")
     private String bankCardPhone;
     /**
-     * 交易限额
+     * 当日交易限额
+     * 默认根据银行卡类型决定最大交易限额
+     * 用户可更改该交易限额
      */
     @Column(name = "bank_card_transfer_limit")
     private Integer bankCardTransferLimit;
