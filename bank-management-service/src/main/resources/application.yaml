@@ -44,7 +44,7 @@ hystrix:
 eureka:
   client:
     service-url:
-      defaultZone: http://127.0.0.1:10081/eureka
+      defaultZone: http://10.1.12.77:10081/eureka
   instance:
     prefer-ip-address: true
     ip-address: 127.0.0.1

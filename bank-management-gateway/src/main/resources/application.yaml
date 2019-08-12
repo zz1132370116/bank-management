@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: api-web-gateway
+    name: web-gateway
   servlet:
     multipart:
       max-file-size: 2MB
@@ -12,7 +12,7 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://127.0.0.1:10081/eureka
+      defaultZone: http://10.1.12.77:10081/eureka
   instance:
     prefer-ip-address: true
 
@@ -67,3 +67,4 @@ sc:
       - /getAllSubordinateBank    #单次转账----查询出所有所属银行
       - /getExchangeRate        #跨境转账----根据用户选择的币种查询对应的汇率
       - /getExchange            #跨境转账----根据用户输入的金额查询转换后的金额
+      - /getBankCardByUser      #跨境转账----根据用户查询用户所持有的本行卡
