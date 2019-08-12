@@ -1,23 +1,20 @@
 package com.zl.dc.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.netflix.discovery.converters.Auto;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.SubordinateBank;
+import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.service.BankCardService;
 import com.zl.dc.service.SubordinateBankService;
+import com.zl.dc.service.TransferRecordService;
 import com.zl.dc.vo.BaseResult;
-import com.zl.dc.vo.transferValueVo;
-import org.bouncycastle.util.StringList;
+import com.zl.dc.vo.TransferValueVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -39,6 +36,9 @@ public class TransferController {
 
     @Autowired
     private BankCardService bankCardService;
+
+    @Autowired
+    private TransferRecordService transferRecordService;
 
     /**
      * @author: lu
@@ -67,24 +67,44 @@ public class TransferController {
 
     /**
      * @author: lu
-     * @param: * @Param null:
-     * @return: * @return: null
-     * @description: 功能描述
+     * @param: * TransferValueVo
+     * @return: * ResponseEntity<BaseResult>
+     * @description: 单次转账功能
      * @data: 2019/8/12 14:13
      */
-    public ResponseEntity<BaseResult> verifyBankCardForVo(@RequestBody transferValueVo transferValueVo) {
-
+    public ResponseEntity<BaseResult> verifyBankCardForVo(@RequestBody TransferValueVo transferValueVo) {
+//查询银行卡
         BankCard bankCard = bankCardService.verifyBankCardForVo(transferValueVo);
         if (bankCard == null) {
-            return ResponseEntity.ok(new BaseResult(666, "密码错误"));
+            return ResponseEntity.ok(new BaseResult(1, "密码错误"));
         }
         if (bankCard.getBankCardBalance().compareTo(transferValueVo.getMuchMoney()) != -1) {
-            return ResponseEntity.ok(new BaseResult(666, "余额不足，操作失败"));
+            return ResponseEntity.ok(new BaseResult(1, "余额不足，操作失败"));
         }
 
-//TODO 添加转账记录操作~~~~~为完成
-
-
+//        添加转账记录
+        TransferRecord transferRecord = transferRecordService.addTransferRecordforTransferValueVo(transferValueVo);
+        if (transferRecord == null) {
+            return ResponseEntity.ok(new BaseResult(1, "操作异常请通知管理员"));
+        }
+        //操作银行卡扣款 转账状态
+        boolean transferStatus = bankCardService.bankCardTransferBusines(transferValueVo);
+//          如果转账失败
+        if (!transferStatus) {
+            boolean transferFailedStatus = transferRecordService.transferFailedOperation(transferRecord);
+            if (transferFailedStatus) {
+                return ResponseEntity.ok(new BaseResult(1, "转账失败"));
+            } else {
+                return ResponseEntity.ok(new BaseResult(1, "操作异常请通知管理员"));
+            }
+        }
+        //如果转账成功
+        boolean transferSuccessfulStatus = transferRecordService.transferSuccessfulOperation(transferRecord);
+        if (transferSuccessfulStatus) {
+            return ResponseEntity.ok(new BaseResult(1, "转账成功"));
+        } else {
+            return ResponseEntity.ok(new BaseResult(1, "操作异常请通知管理员"));
+        }
     }
 
 
