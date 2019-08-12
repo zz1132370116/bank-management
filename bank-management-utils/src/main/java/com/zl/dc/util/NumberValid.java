@@ -31,4 +31,36 @@ public class NumberValid {
             return true;
         }
     }
+
+    /**
+     * @author pds
+     * @param phone
+     * @return java.lang.Boolean
+     * @description 将验证手机号是否正确
+     * @date 2019/8/11 17:30
+     */
+    public static Boolean verifyPhone(String phone){
+        //验证手机号是否正确
+        String regex = "^[1][3,4,5,7,8][0-9]{9}$";
+        if (!phone.matches(regex)){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @author pds
+     * @param idCard
+     * @return java.lang.Boolean
+     * @description 将验证身份证号是否正确
+     * @date 2019/8/11 17:30
+     */
+    public static Boolean verifyIdCard(String idCard){
+        //验证手机号是否正确
+        String regex = "(^\\d{18}$)|(^\\d{15}$)";
+        if (!idCard.matches(regex)){
+            return false;
+        }
+        return true;
+    }
 }
