@@ -25,7 +25,7 @@ public class exchangeRateApi {
      * @description: 金额
      * @data: 2019/8/10 10:27
      */
-     public static String exChangeRatePrice(String amount,String from,String to){
+     public static String exChangeRatePrice(String  amount, String from, String to){
 
          String host = "https://jisuhuilv.market.alicloudapi.com";
          String path = "/exchange/convert";

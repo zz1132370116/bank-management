@@ -40,5 +40,37 @@ public class CrossBorderTransferRecordService {
         }
         return crossBorderTransferRecord;
     }
+    /**
+     * @author: zhanglei
+     * @param: [crossBorderTransferRecord]
+     * @return:com.zl.dc.pojo.CrossBorderTransferRecord
+     * @description: 换算金额
+     * @data: 2019/8/12 9:34
+     */
+    public CrossBorderTransferRecord getExchange(CrossBorderTransferRecord crossBorderTransferRecord) {
 
+        String from = "CNY";
+        //和0，Zero比较
+        int f = crossBorderTransferRecord.getTransferRecordAmountFrom().compareTo(BigDecimal.ZERO);
+        //和0，Zero比较
+        int t = crossBorderTransferRecord.getTransferRecordAmountTo().compareTo(BigDecimal.ZERO);
+        //判断交易额是否存在
+        if (f == 0 || f == -1){
+            //判断到账金额是否为空
+            if (t == 0 || t == -1){
+                //根据外币向人民币转换
+                String s = exchangeRateApi.exChangeRatePrice(String.valueOf(t), crossBorderTransferRecord.getCurrencyType(), from );
+               crossBorderTransferRecord.setTransferRecordAmountFrom(new BigDecimal(s));
+                return crossBorderTransferRecord;
+            }else{
+                return null;
+            }
+        }else{
+            //存在
+            //根据外币向人民币转换
+            String s = exchangeRateApi.exChangeRatePrice(String.valueOf(t),from , crossBorderTransferRecord.getCurrencyType() );
+            crossBorderTransferRecord.setTransferRecordAmountTo(new BigDecimal(s));
+            return crossBorderTransferRecord;
+        }
+    }
 }
