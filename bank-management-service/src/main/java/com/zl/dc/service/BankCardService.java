@@ -61,6 +61,9 @@ public class BankCardService {
         Example.Criteria criteria = example.createCriteria();
         criteria.andEqualTo("userId",bankUser.getUserId());
         List<BankCard> bankCards = bankCardMapper.selectByExample(example);
+        for (BankCard bankCard : bankCards) {
+            bankCard.setBank("五仁银行");
+        }
         return bankCards;
     }
 
