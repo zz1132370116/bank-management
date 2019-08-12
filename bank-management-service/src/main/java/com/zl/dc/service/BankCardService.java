@@ -2,11 +2,14 @@ package com.zl.dc.service;
 
 import com.zl.dc.mapper.BankCardMapper;
 import com.zl.dc.pojo.BankCard;
+import com.zl.dc.pojo.BankUser;
 import com.zl.dc.util.MD5;
 import com.zl.dc.vo.transferValueVo;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @version: V1.0
@@ -46,6 +49,19 @@ public class BankCardService {
         }
         return null;
     }
-
+    /**
+     * @author: zhanglei
+     * @param: [bankUser]
+     * @return:java.util.List<com.zl.dc.pojo.CrossBorderTransferRecord>
+     * @description: 根据用户查询用户所持有的本行卡
+     * @data: 2019/8/12 15:26
+     */
+    public List<BankCard> getBankCardByUser(BankUser bankUser) {
+        Example example = new Example(BankCard.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("userId",bankUser.getUserId());
+        List<BankCard> bankCards = bankCardMapper.selectByExample(example);
+        return bankCards;
+    }
 
 }

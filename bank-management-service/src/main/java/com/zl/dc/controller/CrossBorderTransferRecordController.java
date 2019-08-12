@@ -49,12 +49,11 @@ public class CrossBorderTransferRecordController {
 
         if (crossBorderTransferRecord != null) {
             CrossBorderTransferRecord crossBorderTransferRecord1 = crossBorderTransferRecordService.getExchange(crossBorderTransferRecord);
-            if (crossBorderTransferRecord !=null){
+            if (crossBorderTransferRecord != null) {
                 return ResponseEntity.ok(new BaseResult(0, "成功").append("data", crossBorderTransferRecord1));
             }
             return ResponseEntity.ok(new BaseResult(1, "请重试"));
         }
         return ResponseEntity.ok(new BaseResult(1, "失败"));
     }
-
 }
