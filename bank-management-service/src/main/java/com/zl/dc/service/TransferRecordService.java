@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @version: V1.0
- * @author: Redsheep
+ * @version: V1.1
+ * @author: lu
  * @className: TransferRecordService
  * @description: 转账记录操作层
  * @data: 2019/8/6 19:15
@@ -32,9 +32,5 @@ public class TransferRecordService {
     private UserMapper bankUserMapper;
     @Resource
     private SubordinateBankMapper subordinateBankMapper;
-
-
-
-
 
 }

@@ -2,6 +2,7 @@ package com.zl.dc.service;
 
 import com.zl.dc.mapper.UserMapper;
 import com.zl.dc.pojo.BankUser;
+import com.zl.dc.vo.BankUserVo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
@@ -74,10 +75,22 @@ public class UserService {
      * @description: 修改手机
      * @data: 2019/8/10 10:21
      */
-    public BankUser updateBankUserPhone(BankUser user){
+    public BankUser updateBankUserPhone(BankUserVo user){
         BankUser bankUserByUserPhone = this.getBankUserByUserPhone(user.getOldPhone());
         bankUserByUserPhone.setUserPhone(user.getUserPhone());
         userMapper.updateByPrimaryKeySelective(bankUserByUserPhone);
         return bankUserByUserPhone;
+    }
+
+    /**
+     * @author pds
+     * @param user
+     * @return void
+     * @description 功能描述
+     * @date 2019/8/12 13:58
+     */
+    public void updateBankUserPhoneToEmpty(BankUser user){
+        user.setUserPhone("");
+        userMapper.updateByPrimaryKeySelective(user);
     }
 }

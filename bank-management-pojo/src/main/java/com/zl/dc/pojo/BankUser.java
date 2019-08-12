@@ -22,7 +22,7 @@ public class BankUser {
     //    主键自增
     @Id
     @Column(name = "user_id")
-    private int userId;
+    private Integer userId;
     //    用户姓名
     @Column(name = "user_name")
     private String userName;
@@ -34,10 +34,10 @@ public class BankUser {
     private String userPassword;
     //    用户状态
     @Column(name = "user_status")
-    private byte userStatus;
+    private Byte userStatus;
     //    手机号收款的银行卡，默认为空
     @Column(name = "default_bank_card_id")
-    private int defaultBankCardId;
+    private Integer defaultBankCardId;
     //    用户身份证号
     @Column(name = "id_card")
     private String idCard;
@@ -52,19 +52,4 @@ public class BankUser {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date gmtModified;
 
-    /**
-     * 接收验证码
-     */
-    @Transient
-    private String code;
-    /**
-     * 修改手机功能的原手机号
-     */
-    @Transient
-    private String oldPhone;
-    /**
-     * 修改密码功能的确认密码
-     */
-    @Transient
-    private String passwordConfig;
 }
