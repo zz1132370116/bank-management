@@ -64,3 +64,4 @@ sc:
       - /updatePhoneSms      #修改手机----获取验证码
       - /updatePhoneVerify   #修改手机----验证验证码是否正确
       - /updatePhone         #修改手机----修改手机
+      - /getAllSubordinateBank    #单次转账----查询出所有所属银行
