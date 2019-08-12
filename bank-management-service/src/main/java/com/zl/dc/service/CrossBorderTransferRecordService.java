@@ -31,10 +31,11 @@ public class CrossBorderTransferRecordService {
      */
     public CrossBorderTransferRecord getExchangeRate(CrossBorderTransferRecord crossBorderTransferRecord) {
 
-        String amount = "10";
+        String amount = "100";
         String from = "CNY";
         String to = null;
-        if (crossBorderTransferRecord.getCurrencyType().equals("") && crossBorderTransferRecord.getCurrencyType() != null) {
+        if (!crossBorderTransferRecord.getCurrencyType().equals("") && crossBorderTransferRecord.getCurrencyType() != null) {
+            to = crossBorderTransferRecord.getCurrencyType();
             String s = exchangeRateApi.exChangeRate(amount, from, to);
             crossBorderTransferRecord.setRate(s);
         }
