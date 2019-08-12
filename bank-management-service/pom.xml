@@ -58,9 +58,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
+        <!-- 导入pojo -->
         <dependency>
             <groupId>com.zl</groupId>
             <artifactId>bank-management-pojo</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!-- 导入utils -->
+        <dependency>
+            <groupId>com.zl</groupId>
+            <artifactId>bank-management-utils</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
