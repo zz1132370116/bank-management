@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * @version: V1.0
@@ -20,6 +19,7 @@ import java.util.Objects;
  */
 @Data
 @ToString
+@Component
 @Table(name = "transfer_record")
 public class TransferRecord {
     /**

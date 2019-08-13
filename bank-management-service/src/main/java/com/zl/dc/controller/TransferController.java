@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
@@ -72,13 +73,14 @@ public class TransferController {
      * @description: 单次转账功能
      * @data: 2019/8/12 14:13
      */
+    @PostMapping("/verifyBankCardForVo")
     public ResponseEntity<BaseResult> verifyBankCardForVo(@RequestBody TransferValueVo transferValueVo) {
-//查询银行卡
+        //查询银行卡
         BankCard bankCard = bankCardService.verifyBankCardForVo(transferValueVo);
         if (bankCard == null) {
             return ResponseEntity.ok(new BaseResult(1, "密码错误"));
         }
-        if (bankCard.getBankCardBalance().compareTo(transferValueVo.getMuchMoney()) != -1) {
+        if (bankCard.getBankCardBalance().compareTo(transferValueVo.getMuchMoney()) == -1) {
             return ResponseEntity.ok(new BaseResult(1, "余额不足，操作失败"));
         }
 
@@ -106,6 +108,4 @@ public class TransferController {
             return ResponseEntity.ok(new BaseResult(1, "操作异常请通知管理员"));
         }
     }
-
-
 }
