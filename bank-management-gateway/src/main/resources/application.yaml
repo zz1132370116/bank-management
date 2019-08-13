@@ -68,3 +68,4 @@ sc:
       - /getExchangeRate        #跨境转账----根据用户选择的币种查询对应的汇率
       - /getExchange            #跨境转账----根据用户输入的金额查询转换后的金额
       - /getBankCardByUser      #跨境转账----根据用户查询用户所持有的本行卡
+      - /verifyBankCardForVo     #单次转账----转账方法

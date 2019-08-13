@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.io.PrintStream;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ import java.util.List;
  * @data: 2019/8/12 11:00
  */
 @Service
-@Transactional(rollbackFor = Exception.class)
+@Transactional
 public class BankCardService {
 
     @Resource
@@ -36,20 +37,20 @@ public class BankCardService {
      */
 
     public BankCard verifyBankCardForVo(TransferValueVo transferValueVo) {
+        Example example = new Example(BankCard.class);
+        Example.Criteria criteria = example.createCriteria();
 //          对VO进非空校验
         if (transferValueVo != null) {
 //            对密码进行非空校验
-            if (transferValueVo.getPassword() != null && "".equals(transferValueVo.getPassword())) {
+            if (transferValueVo.getPassword() != null && !"".equals(transferValueVo.getPassword())) {
+                criteria.andEqualTo("bankCardPassword", transferValueVo.getPassword());
 //                对银行卡id进行非空校验
-                if (transferValueVo.getOutBankCardID() != null && "".equals(transferValueVo.getOutBankCardID())) {
+                if (transferValueVo.getOutBankCardID() != null && !"".equals(transferValueVo.getOutBankCardID())) {
 //            将传入密码加密处理
-                    transferValueVo.setPassword(MD5.GetMD5Code(transferValueVo.getPassword()));
+//                    transferValueVo.setPassword(MD5.GetMD5Code(transferValueVo.getPassword()));
 //            拼接条件查询出该银行卡
-                    Example example = new Example(BankCard.class);
-                    Example.Criteria criteria = example.createCriteria();
                     criteria.andEqualTo("bankCardId", transferValueVo.getOutBankCardID());
-                    criteria.andEqualTo("bankCardPassword", transferValueVo.getPassword());
-                    criteria.andEqualTo("bankCardType", 100);
+                    criteria.andEqualTo("bankCardStatus", "100");
                     return bankCardMapper.selectOneByExample(example);
 
                 }
@@ -66,20 +67,25 @@ public class BankCardService {
      * @data: 2019/8/12 16:19
      */
     public boolean bankCardTransferBusines(TransferValueVo transferValueVo) {
-        //          查询扣款卡，扣款
-        BankCard outBankCard = bankCardMapper.selectByPrimaryKey(transferValueVo.getOutBankCardID());
-        outBankCard.setBankCardBalance(outBankCard.getBankCardBalance().subtract(transferValueVo.getMuchMoney()));
-        int transferOut = bankCardMapper.updateByExample(outBankCard, BankCard.class);
+        try {
+            //          查询扣款卡，扣款
 
-        //          查询收款卡，收款
-        BankCard inBankCard = bankCardMapper.selectByPrimaryKey(transferValueVo.getInBankCard());
-        inBankCard.setBankCardBalance(inBankCard.getBankCardBalance().add(transferValueVo.getMuchMoney()));
-        int transfer = bankCardMapper.updateByExample(inBankCard, BankCard.class);
+            BankCard outBankCard = bankCardMapper.selectByPrimaryKey(transferValueVo.getOutBankCardID());
+            outBankCard.setBankCardBalance(outBankCard.getBankCardBalance().subtract(transferValueVo.getMuchMoney()));
+            int transferOut = bankCardMapper.updateByPrimaryKeySelective(outBankCard);
 
-        if ((transferOut + transfer) == 2) {
-            return true;
+
+            //          查询收款卡，收款
+            Example example = new Example(BankCard.class);
+            Example.Criteria criteria = example.createCriteria();
+            criteria.andEqualTo("bankCardNumber", transferValueVo.getInBankCard());
+            BankCard inBankCard = bankCardMapper.selectOneByExample(example);
+            inBankCard.setBankCardBalance(inBankCard.getBankCardBalance().add(transferValueVo.getMuchMoney()));
+            int transfer = bankCardMapper.updateByPrimaryKeySelective(inBankCard);
+        } catch (Exception e) {
+            throw e;
         }
-        return false;
+        return true;
     }
 
     /**
@@ -99,4 +105,6 @@ public class BankCardService {
         }
         return bankCards;
     }
+
+
 }

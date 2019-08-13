@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * @version: V1.0
@@ -20,6 +19,7 @@ import java.util.Objects;
  */
 @Data
 @ToString
+@Component
 @Table(name = "transfer_record")
 public class TransferRecord {
     /**
@@ -62,8 +62,8 @@ public class TransferRecord {
      * 转账类型
      * 100 单次转账
      * 110 批量转账
-     * 120 跨境转账
      * 130 主动收款
+     * 120 跨境转账
      * 140 手机转账
      * 150 企业=>个人转账
      * 160 个人=>企业转账
