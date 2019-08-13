@@ -87,16 +87,16 @@ public class CrossBorderTransferRecordController {
     public ResponseEntity<BaseResult> CrossBorderTransfer(@RequestBody CrossBorderTransferRecord crossBorderTransferRecord) {
         if (crossBorderTransferRecord != null) {
             String s = crossBorderTransferRecordService.CrossBorderTransfer(crossBorderTransferRecord);
-            if ("转账成功".equals(s)){
-                return ResponseEntity.ok(new BaseResult(0,"成功"));
-            }else if ("余额不足".equals(s)){
-                return ResponseEntity.ok(new BaseResult(1,"余额不足"));
-            }else{
-                return ResponseEntity.ok(new BaseResult(2,"转账失败"));
+            if ("转账成功".equals(s)) {
+                return ResponseEntity.ok(new BaseResult(0, "成功"));
+            } else if ("余额不足".equals(s)) {
+                return ResponseEntity.ok(new BaseResult(1, "余额不足"));
+            } else if ("已超出银行卡限额,请前往提升卡类型".equals(s)) {
+                return ResponseEntity.ok(new BaseResult(2, "已超出银行卡限额,请前往提升卡类型"));
             }
-        }else{
-            return ResponseEntity.ok(new BaseResult(2,"转账失败"));
+        } else {
+            return ResponseEntity.ok(new BaseResult(3, "转账失败"));
         }
-
+        return null;
     }
 }
