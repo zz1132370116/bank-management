@@ -76,12 +76,27 @@ public class CrossBorderTransferRecordController {
         }
         return ResponseEntity.ok(new BaseResult(1, "失败"));
     }
-
+    /**
+     * @author: zhanglei
+     * @param: [crossBorderTransferRecord]
+     * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description: 跨境转账
+     * @data: 2019/8/13 14:22
+     */
     @PostMapping("/CrossBorderTransfer")
     public ResponseEntity<BaseResult> CrossBorderTransfer(@RequestBody CrossBorderTransferRecord crossBorderTransferRecord) {
         if (crossBorderTransferRecord != null) {
-            crossBorderTransferRecordService.CrossBorderTransfer(crossBorderTransferRecord);
+            String s = crossBorderTransferRecordService.CrossBorderTransfer(crossBorderTransferRecord);
+            if ("转账成功".equals(s)){
+                return ResponseEntity.ok(new BaseResult(0,"成功"));
+            }else if ("余额不足".equals(s)){
+                return ResponseEntity.ok(new BaseResult(1,"余额不足"));
+            }else{
+                return ResponseEntity.ok(new BaseResult(2,"转账失败"));
+            }
+        }else{
+            return ResponseEntity.ok(new BaseResult(2,"转账失败"));
         }
-        return ResponseEntity.ok(new BaseResult(0,"成功"));
+
     }
 }

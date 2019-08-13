@@ -94,11 +94,14 @@ public class CrossBorderTransferRecordService {
      * @description: 跨境转账
      * @data: 2019/8/13 10:15
      */
-    public void CrossBorderTransfer(CrossBorderTransferRecord crossBorderTransferRecord) {
+    public String CrossBorderTransfer(CrossBorderTransferRecord crossBorderTransferRecord) {
         Example example = new Example(BankCard.class);
         Example.Criteria criteria = example.createCriteria();
         //非空判断
-        if (StringUtils.isNotBlank(crossBorderTransferRecord.getBankOutCard()) && StringUtils.isNotBlank(crossBorderTransferRecord.getBankInCard()) && StringUtils.isNotBlank(crossBorderTransferRecord.getCurrencyType())) {
+        if (StringUtils.isNotBlank(crossBorderTransferRecord.getBankOutCard())
+                && StringUtils.isNotBlank(crossBorderTransferRecord.getBankInCard())
+                && StringUtils.isNotBlank(crossBorderTransferRecord.getCurrencyType())) {
+            //类型转换
             int from = crossBorderTransferRecord.getTransferRecordAmountFrom().compareTo(BigDecimal.ZERO);
             int to = crossBorderTransferRecord.getTransferRecordAmountTo().compareTo(BigDecimal.ZERO);
             //非0判断
@@ -106,18 +109,33 @@ public class CrossBorderTransferRecordService {
                 //转账
                 //修改银行卡金额
                 criteria.andEqualTo("bankCardNumber", crossBorderTransferRecord.getBankOutCard());
+                //条件查询银行卡
                 BankCard bankCard = bankCardMapper.selectOneByExample(example);
-                bankCard.setBankCardBalance(bankCard.getBankCardBalance().subtract(crossBorderTransferRecord.getTransferRecordAmountFrom()));
-                bankCardMapper.updateByPrimaryKeySelective(bankCard);
-                //创建转账机记录
-                //生成流水号
-                crossBorderTransferRecord.setTransferRecordUuid(UUID.randomUUID().toString());
-                //生成创建时间
-                crossBorderTransferRecord.setGmtCreate(new Date());
-                //
-                crossBorderTransferRecordMapper.insertSelective(crossBorderTransferRecord);
+                //判断银行卡不为空并且银行卡可用
+                if (bankCard != null && bankCard.getBankCardStatus() == 0) {
+                    int i = bankCard.getBankCardBalance().compareTo(BigDecimal.ZERO);
+                    //银行卡余额不为空 并且 银行卡余额大于转账金额
+                    if (i != 0 && bankCard.getBankCardBalance().compareTo(crossBorderTransferRecord.getTransferRecordAmountFrom()) == 1) {
+                        bankCard.setBankCardBalance(bankCard.getBankCardBalance().subtract(crossBorderTransferRecord.getTransferRecordAmountFrom()));
+                        bankCardMapper.updateByPrimaryKeySelective(bankCard);
+                        //创建转账机记录
+                        //生成流水号
+                        crossBorderTransferRecord.setTransferRecordUuid(UUID.randomUUID().toString());
+                        //生成创建时间
+                        crossBorderTransferRecord.setGmtCreate(new Date());
+                        //生成转账记录
+                        crossBorderTransferRecordMapper.insertSelective(crossBorderTransferRecord);
+                        return "转账成功";
+                    } else {
+                        return "余额不足";
+                    }
+                }
+            } else {
+                return "转账失败";
             }
-
+        } else {
+            return "数据为空";
         }
+        return null;
     }
 }
