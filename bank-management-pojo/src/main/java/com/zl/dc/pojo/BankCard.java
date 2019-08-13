@@ -10,11 +10,11 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * @version: V1.1
- * @author: lu
- * @className: 银行卡
- * @description:
- * @data: 2019/8/6 9:32
+ * @version: V1.0
+ * @author: redsheep
+ * @className: BankCard
+ * @description: 银行卡实体类
+ * @data: 2019/8/12 14:42
  */
 @Data
 @ToString
@@ -28,12 +28,12 @@ public class BankCard {
     private Integer bankCardId;
     /**
      * 银行卡卡号
+     * 9999 **** **** ****
      */
     @Column(name = "bank_card_number")
     private String bankCardNumber;
-    //    银行卡密码加密
     /**
-     * 所属用户
+     * 银行卡密码密文
      */
     @Column(name = "bank_card_password")
     private String bankCardPassword;
@@ -42,38 +42,38 @@ public class BankCard {
      */
     @Column(name = "user_id")
     private Integer userId;
-
     /**
      * 银行卡余额
      */
     @Column(name = "bank_card_balance")
     private BigDecimal bankCardBalance;
-
     /**
      * 银行卡类型
-     * 100为用户普通卡
-     * 110为用户钻石卡
-     * 120为用户黑卡
-     * 130位企业用卡
+     * 普通卡 ￥500,000
+     * 钻石卡 ￥1,000,000
+     * 黑卡 ￥10,000,000
+     * 企业卡 ￥100,000,000
      */
     @Column(name = "bank_card_type")
     private String bankCardType;
-
     /**
      * 银行卡状态
-     * 100 为正常时用状态
-     * 110 为申请状态
-     * 120 为冻结状态
+     * 100 正常
+     * 120 挂失
+     * 130 冻结
+     * 140 注销
      */
     @Column(name = "bank_card_status")
-    private byte bankCardStatus;
+    private Byte bankCardStatus;
     /**
      * 银行卡预留手机号码
      */
     @Column(name = "bank_card_phone")
     private String bankCardPhone;
     /**
-     * 交易限额
+     * 当日交易限额
+     * 默认根据银行卡类型决定最大交易限额
+     * 用户可更改该交易限额
      */
     @Column(name = "bank_card_transfer_limit")
     private Integer bankCardTransferLimit;

@@ -17,7 +17,7 @@ public class BaseResult {
 
     /**
      * 2个必填项
-     * @param errno  提示码
+     * @param errno  提示码,0表示
      * @param errmsg  错误提示信息
      */
     public BaseResult(Integer errno, String errmsg) {
