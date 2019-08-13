@@ -3,6 +3,7 @@ package com.zl.dc.config;
 
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
@@ -10,10 +11,13 @@ import com.netflix.zuul.exception.ZuulException;
 import com.zl.dc.util.JwtUtils;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 
 /**
  * Created by 舍頭襘游泳 on 2018/12/17.
@@ -51,6 +55,9 @@ public class LoginFilter extends ZuulFilter {
         for (String path  : filterProperties.getAllowPaths()) {
             //  /v1/auth-service/login  --> ["","v1","auth-service","login"]
             String[] pathArr = requestURI.split("/");
+            /*if("loginBySendSms".equals(pathArr[3]) || "login".equals(pathArr[3])){
+                return false;
+            }*/
             //只要有一个路径匹配的，过滤器不执行
             if(path.equals("/" + pathArr[3])){
 
@@ -80,8 +87,13 @@ public class LoginFilter extends ZuulFilter {
             JwtUtils.getInfoFromToken( token , jwtProperties.getPublicKey() );
         } catch (Exception e) {
             // 2.4 如果有异常--没有登录（没有权限）
-            currentContext.setResponseStatusCode( 403 );        //响应的状态码：403
-            currentContext.setSendZuulResponse( false );        //没有响应内容
+            //响应的状态码：403
+            currentContext.setResponseStatusCode( 403 );
+            //没有响应内容
+            currentContext.setSendZuulResponse( false );
+            String bodyStr = "{\"errno\":1,\"errmsg\":\"please login\"}";
+            JSONObject jsonObject = JSONObject.parseObject(bodyStr);
+            currentContext.setResponseBody(jsonObject.toJSONString());
         }
 
         // 2.5 如果没有异常，登录了--放行
