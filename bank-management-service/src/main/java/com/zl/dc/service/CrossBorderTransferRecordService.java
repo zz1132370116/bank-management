@@ -61,13 +61,14 @@ public class CrossBorderTransferRecordService {
     public CrossBorderTransferRecord getExchangeRatePrice(String price, String type) {
         //类型转换
         //根据人民币转为用户选择币种的金额
-        String s = exchangeRateApi.exChangeRatePrice(price,"CNY" , type );
+        String s = exchangeRateApi.exChangeRatePrice(price, "CNY", type);
         CrossBorderTransferRecord crossBorderTransferRecord = new CrossBorderTransferRecord();
         crossBorderTransferRecord.setCurrencyType(type);
         crossBorderTransferRecord.setTransferRecordAmountFrom(new BigDecimal(price));
         crossBorderTransferRecord.setTransferRecordAmountTo(new BigDecimal(s));
         return crossBorderTransferRecord;
     }
+
     /**
      * @author: zhanglei
      * @param: [price, type]
@@ -78,13 +79,14 @@ public class CrossBorderTransferRecordService {
     public CrossBorderTransferRecord getExchangeRateCNY(String price, String type) {
         //类型转换
         //根据人民币转为用户选择币种的金额
-        String s = exchangeRateApi.exChangeRatePrice(price,type , "CNY" );
+        String s = exchangeRateApi.exChangeRatePrice(price, type, "CNY");
         CrossBorderTransferRecord crossBorderTransferRecord = new CrossBorderTransferRecord();
         crossBorderTransferRecord.setCurrencyType(type);
         crossBorderTransferRecord.setTransferRecordAmountFrom(new BigDecimal(s));
         crossBorderTransferRecord.setTransferRecordAmountTo(new BigDecimal(price));
         return crossBorderTransferRecord;
     }
+
     /**
      * @author: zhanglei
      * @param: [crossBorderTransferRecord]
@@ -96,14 +98,14 @@ public class CrossBorderTransferRecordService {
         Example example = new Example(BankCard.class);
         Example.Criteria criteria = example.createCriteria();
         //非空判断
-        if (StringUtils.isNotBlank(crossBorderTransferRecord.getBankOutCard()) &&StringUtils.isNotBlank(crossBorderTransferRecord.getBankInCard()) && StringUtils.isNotBlank(crossBorderTransferRecord.getCurrencyType())){
+        if (StringUtils.isNotBlank(crossBorderTransferRecord.getBankOutCard()) && StringUtils.isNotBlank(crossBorderTransferRecord.getBankInCard()) && StringUtils.isNotBlank(crossBorderTransferRecord.getCurrencyType())) {
             int from = crossBorderTransferRecord.getTransferRecordAmountFrom().compareTo(BigDecimal.ZERO);
             int to = crossBorderTransferRecord.getTransferRecordAmountTo().compareTo(BigDecimal.ZERO);
             //非0判断
-            if (from !=0 && from != -1 && to !=0 && to!= -1){
+            if (from != 0 && from != -1 && to != 0 && to != -1) {
                 //转账
                 //修改银行卡金额
-                criteria.andEqualTo("bankCardNumber",crossBorderTransferRecord.getBankOutCard());
+                criteria.andEqualTo("bankCardNumber", crossBorderTransferRecord.getBankOutCard());
                 BankCard bankCard = bankCardMapper.selectOneByExample(example);
                 bankCard.setBankCardBalance(bankCard.getBankCardBalance().subtract(crossBorderTransferRecord.getTransferRecordAmountFrom()));
                 bankCardMapper.updateByPrimaryKeySelective(bankCard);

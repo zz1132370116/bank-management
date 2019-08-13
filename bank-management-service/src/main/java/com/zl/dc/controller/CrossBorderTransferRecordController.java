@@ -37,6 +37,7 @@ public class CrossBorderTransferRecordController {
         }
         return ResponseEntity.ok(new BaseResult(1, "失败"));
     }
+
     /**
      * @author: zhanglei
      * @param: [crossBorderTransferRecord]
@@ -45,10 +46,10 @@ public class CrossBorderTransferRecordController {
      * @data: 2019/8/11 9:48
      */
     @GetMapping("/getExchangeRatePrice/{price}/{type}")
-    public ResponseEntity<BaseResult> getExchangeRatePrice(@PathVariable("price")String price,@PathVariable("type") String type) {
+    public ResponseEntity<BaseResult> getExchangeRatePrice(@PathVariable("price") String price, @PathVariable("type") String type) {
 
-        if (price != "" && type !="") {
-            CrossBorderTransferRecord crossBorderTransferRecord1 = crossBorderTransferRecordService.getExchangeRatePrice(price,type);
+        if (price != "" && type != "") {
+            CrossBorderTransferRecord crossBorderTransferRecord1 = crossBorderTransferRecordService.getExchangeRatePrice(price, type);
             if (crossBorderTransferRecord1 != null) {
                 return ResponseEntity.ok(new BaseResult(0, "成功").append("data", crossBorderTransferRecord1));
             }
@@ -56,6 +57,7 @@ public class CrossBorderTransferRecordController {
         }
         return ResponseEntity.ok(new BaseResult(1, "失败"));
     }
+
     /**
      * @author: zhanglei
      * @param: [price, type]
@@ -64,9 +66,9 @@ public class CrossBorderTransferRecordController {
      * @data: 2019/8/13 9:41
      */
     @GetMapping("/getExchangeRateCNY/{price}/{type}")
-    public ResponseEntity<BaseResult> getExchangeRateCNY(@PathVariable("price")String price,@PathVariable("type") String type) {
-        if (price != "" && type !="") {
-            CrossBorderTransferRecord crossBorderTransferRecord1 = crossBorderTransferRecordService.getExchangeRateCNY(price,type);
+    public ResponseEntity<BaseResult> getExchangeRateCNY(@PathVariable("price") String price, @PathVariable("type") String type) {
+        if (price != "" && type != "") {
+            CrossBorderTransferRecord crossBorderTransferRecord1 = crossBorderTransferRecordService.getExchangeRateCNY(price, type);
             if (crossBorderTransferRecord1 != null) {
                 return ResponseEntity.ok(new BaseResult(0, "成功").append("data", crossBorderTransferRecord1));
             }
@@ -74,10 +76,12 @@ public class CrossBorderTransferRecordController {
         }
         return ResponseEntity.ok(new BaseResult(1, "失败"));
     }
+
     @PostMapping("/CrossBorderTransfer")
-    public ResponseEntity<BaseResult> CrossBorderTransfer(@RequestBody CrossBorderTransferRecord crossBorderTransferRecord){
-        if (crossBorderTransferRecord != null){
+    public ResponseEntity<BaseResult> CrossBorderTransfer(@RequestBody CrossBorderTransferRecord crossBorderTransferRecord) {
+        if (crossBorderTransferRecord != null) {
             crossBorderTransferRecordService.CrossBorderTransfer(crossBorderTransferRecord);
         }
+        return ResponseEntity.ok(new BaseResult(0,"成功"));
     }
 }
