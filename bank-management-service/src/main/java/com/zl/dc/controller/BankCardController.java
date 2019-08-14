@@ -147,7 +147,23 @@ public class BankCardController {
             String code = redisTemplate.opsForValue().get(bankCard.getBankCardPhone()+bankCard.getCode());
             if (StringUtils.isNotBlank(code)){
                 //申请
-                bankCardService.UpgradeCard(bankCard);
+                String s = bankCardService.UpgradeCard(bankCard);
+                if (StringUtils.isNotBlank(s)){
+                    if (s.equals("缺少银行卡信息")){
+                        return ResponseEntity.ok(new BaseResult(1,"缺少银行卡信息")) ;
+                    }
+                    if (s.equals("缺少用户信息")){
+                        return ResponseEntity.ok(new BaseResult(1,"缺少用户信息")) ;
+                    }
+                    if (s.equals("申请成功")){
+                        return ResponseEntity.ok(new BaseResult(0,"申请成功")) ;
+                    }
+                    if (s.equals("申请失败")){
+                        return ResponseEntity.ok(new BaseResult(1,"申请失败")) ;
+                    }
+                }else{
+                    return ResponseEntity.ok(new BaseResult(1,"申请失败")) ;
+                }
             }else{
                 return ResponseEntity.ok(new BaseResult(1,"验证码错误"));
             }
@@ -155,5 +171,6 @@ public class BankCardController {
         }else{
             return ResponseEntity.ok(new BaseResult(1,"申请失败")) ;
         }
+        return ResponseEntity.ok(new BaseResult(1,"申请失败"));
     }
 }
