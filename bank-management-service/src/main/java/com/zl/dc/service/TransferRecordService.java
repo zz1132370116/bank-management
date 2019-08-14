@@ -4,6 +4,8 @@ import com.zl.dc.mapper.TransferRecordMapper;
 import com.zl.dc.mapper.UserMapper;
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.TransferRecord;
+import com.zl.dc.util.AccessBank;
+import com.zl.dc.vo.PageBean;
 import com.zl.dc.vo.TransferValueVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -117,5 +120,15 @@ public class TransferRecordService {
         }
     }
 
+    /**
+     * @author: redsheep
+     * @Param pageBean
+     * @return: java.util.List<com.zl.dc.pojo.TransferRecord>
+     * @description: 根据月份分页查询用户所有卡的转账记录
+     * @data: 2019/8/13 9:26
+     */
+    public List<TransferRecord> getTransferRecordByMonth(PageBean pageBean) {
 
+        return null;
+    }
 }

@@ -73,24 +73,30 @@ public class BankCardService {
      * @data: 2019/8/12 16:19
      */
     public boolean bankCardTransferBusines(TransferValueVo transferValueVo) {
-        try {
-            //          查询扣款卡，扣款
-            BankCard outBankCard = bankCardMapper.selectByPrimaryKey(transferValueVo.getOutBankCardID());
-            outBankCard.setBankCardBalance(outBankCard.getBankCardBalance().subtract(transferValueVo.getMuchMoney()));
-            int transferOut = bankCardMapper.updateByPrimaryKeySelective(outBankCard);
 
+        //          查询扣款卡，扣款
+        BankCard outBankCard = bankCardMapper.selectByPrimaryKey(transferValueVo.getOutBankCardID());
+        outBankCard.setBankCardBalance(outBankCard.getBankCardBalance().subtract(transferValueVo.getMuchMoney()));
+        int transferOut = bankCardMapper.updateByPrimaryKeySelective(outBankCard);
 
-            //          查询收款卡，收款
-            Example example = new Example(BankCard.class);
-            Example.Criteria criteria = example.createCriteria();
-            criteria.andEqualTo("bankCardNumber", transferValueVo.getInBankCard());
-            BankCard inBankCard = bankCardMapper.selectOneByExample(example);
-            inBankCard.setBankCardBalance(inBankCard.getBankCardBalance().add(transferValueVo.getMuchMoney()));
-            int transfer = bankCardMapper.updateByPrimaryKeySelective(inBankCard);
-        } catch (Exception e) {
-            throw e;
+        if (transferOut != 1) {
+            //转账失败回滚操作
+            return false;
+        }
+
+        //          查询收款卡，收款
+        Example example = new Example(BankCard.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("bankCardNumber", transferValueVo.getInBankCard());
+        BankCard inBankCard = bankCardMapper.selectOneByExample(example);
+        inBankCard.setBankCardBalance(inBankCard.getBankCardBalance().add(transferValueVo.getMuchMoney()));
+        int transfer = bankCardMapper.updateByPrimaryKeySelective(inBankCard);
+        if (transfer != 1) {
+            //转账失败回滚操作
+            return false;
         }
         return true;
+
     }
 
     /**
@@ -124,7 +130,7 @@ public class BankCardService {
         Example.Criteria criteria = example.createCriteria();
         criteria.andEqualTo("bankCardNumber", BankNum);
         OtherBankCard otherBankCard = otherBankCardMapper.selectOneByExample(example);
-        if (otherBankCard == null){
+        if (otherBankCard == null) {
             return null;
         }
         return otherBankCard;
@@ -137,15 +143,13 @@ public class BankCardService {
      * @description: 根据银行卡号查询用户id
      * @data: 2019/8/13 20:32
      */
-    public Integer selectBankUserByBankCardNum(String bankCardNum){
+    public Integer selectBankUserByBankCardNum(String bankCardNum) {
         Example example = new Example(BankCard.class);
         Example.Criteria criteria = example.createCriteria();
         criteria.andEqualTo("bankCardNumber", bankCardNum);
         BankCard bankCard = bankCardMapper.selectOneByExample(example);
         return bankCard.getUserId();
     }
-
-
 
 
 }

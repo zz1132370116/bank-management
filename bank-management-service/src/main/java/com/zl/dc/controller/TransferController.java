@@ -151,17 +151,7 @@ public class TransferController {
         }
     }
 
-    /**
-     * @author: lu
-     * @Param TransferValueVo:
-     * @return: ResponseEntity<BaseResult>
-     * @description: 根据手机号转账
-     * @data: 2019/8/13 14:49
-     */
-    public ResponseEntity<BaseResult> verifyBankCardForPhone(TransferValueVo transferValueVo) {
 
-        return null;
-    }
 
 
     /**

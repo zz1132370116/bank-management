@@ -66,7 +66,8 @@ sc:
       - /updatePhone         #修改手机----修改手机
       - /getAllSubordinateBank    #单次转账----查询出所有所属银行
       - /getExchangeRate        #跨境转账----根据用户选择的币种查询对应的汇率
-      - /getExchange            #跨境转账----根据用户输入的金额查询转换后的金额
+      - /getExchangeRatePrice   #跨境转账----根据人民币查询对饮外币
       - /getBankCardByUser      #跨境转账----根据用户查询用户所持有的本行卡
+      - /getExchangeRateCNY     #跨境转账----根据外币查询对应人民币
+      - /CrossBorderTransfer    #跨境转账----转账
       - /verifyBankCardForVo     #单次转账----转账方法
-      - /selectSubordinateBankByNum  #单次转账----根据银行卡号查询该卡银行
