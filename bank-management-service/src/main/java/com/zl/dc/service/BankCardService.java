@@ -1,10 +1,14 @@
 package com.zl.dc.service;
 
+import com.sun.org.apache.bcel.internal.generic.RETURN;
 import com.zl.dc.mapper.BankCardMapper;
+import com.zl.dc.mapper.OtherBankCardMapper;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankUser;
+import com.zl.dc.pojo.OtherBankCard;
 import com.zl.dc.util.MD5;
 import com.zl.dc.vo.TransferValueVo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
@@ -27,6 +31,8 @@ public class BankCardService {
     @Resource
     private BankCardMapper bankCardMapper;
 
+    @Resource
+    private OtherBankCardMapper otherBankCardMapper;
 
     /**
      * @author: lu
@@ -42,13 +48,13 @@ public class BankCardService {
 //          对VO进非空校验
         if (transferValueVo != null) {
 //            对密码进行非空校验
-            if (transferValueVo.getPassword() != null && !"".equals(transferValueVo.getPassword())) {
-                criteria.andEqualTo("bankCardPassword", transferValueVo.getPassword());
+            if (StringUtils.isNotBlank(transferValueVo.getPassword())) {
 //                对银行卡id进行非空校验
-                if (transferValueVo.getOutBankCardID() != null && !"".equals(transferValueVo.getOutBankCardID())) {
+                if (transferValueVo.getOutBankCardID() != null) {
 //            将传入密码加密处理
 //                    transferValueVo.setPassword(MD5.GetMD5Code(transferValueVo.getPassword()));
 //            拼接条件查询出该银行卡
+                    criteria.andEqualTo("bankCardPassword", transferValueVo.getPassword());
                     criteria.andEqualTo("bankCardId", transferValueVo.getOutBankCardID());
                     criteria.andEqualTo("bankCardStatus", "100");
                     return bankCardMapper.selectOneByExample(example);
@@ -69,7 +75,6 @@ public class BankCardService {
     public boolean bankCardTransferBusines(TransferValueVo transferValueVo) {
         try {
             //          查询扣款卡，扣款
-
             BankCard outBankCard = bankCardMapper.selectByPrimaryKey(transferValueVo.getOutBankCardID());
             outBankCard.setBankCardBalance(outBankCard.getBankCardBalance().subtract(transferValueVo.getMuchMoney()));
             int transferOut = bankCardMapper.updateByPrimaryKeySelective(outBankCard);
@@ -105,6 +110,42 @@ public class BankCardService {
         }
         return bankCards;
     }
+
+    /**
+     * @author: lu
+     * @Param String 银行卡号
+     * @return: OtherBankCard
+     * @description: 根据他行银行卡号查询银行
+     * @data: 2019/8/13 14:18
+     */
+    public OtherBankCard getBankNameByBankNum(String BankNum) {
+
+        Example example = new Example(OtherBankCard.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("bankCardNumber", BankNum);
+        OtherBankCard otherBankCard = otherBankCardMapper.selectOneByExample(example);
+        if (otherBankCard == null){
+            return null;
+        }
+        return otherBankCard;
+    }
+
+    /**
+     * @author: lu
+     * @Param String 银行卡号
+     * @return: BankUser
+     * @description: 根据银行卡号查询用户id
+     * @data: 2019/8/13 20:32
+     */
+    public Integer selectBankUserByBankCardNum(String bankCardNum){
+        Example example = new Example(BankCard.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("bankCardNumber", bankCardNum);
+        BankCard bankCard = bankCardMapper.selectOneByExample(example);
+        return bankCard.getUserId();
+    }
+
+
 
 
 }

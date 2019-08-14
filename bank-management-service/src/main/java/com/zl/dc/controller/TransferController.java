@@ -1,14 +1,15 @@
 package com.zl.dc.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.zl.dc.pojo.BankCard;
-import com.zl.dc.pojo.SubordinateBank;
-import com.zl.dc.pojo.TransferRecord;
+import com.zl.dc.pojo.*;
 import com.zl.dc.service.BankCardService;
 import com.zl.dc.service.SubordinateBankService;
 import com.zl.dc.service.TransferRecordService;
+import com.zl.dc.service.UserService;
+import com.zl.dc.util.NumberValid;
 import com.zl.dc.vo.BaseResult;
 import com.zl.dc.vo.TransferValueVo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 
 
@@ -40,6 +42,9 @@ public class TransferController {
 
     @Autowired
     private TransferRecordService transferRecordService;
+
+    @Autowired
+    private UserService userService;
 
     /**
      * @author: lu
@@ -75,6 +80,10 @@ public class TransferController {
      */
     @PostMapping("/verifyBankCardForVo")
     public ResponseEntity<BaseResult> verifyBankCardForVo(@RequestBody TransferValueVo transferValueVo) {
+        //对转账金额进行校验
+        if(!NumberValid.moneyValid(transferValueVo.getMuchMoney().toString())){
+            return ResponseEntity.ok(new BaseResult(1, "金额输入有误，请重新转账"));
+        }
         //查询银行卡
         BankCard bankCard = bankCardService.verifyBankCardForVo(transferValueVo);
         if (bankCard == null) {
@@ -84,10 +93,43 @@ public class TransferController {
             return ResponseEntity.ok(new BaseResult(1, "余额不足，操作失败"));
         }
 
+        //设置卡号
+        transferValueVo.setOutBankCard(bankCard.getBankCardNumber());
+        //判断手机为不为空
+        if (StringUtils.isNotBlank(transferValueVo.getBankPhone()) && StringUtils.isBlank(transferValueVo.getInBankCard())) {
+            BankUser bankUser = userService.getBankUserByUserPhone(transferValueVo.getBankPhone());
+
+            if (StringUtils.isBlank(bankUser.getDefaultBankCard())) {
+                return ResponseEntity.ok(new BaseResult(1, "转账失败，收款手机号未绑定银行卡"));
+            }
+            if (!bankUser.getUserName().equals(transferValueVo.getInBankName())) {
+                return ResponseEntity.ok(new BaseResult(1, "转账失败，收款人与银行卡不符合"));
+            }
+            //添加收款银行卡号
+            transferValueVo.setInBankCard(bankUser.getDefaultBankCard());
+        }
+        if (StringUtils.isBlank(transferValueVo.getBankPhone()) && StringUtils.isNotBlank(transferValueVo.getInBankCard())) {
+            if ("BOWR".equals(transferValueVo.getInBank())) {
+            //本行卡查询用户进行校验
+                Integer userId = bankCardService.selectBankUserByBankCardNum(transferValueVo.getInBankCard());
+                BankUser bankUser = userService.selectBankUserByUid(userId);
+                if (!bankUser.getUserName().equals(transferValueVo.getInBankName())){
+                    return ResponseEntity.ok(new BaseResult(1, "转账失败，收款人与银行卡不符合"));
+                }
+            }else {
+                //模拟调用接口，传输数据给他行，返回他行用户信息
+                OtherBankCard otherBankCard = bankCardService.getBankNameByBankNum(transferValueVo.getInBankCard());
+                BankUser bankUser = userService.selectBankUserByUid(otherBankCard.getUserId());
+                if (!bankUser.getUserName().equals(transferValueVo.getInBankName())){
+                    return ResponseEntity.ok(new BaseResult(1, "转账失败，收款人与银行卡不符合"));
+                }
+            }
+        }
+
 //        添加转账记录
         TransferRecord transferRecord = transferRecordService.addTransferRecordforTransferValueVo(transferValueVo);
         if (transferRecord == null) {
-            return ResponseEntity.ok(new BaseResult(1, "操作异常请通知管理员"));
+            return ResponseEntity.ok(new BaseResult(1, "转账记录生成异常请通知管理员"));
         }
         //操作银行卡扣款 转账状态
         boolean transferStatus = bankCardService.bankCardTransferBusines(transferValueVo);
@@ -105,7 +147,44 @@ public class TransferController {
         if (transferSuccessfulStatus) {
             return ResponseEntity.ok(new BaseResult(1, "转账成功"));
         } else {
-            return ResponseEntity.ok(new BaseResult(1, "操作异常请通知管理员"));
+            return ResponseEntity.ok(new BaseResult(1, "转账记录生成异常请通知管理员"));
+        }
+    }
+
+    /**
+     * @author: lu
+     * @Param TransferValueVo:
+     * @return: ResponseEntity<BaseResult>
+     * @description: 根据手机号转账
+     * @data: 2019/8/13 14:49
+     */
+    public ResponseEntity<BaseResult> verifyBankCardForPhone(TransferValueVo transferValueVo) {
+
+        return null;
+    }
+
+
+    /**
+     * @author: lu
+     * @param: 他行银行卡号
+     * @return: ResponseEntity<BaseResult>
+     * @description: 根据他行银行卡号查询出所属银行标识
+     * @data: 2019/8/13 11:29
+     */
+    @PostMapping("/selectSubordinateBankByNum")
+    public ResponseEntity<BaseResult> selectSubordinateBankByNum(@RequestBody String inBankCard) {
+
+        //如果头四位为9999位本行银行卡
+        if ("9999".equals(inBankCard.substring(0, 4))) {
+            return ResponseEntity.ok(new BaseResult(0, "成功").append("data", "BOWR"));
+        }
+
+        OtherBankCard otherBankCard = bankCardService.getBankNameByBankNum(inBankCard);
+        if (otherBankCard==null) {
+//           如果为空表示未查询到该卡
+            return ResponseEntity.ok(new BaseResult(1, "为找到该卡所属银行，请用户仔细校验卡号"));
+        } else {
+            return ResponseEntity.ok(new BaseResult(0, "成功").append("data", otherBankCard.getSubordinateBanksIdentification()));
         }
     }
 }
