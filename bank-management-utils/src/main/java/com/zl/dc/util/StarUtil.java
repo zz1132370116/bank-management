@@ -21,6 +21,7 @@ public class StarUtil {
     public static String StringAddStar(String str, int front, int end) {
         // 判空
         if (str == null || "".equals(str)) {
+
             return null;
         }
         //需要截取的长度不能大于身份证号长度
