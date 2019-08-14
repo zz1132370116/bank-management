@@ -84,3 +84,6 @@ sc:
       - /getBankCardByUserId      # 根据用户id查询所有本行银行卡
       - /getBankCardBybankCardId  # 根据银行卡ID查询银行卡
       - /sendUpgradeCard          # 升级银行卡(发短信)
+      # 他行卡
+      - /addOtherBankCard         # 绑定他行卡
+      - /deleteOtherBankCard      # 解绑他行卡
