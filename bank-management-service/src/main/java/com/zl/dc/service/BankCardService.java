@@ -106,5 +106,16 @@ public class BankCardService {
         return bankCards;
     }
 
+    /**
+     * @author: zhanglei
+     * @param: [bankCardId]
+     * @return:com.zl.dc.pojo.BankCard
+     * @description: 根据银行卡ID查询银行卡信息
+     * @data: 2019/8/14 11:35
+     */
+    public BankCard getBankCardBybankCardId(String bankCardId) {
+        BankCard bankCard = bankCardMapper.selectByPrimaryKey(Integer.parseInt(bankCardId));
 
+        return bankCard;
+    }
 }

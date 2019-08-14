@@ -71,3 +71,4 @@ sc:
       - /getExchangeRateCNY     #跨境转账----根据外币查询对应人民币
       - /CrossBorderTransfer    #跨境转账----转账
       - /verifyBankCardForVo     #单次转账----转账方法
+      - /getBankCardBybankCardId  #根据银行卡Id查询银行卡
