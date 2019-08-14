@@ -48,7 +48,7 @@ public class ActiveGatheringController {
      * @author: nwm
      * @param: * updateGatheringStatus
      * @return: * HashMap<String,Object>
-     * @description: 用户修改主动收款状态是执行的方法
+     * @description: 用户修改主动收款状态为取消时执行的方法
      * @data: 2019/8/13 19:00
      */
     @PostMapping("/updateGatheringType/{id}")
@@ -122,7 +122,7 @@ public class ActiveGatheringController {
      * @author: nwm
      * @param: * updateManagerTranscationStatus
      * @return: * HashMap<String,Object>
-     * @description: 用户拒绝付款时执行的方法
+     * @description: 用户主动取消升级卡申请方法
      * @data: 2019/8/13 19:00
      */
     @PostMapping("/updateManagerTranscationStatus/{id}")
@@ -140,9 +140,8 @@ public class ActiveGatheringController {
      */
     @GetMapping("/getBankCardByUser")
     public   List<BankCard>  getBankCardByUser(){
-        BankUser bankUser=new BankUser();
         //session中获取当前登录用户id
-        return  bcs.getBankCardByUser(bankUser);
+        return  ags.getBankCardByUser();
     }
     //
 
