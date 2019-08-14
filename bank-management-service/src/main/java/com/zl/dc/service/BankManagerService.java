@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -256,6 +257,7 @@ public class BankManagerService {
         ManagerTranscation managerTranscation = new ManagerTranscation();
         managerTranscation.setTranscationId(transcationId);
         managerTranscation.setTranscationStatus(Byte.parseByte("1"));
+        managerTranscation.setGmtModified(new Date());
         //修改状态
         managerTranscationMapper.updateByPrimaryKeySelective(managerTranscation);
         //修改银行卡类型
@@ -270,7 +272,6 @@ public class BankManagerService {
         if ("钻石卡".equals(bankCard.getBankCardType())) {
             bankCard.setBankCardType("黑卡");
         }
-
         bankCardMapper.updateByPrimaryKeySelective(bankCard);
     }
 

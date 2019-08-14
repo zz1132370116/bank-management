@@ -97,5 +97,16 @@ public class BankCard {
      */
     @Transient
     private String bank;
+    /**
+    *备注
+    */
+    @Transient
+    private String transcationMsg;
+    /**
+     *验证码
+     */
+    @Transient
+    private String code;
 
-}
+
+     }

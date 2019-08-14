@@ -2,9 +2,11 @@ package com.zl.dc.service;
 
 import com.zl.dc.mapper.BankCardDOMapper;
 import com.zl.dc.mapper.BankCardMapper;
+import com.zl.dc.mapper.ManagerTranscationMapper;
 import com.zl.dc.mapper.OtherBankCardMapper;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankUser;
+import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.OtherBankCard;
 import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.TransferValueVo;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -34,6 +37,8 @@ public class BankCardService {
     private BankCardDOMapper bankCardDOMapper;
     @Resource
     private OtherBankCardMapper otherBankCardMapper;
+    @Resource
+    private ManagerTranscationMapper managerTranscationMapper;
 
     /**
      * @author: lu
@@ -225,5 +230,41 @@ public class BankCardService {
         //将预留手机号变成*
         bankCard.setBankCardPhone(StarUtil.StringAddStar(bankCard.getBankCardPhone(),3,4));
         return bankCard;
+    }
+    /**
+     * @author: zhanglei
+     * @param: [bankCard]
+     * @return:java.lang.String
+     * @description: 申请升级卡
+     * @data: 2019/8/14 16:00
+     */
+    public String UpgradeCard(BankCard bankCard) {
+
+        ManagerTranscation managerTranscation = new ManagerTranscation();
+        if (StringUtils.isNotBlank(bankCard.getBankCardNumber())){
+            managerTranscation.setBankCard(bankCard.getBankCardNumber());
+        }else{
+            return "缺少银行卡信息";
+        }
+        if (bankCard.getUserId() !=null){
+            managerTranscation.setUserId(bankCard.getUserId());
+        }else{
+            return "缺少用户信息";
+        }
+        //申请中状态为0
+        managerTranscation.setTranscationStatus(Byte.parseByte("0"));
+        //申请提升类型 0
+        managerTranscation.setTranscationType(Byte.parseByte("0"));
+        if (StringUtils.isNotBlank(bankCard.getTranscationMsg())){
+            managerTranscation.setTranscationMsg(bankCard.getTranscationMsg());
+        }
+        managerTranscation.setGmtCreate(new Date());
+        managerTranscation.setGmtModified(new Date());
+        int i = managerTranscationMapper.insertSelective(managerTranscation);
+        if (i !=0){
+            return "申请成功";
+        }else{
+            return "申请失败";
+        }
     }
 }
