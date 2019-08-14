@@ -42,30 +42,37 @@ sc:
     pubKeyPath: D:/rsa/rsa.pub # 公钥地址
   filter:
     allowPaths:
-      - /loginBySendSms #根据验证码登录(用户)
-      - /getLogin #登录(管理员)
-      - /GetUserList  #查询用户数量(管理员)
-      - /GetRecords #查询记录数(管理员)
-      - /GetAbnormals #查询异常数(管理员)
-      - /sendSms  #发送短信(用户登录)
-      - /login #用户登录(手机号/身份证号)
-      - /getTransferRecords #查询所有订单(管理员)
-      - /getBankUserList #管理员查询所有用户(带条件)
-      - /memberStart #启用用户状态(管理员)
-      - /memberStop #停用用户状态(管理员)
-      - /GetUserByRedis #从redis查询用户信息
-      - /updatePasswordSms  #修改密码----获取验证码
-      - /updatePasswordVerify  #修改密码----验证验证码是否正确
-      - /updateBankUserPassword    #修改密码----修改密码
-      - /loginOut #退出(管理员)
-      - /getManagerTranscations #查询用户申请中的提卡信息(管理员)
-      - /adopt #提升卡种通过(管理员)
-      - /NoPassage #提升卡种不通过(管理员)
-      - /updatePhoneSms      #修改手机----获取验证码
-      - /updatePhoneVerify   #修改手机----验证验证码是否正确
-      - /updatePhone         #修改手机----修改手机
-      - /getAllSubordinateBank    #单次转账----查询出所有所属银行
-      - /getExchangeRate        #跨境转账----根据用户选择的币种查询对应的汇率
-      - /getExchange            #跨境转账----根据用户输入的金额查询转换后的金额
-      - /getBankCardByUser      #跨境转账----根据用户查询用户所持有的本行卡
-      - /verifyBankCardForVo     #单次转账----转账方法
+      # 管理员
+      - /getLogin                 # 登录(管理员)
+      - /GetUserList              # 查询用户数量(管理员)
+      - /GetRecords               # 查询记录数(管理员)
+      - /GetAbnormals             # 查询异常数(管理员)
+      - /getTransferRecords       # 查询所有订单(管理员)
+      - /getBankUserList          # 管理员查询所有用户(带条件)
+      - /memberStart              # 启用用户状态(管理员)
+      - /memberStop               # 停用用户状态(管理员)
+      - /loginOut                 # 退出(管理员)
+      - /getManagerTranscations   # 查询用户申请中的提卡信息(管理员)
+      - /adopt                    # 提升卡种通过(管理员)
+      - /NoPassage                # 提升卡种不通过(管理员)
+      # 登录
+      - /loginBySendSms           # 根据验证码登录(用户)
+      - /sendSms                  # 发送短信(用户登录)
+      - /login                    # 用户登录(手机号/身份证号)
+      - /GetUserByRedis           # 从redis查询用户信息
+      # 个人中心
+      - /updatePasswordSms        # 修改密码----获取验证码
+      - /updatePasswordVerify     # 修改密码----验证验证码是否正确
+      - /updateBankUserPassword   # 修改密码----修改密码
+      - /updatePhoneSms           # 修改手机----获取验证码
+      - /updatePhoneVerify        # 修改手机----验证验证码是否正确
+      - /updatePhone              # 修改手机----修改手机
+      # 转账
+      - /getAllSubordinateBank    # 单次转账----查询出所有所属银行
+      - /getExchangeRate          # 跨境转账----根据用户选择的币种查询对应的汇率
+      - /getExchange              # 跨境转账----根据用户输入的金额查询转换后的金额
+      - /getBankCardByUser        # 跨境转账----根据用户查询用户所持有的本行卡
+      - /verifyBankCardForVo      # 单次转账----转账方法
+      # 转账记录
+      - /getTransferRecordList    # 查询转账记录----根据月份和银行卡id
+      - /getBankCardByUserId      # 根据用户id查询所有本行银行卡

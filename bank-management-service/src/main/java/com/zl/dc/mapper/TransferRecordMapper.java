@@ -17,7 +17,5 @@ import java.util.List;
 @org.apache.ibatis.annotations.Mapper
 public interface TransferRecordMapper extends Mapper<TransferRecord> {
 
-    
-    List<TransferRecord> getRecordsByBankCardAndDate(String BankCard);
 
 }
