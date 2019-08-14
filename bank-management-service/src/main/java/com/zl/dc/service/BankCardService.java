@@ -32,7 +32,6 @@ public class BankCardService {
     private BankCardMapper bankCardMapper;
     @Resource
     private BankCardDOMapper bankCardDOMapper;
-
     @Resource
     private OtherBankCardMapper otherBankCardMapper;
 

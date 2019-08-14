@@ -3,6 +3,7 @@ package com.zl.dc.controller;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.CrossBorderTransferRecord;
+import com.zl.dc.pojo.OtherBankCard;
 import com.zl.dc.service.BankCardService;
 import com.zl.dc.vo.BaseResult;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class BankCardController {
      * @data: 2019/8/14 9:04
      */
     @GetMapping("/getBankCardByUserId")
-        public ResponseEntity<BaseResult> getBankCardByUserId(@RequestParam("userId") Integer userId) {
+    public ResponseEntity<BaseResult> getBankCardByUserId(@RequestParam("userId") Integer userId) {
         if (userId == null) {
             return ResponseEntity.ok(new BaseResult(1, "参数错误"));
         }
@@ -59,5 +60,10 @@ public class BankCardController {
             return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", bankCards));
         }
         return ResponseEntity.ok(new BaseResult(1, "查询不到数据"));
+    }
+
+    @PostMapping("/addOtherBankCard")
+    public ResponseEntity<BaseResult> addOtherBankCard(@RequestBody OtherBankCard otherBankCard) {
+        return null;
     }
 }
