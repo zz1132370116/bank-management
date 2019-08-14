@@ -1,8 +1,8 @@
 package com.zl.dc.controller;
 
 import com.zl.dc.pojo.BankCard;
+import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.service.ActiveGatheringService;
-import com.zl.dc.service.BankCardService;
 import com.zl.dc.vo.ActiveGatheringVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @version: V1.0
@@ -24,8 +25,6 @@ public class ActiveGatheringController {
     @Autowired
     ActiveGatheringService ags;
     @Autowired
-    BankCardService bcs;
-    @Autowired
     HttpSession session;
     /**
      * @author: nwm
@@ -35,21 +34,23 @@ public class ActiveGatheringController {
      * @data: 2019/8/13 19:00
      */
     @GetMapping("/getActiveCollection")
+    //ResponseEntity<BaseResult>
      public List<ActiveGatheringVo> getActiveCollection(){
-         return null;
+
+         return ags.getActiveGatheringVoList();
      }
 
     /**
      * @author: nwm
      * @param: * updateGatheringStatus
-     * @return: * HashMap<String,Object>
-     * @description: 用户修改主动收款状态为取消时执行的方法
+     * @return: * boolean
+     * @description: 用户修改主动收款状态为取消时执行的方法,付款用户拒绝付款时执行的方法
      * @data: 2019/8/13 19:00
      */
     @PostMapping("/updateGatheringType/{id}")
-    public HashMap<String,Object>  updateGatheringStatus(@PathVariable("id") String activeId){
+    public boolean  updateGatheringStatus(@PathVariable("id") String activeId){
         //修改该订单id的收款状态为取消
-        return null;
+        return ags.updateGatheringStatus(activeId);
     }
     /**
      * @author: nwm
@@ -59,12 +60,12 @@ public class ActiveGatheringController {
      * @data: 2019/8/13 19:00
      */
     @PostMapping("/addTransactionTecord/{userPhone}/{userBankId}")
-    public HashMap<String,Object> addTransactionTecord(@PathVariable("userPhone") String userPhone,@PathVariable("userBankId") String userBankId ,ActiveGatheringVo agvo){
+    public boolean addTransactionTecord(@PathVariable("userPhone") String userPhone,@PathVariable("userBankId") String userBankId ,ActiveGatheringVo agvo){
         //根据发起主动收款用户填写的数据添加交易订单
         //agvo 收款订单基本信息
         //userPhone 付款人电话
         //userBankId 收款卡id
-        return null;
+        return ags.addTransactionTecord(userPhone,userBankId,agvo);
     }
     //
     /**
@@ -75,26 +76,29 @@ public class ActiveGatheringController {
      * @data: 2019/8/13 19:00
      */
     @GetMapping("/getMessageCenter")
-    public HashMap<String,Object> getMessageCenter(){
+    public Map<String,Object> getMessageCenter(){
         //查询相关收款记录
-        List<ActiveGatheringVo> agVOList=null;
+        List<ActiveGatheringVo> agVOList=ags.getActiveGatheringVo();
         //查询相关提额记录
-      //  List<ManagerTranscation> mtList=null;
-        return null;
+         List<ManagerTranscation> mtList=ags.getManagerTranscation();
+        Map<String,Object> map=new HashMap<>();
+        map.put("activeGatheringVo",agVOList);
+        map.put("managerTranscation",mtList);
+        return map;
     }
 
-    /**
+ /*   *//*
      * @author: nwm
      * @param: * cancelGathering
      * @return: * HashMap<String,Object>
-     * @description: 用户拒绝付款时执行的方法
+     * @description: 用户拒绝付款时执行的方法,用户主动取消收款
      * @data: 2019/8/13 19:00
-     */
+     *//*
     @PostMapping("/cancelGathering/{id}")
-    public  HashMap<String,Object> cancelGathering(@PathVariable("id") String activeId){
+    public  boolean cancelGathering(@PathVariable("id") String activeId){
         //根据订单id修改主动收款状态为取消
-        return null;
-    }
+        return ags.updateGatheringStatus(activeId);
+    }*/
 
     /**
      * @author: nwm
@@ -103,14 +107,11 @@ public class ActiveGatheringController {
      * @description: 用户同意付款时执行的方法
      * @data: 2019/8/13 19:00
      */
-    @PostMapping("/agreeGathering/{transferRecordId}/{bankCardId}/{bankCardPassword}")
-    public  HashMap<String,Object> agreeGathering(
-            @PathVariable("transferRecordId") String transferRecordId,@PathVariable("bankCardId") String bankCardId,@PathVariable("bankCardPassword") String bankCardPassword){
-        //根据用户传的订单id, transferRecordId
-        // 银行卡id bankCardId
-        // 银行卡密码.bankCardPassword
-        //执行转账
-        return null;
+    @PostMapping("/agreeGathering/{transferRecordId}/{muchMoney}/{bankCardId}/{bankCardPassword}")
+    public  boolean agreeGathering(
+            @PathVariable("transferRecordId") String transferRecordId, @PathVariable("muchMoney") String muchMoney,@PathVariable("bankCardId") String bankCardId,@PathVariable("bankCardPassword") String bankCardPassword){
+
+        return ags.agreeGathering(transferRecordId,muchMoney,bankCardId,bankCardPassword);
     }
 
     /**
@@ -121,9 +122,9 @@ public class ActiveGatheringController {
      * @data: 2019/8/13 19:00
      */
     @PostMapping("/updateManagerTranscationStatus/{id}")
-    public  HashMap<String,Object> updateManagerTranscationStatus(@PathVariable("id") String transcationId){
+    public  boolean updateManagerTranscationStatus(@PathVariable("id") String transcationId){
         //根据事务表id修改订单为取消
-        return  null;
+        return  ags.updateManagerTranscationStatus(transcationId);
     }
 
     /**
