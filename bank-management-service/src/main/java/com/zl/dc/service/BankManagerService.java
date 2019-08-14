@@ -167,7 +167,7 @@ public class BankManagerService {
      * @description: 处理身份证号码
      * @data: 2019/8/7 11:25
      */
-    public String handlingIdCards(String idcard) {
+    public static String handlingIdCards(String idcard) {
         //处理身份证号
         StringBuilder sb = new StringBuilder(idcard);
         sb.replace(6, 14, "****");

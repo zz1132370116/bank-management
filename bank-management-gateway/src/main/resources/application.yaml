@@ -73,3 +73,4 @@ sc:
       - /verifyBankCardForVo     #单次转账----转账方法
       - /registrySms             #注册----获取验证码
       - /registry                #注册----注册
+      - /getBankCardBybankCardId  #根据银行卡Id查询银行卡
