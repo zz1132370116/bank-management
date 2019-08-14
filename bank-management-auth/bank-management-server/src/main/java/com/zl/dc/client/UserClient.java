@@ -5,10 +5,8 @@ import com.zl.dc.pojo.BankUser;
 import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.BaseResult;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 /**
@@ -21,9 +19,19 @@ public interface UserClient {
 
     /**
      * @author pds
+     * @param bankUserVo
+     * @return com.zl.dc.vo.BaseResult
+     * @description 注册----注册
+     * @date 2019/8/14 9:17
+     */
+    @PostMapping("/register")
+    BaseResult register(@RequestBody BankUserVo bankUserVo);
+
+    /**
+     * @author pds
      * @param user
      * @return org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
-     * @description 功能描述
+     * @description 登录----使用密码登录
      * @date 2019/8/12 16:29
      */
     @PostMapping("query")
@@ -34,7 +42,7 @@ public interface UserClient {
      * @author pds
      * @param user
      * @return com.zl.dc.vo.BaseResult
-     * @description 功能描述
+     * @description 登录----使用验证码登录
      * @date 2019/8/13 9:01
      */
     @PostMapping("loginBySendSms")

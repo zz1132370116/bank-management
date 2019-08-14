@@ -5,6 +5,7 @@ import com.zl.dc.pojo.BankUser;
 import com.zl.dc.service.AuthService;
 import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.BaseResult;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +22,31 @@ import javax.annotation.Resource;
 public class AuthController {
     @Resource
     private AuthService authService;
+
+    /**
+     * @author pds
+     * @param bankUserVo
+     * @return org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description 注册----注册
+     * @date 2019/8/14 9:29
+     */
+    @PostMapping("/registry")
+    public ResponseEntity<BaseResult> registry(@RequestBody BankUserVo bankUserVo){
+
+        if (StringUtils.isNoneBlank(bankUserVo.getUserPhone(),bankUserVo.getUserPassword(),bankUserVo.getPasswordConfig(),bankUserVo.getCode())){
+            if (!bankUserVo.getUserPassword().equals(bankUserVo.getPasswordConfig())){
+                return ResponseEntity.ok(new BaseResult(2,"确认密码与密码不相等"));
+            }
+            String regex = "^[1][3,4,5,7,8][0-9]{9}$";
+            if (!bankUserVo.getUserPhone().matches(regex)){
+                return ResponseEntity.ok(new BaseResult(3,"手机格式不正确"));
+            }
+            BaseResult baseResult = authService.registry(bankUserVo);
+            return ResponseEntity.ok(baseResult);
+        }
+        return ResponseEntity.ok(new BaseResult(1,"注册失败"));
+    }
+
 
     /**
      * @author: zhanglei

@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  * @author pds
  * @version V1.0
  * @className Redsheep
- * @description 金额校验工具类
+ * @description 数值校验工具类
  * @date 2019/8/11 19:57
  */
 public class NumberValid {
@@ -63,4 +63,5 @@ public class NumberValid {
         }
         return true;
     }
+
 }

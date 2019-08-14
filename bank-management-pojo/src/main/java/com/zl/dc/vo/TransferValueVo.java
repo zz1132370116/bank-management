@@ -58,4 +58,10 @@ public class TransferValueVo {
      */
     private String password;
 
+    /**
+     * 收款手机号
+     */
+    private String bankPhone;
+
+
 }
