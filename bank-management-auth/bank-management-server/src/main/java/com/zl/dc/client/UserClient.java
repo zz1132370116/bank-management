@@ -3,6 +3,7 @@ package com.zl.dc.client;
 
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.vo.BankUserVo;
+import com.zl.dc.vo.BaseResult;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,22 +20,24 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface UserClient {
 
     /**
-    * @author pds
-    * @param  user
-    * @return com.zl.dc.pojo.BankUser
-    * @description 根据手机号或身份证号登录
-    * @date 2019/8/11 15:53
-    */
+     * @author pds
+     * @param user
+     * @return org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description 功能描述
+     * @date 2019/8/12 16:29
+     */
     @PostMapping("query")
-    BankUser queryUser(@RequestBody BankUser user);
+    BaseResult queryUser(@RequestBody BankUser user);
+
 
     /**
-    * @author pds
-    * @param user
-    * @return com.zl.dc.vo.BankUserVo
-    * @description 使用手机验证码登录
-    * @date 2019/8/11 15:53
-    */
+     * @author pds
+     * @param user
+     * @return com.zl.dc.vo.BaseResult
+     * @description 功能描述
+     * @date 2019/8/13 9:01
+     */
     @PostMapping("loginBySendSms")
-    BankUser loginBySendSms(@RequestBody BankUserVo user);
+    BaseResult loginBySendSms(@RequestBody BankUserVo user);
+
 }

@@ -93,4 +93,14 @@ public class UserService {
         user.setUserPhone("");
         userMapper.updateByPrimaryKeySelective(user);
     }
+    /**
+    * @author: lu
+    * @Param Integer uid:
+    * @return: BankUser
+    * @description: 根据用户ID查询用户
+    * @data: 2019/8/13 20:40
+    */
+    public BankUser selectBankUserByUid(Integer uid){
+        return userMapper.selectByPrimaryKey(uid);
+    }
 }
