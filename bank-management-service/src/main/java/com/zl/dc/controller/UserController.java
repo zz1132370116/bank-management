@@ -46,14 +46,16 @@ public class UserController {
      * @description 注册----获取验证码
      * @date 2019/8/13 16:47
      */
-    @PostMapping("/registrySms/{phone}")
+    @GetMapping("/registrySms/{phone}")
     public ResponseEntity<BaseResult> registrySms(@PathVariable("phone") String phone){
         if (StringUtils.isNotBlank(phone)){
             if (!NumberValid.verifyPhone(phone)){
                 return ResponseEntity.ok(new BaseResult(1,"手机号不正确"));
             }
             String code = RandomStringUtils.randomNumeric(6);
+            /*System.out.println(code);
             redisTemplate.opsForValue().set(phone+code,code,5,TimeUnit.MINUTES);
+            return ResponseEntity.ok(new BaseResult(0, "发送成功"));*/
 
             SendSmsResponse smsResponse;
             try {

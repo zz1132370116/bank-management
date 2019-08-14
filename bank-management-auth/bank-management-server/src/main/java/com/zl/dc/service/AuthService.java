@@ -99,6 +99,22 @@ public class AuthService {
             String token = JwtUtils.generateToken(new UserInfo(bankUser.getUserId(), bankUser.getUserName()), jwtProperties.getPrivateKey(), jwtProperties.getExpire());
             baseResult.append("token",token);
 
+            String userName = bankUser.getUserName();
+            String first = userName.substring(0,1);
+            String end = userName.substring(userName.length()-1);
+            if (userName.length() == 2){
+                bankUser.setUserName(first+"*");
+            }else if(userName.length() >= 3){
+                StringBuffer stringBuffer = new StringBuffer();
+                for (int i = 0;i < userName.length()-2;i++){
+                    stringBuffer.append("*");
+                }
+                bankUser.setUserName(first+stringBuffer.toString()+end);
+            }
+
+            String phone = bankUser.getUserPhone();
+            bankUser.setUserPassword(phone.substring(0,3)+"****"+phone.substring(phone.length()-4));
+
             //将用户的一些信息置空
             bankUser.setUserPassword(null);
             bankUser.setIdCard(null);
