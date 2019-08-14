@@ -33,6 +33,7 @@ public class BankCardController {
     private BankCardService bankCardService;
     @Resource
     private StringRedisTemplate redisTemplate;
+
     /**
      * @author: zhanglei
      * @param: [bankUser]
@@ -74,6 +75,7 @@ public class BankCardController {
     public ResponseEntity<BaseResult> addOtherBankCard(@RequestBody OtherBankCard otherBankCard) {
         return null;
     }
+
     /**
      * @author: zhanglei
      * @param: [bankCardId]
@@ -82,37 +84,46 @@ public class BankCardController {
      * @data: 2019/8/14 11:32
      */
     @GetMapping("/getBankCardBybankCardId/{bankCardId}")
-    public ResponseEntity<BaseResult> getBankCardBybankCardId(@PathVariable("bankCardId") String bankCardId){
+    public ResponseEntity<BaseResult> getBankCardBybankCardId(@PathVariable("bankCardId") String bankCardId) {
         //非空非null判断
-        if (StringUtils.isNotBlank(bankCardId)){
+        if (StringUtils.isNotBlank(bankCardId)) {
             //调用service
             BankCard bankCard = bankCardService.getBankCardBybankCardId(bankCardId);
-            if (bankCard !=null){
+            if (bankCard != null) {
                 //返回
-                return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",bankCard));
+                return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", bankCard));
             }
 
         }
-        return ResponseEntity.ok(new BaseResult(1,"查询失败"));
+        return ResponseEntity.ok(new BaseResult(1, "查询失败"));
     }
+
+    /**
+     * @author: zhanglei
+     * @param: [bankCardId]
+     * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description: 升级银行(发短信)
+     * @data: 2019/8/14 14:32
+     */
     @GetMapping("/sendUpgradeCard/{bankCardId}")
-    public ResponseEntity<BaseResult> sendUpgradeCard(@PathVariable("bankCardId") String bankCardId){
+    public ResponseEntity<BaseResult> sendUpgradeCard(@PathVariable("bankCardId") String bankCardId) {
+
         //非空非null判断
-        if (StringUtils.isNotBlank(bankCardId)){
+        if (StringUtils.isNotBlank(bankCardId)) {
 
             //调用service
             BankCard bankCard = bankCardService.getBankCardBybankCardId(bankCardId);
-            if (bankCard !=null){
+            if (bankCard != null) {
                 //1 生产验证码
                 String code = RandomStringUtils.randomNumeric(6);
                 //发短信
                 try {
                     SendSmsResponse sendSmsResponse = SendUpgradeCard.sendSms(bankCard.getBankCardPhone(), code);
                     //存redis5分钟，因为用户的信息是使用手机号为key存放到redis中的，为了防止将用户信息覆盖，
-                    redisTemplate.opsForValue().set(bankCard.getBankCardPhone()+code, code, 5, TimeUnit.MINUTES);
+                    redisTemplate.opsForValue().set(bankCard.getBankCardPhone() + code, code, 5, TimeUnit.MINUTES);
                     if ("OK".equalsIgnoreCase(sendSmsResponse.getCode())) {
                         return ResponseEntity.ok(new BaseResult(0, "发送成功"));
-                    }else {
+                    } else {
                         return ResponseEntity.ok(new BaseResult(0, sendSmsResponse.getMessage()));
                     }
                 } catch (ClientException e) {
