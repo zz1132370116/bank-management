@@ -58,17 +58,23 @@
              -->
         </javaClientGenerator>
 
-<!--        <table tableName="transfer_record" domainObjectName="TransferRecordDO"-->
-<!--               enableDeleteByExample="false" enableCountByExample="false"-->
-<!--               enableUpdateByExample="false" enableSelectByExample="false"-->
-<!--               selectByExampleQueryId="false">-->
-<!--        </table>-->
+        <!--        <table tableName="transfer_record" domainObjectName="TransferRecordDO"-->
+        <!--               enableDeleteByExample="false" enableCountByExample="false"-->
+        <!--               enableUpdateByExample="false" enableSelectByExample="false"-->
+        <!--               selectByExampleQueryId="false">-->
+        <!--        </table>-->
 
-<!--        <table tableName="bank_card" domainObjectName="BankCardDO"-->
-<!--               enableDeleteByExample="false" enableCountByExample="false"-->
-<!--               enableUpdateByExample="false" enableSelectByExample="false"-->
-<!--               selectByExampleQueryId="false">-->
-<!--        </table>-->
+        <!--        <table tableName="bank_card" domainObjectName="BankCardDO"-->
+        <!--               enableDeleteByExample="false" enableCountByExample="false"-->
+        <!--               enableUpdateByExample="false" enableSelectByExample="false"-->
+        <!--               selectByExampleQueryId="false">-->
+        <!--        </table>-->
+
+        <table tableName="other_bank_card" domainObjectName="OtherBankCardDO"
+               enableDeleteByExample="false" enableCountByExample="false"
+               enableUpdateByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false">
+        </table>
 
     </context>
 
