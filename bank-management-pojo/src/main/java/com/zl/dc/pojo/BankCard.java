@@ -59,9 +59,9 @@ public class BankCard {
     /**
      * 银行卡状态
      * 100 正常
-     * 120 挂失
-     * 130 冻结
-     * 140 注销
+     * 101 挂失
+     * 102 冻结
+     * 103 注销
      */
     @Column(name = "bank_card_status")
     private Byte bankCardStatus;

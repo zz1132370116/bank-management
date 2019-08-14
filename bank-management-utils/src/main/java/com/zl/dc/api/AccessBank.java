@@ -1,4 +1,4 @@
-package com.zl.dc.util;
+package com.zl.dc.api;
 
 import com.alibaba.fastjson.JSONObject;
 import org.junit.Test;
@@ -16,26 +16,25 @@ import java.net.URLConnection;
  * @Description: 获取银行卡标识
  */
 public class AccessBank {
-        /**
-         * Rigorous Test :-)
-         */
-        @Test
-        public void shouldAnswerWithTrue (){
-            String str = getCardDetail("6221505915000450309");
-            JSONObject json = JSONObject.parseObject(str);
-            System.out.println(getCardDetail("6221505915000450309"));
-            System.out.println(json.toJSONString());
-            System.out.println(json.get("bank"));
-            System.out.println(json.get("validated"));
-        }
+    /**
+     * Rigorous Test :-)
+     */
+    @Test
+    public void shouldAnswerWithTrue() {
+        String str = getCardDetail("6221505915000450309");
+        JSONObject json = JSONObject.parseObject(str);
+        System.out.println(getCardDetail("6221505915000450309"));
+        System.out.println(json.toJSONString());
+        System.out.println(json.get("bank"));
+        System.out.println(json.get("validated"));
+    }
 
-        /**
-         * TODO
-         * @param cardNo 银行卡卡号
-         * @return {"bank":"CMB","validated":true,"cardType":"DC","key":"(卡号)","messages":[],"stat":"ok"}
-         * 2017年5月22日 下午4:35:23
-         */
-        public static String getCardDetail (String cardNo){
+    /**
+     * @param cardNo 银行卡卡号
+     * @return {"bank":"CMB","validated":true,"cardType":"DC","key":"(卡号)","messages":[],"stat":"ok"}
+     * 2017年5月22日 下午4:35:23
+     */
+    public static String getCardDetail(String cardNo) {
         // 创建HttpClient实例
         String url = "https://ccdcapi.alipay.com/validateAndCacheCardInfo.json?_input_charset=utf-8&cardNo=";
         url += cardNo;
@@ -57,11 +56,12 @@ public class AccessBank {
         }
         return sb.toString();
     }
-    public static String getSubordinateBank(String cardNo){
+
+    public static String getSubordinateBank(String cardNo) {
         String cardDetail = getCardDetail(cardNo);
         JSONObject json = JSONObject.parseObject(cardDetail);
         System.out.println(json.toJSONString());
-       return json.get("bank").toString();
+        return json.get("bank").toString();
     }
 
 }

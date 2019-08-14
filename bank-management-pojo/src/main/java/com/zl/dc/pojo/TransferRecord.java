@@ -52,21 +52,21 @@ public class TransferRecord {
     private String transferNote;
     /**
      * 交易状态
-     * 110 交易中
-     * 120 成功
-     * 130 失败
+     * 100 交易中
+     * 101 成功
+     * 102 失败
      */
     @Column(name = "transfer_status")
     private Byte transferStatus;
     /**
      * 转账类型
      * 100 单次转账
-     * 110 批量转账
-     * 130 主动收款
-     * 120 跨境转账
-     * 140 手机转账
-     * 150 企业=>个人转账
-     * 160 个人=>企业转账
+     * 101 批量转账
+     * 102 主动收款
+     * 103 跨境转账
+     * 104 手机转账
+     * 105 企业转个人
+     * 106 个人转企业
      */
     @Column(name = "transfer_type")
     private Byte transferType;
@@ -120,6 +120,11 @@ public class TransferRecord {
     @Transient
     private String idCard;
     /**
+     * 银行卡id
+     */
+    @Transient
+    private int bankOutCardId;
+    /**
      * 转出卡银行
      */
     @Transient
@@ -145,5 +150,16 @@ public class TransferRecord {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endDate;
+
+    /**
+     * 转账状态
+     */
+    @Transient
+    private String transferStringType;
+    /**
+     * 转账类型
+     */
+    @Transient
+    private String transferStringStatus;
 
 }
