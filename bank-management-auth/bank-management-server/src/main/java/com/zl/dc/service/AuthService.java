@@ -29,40 +29,53 @@ public class AuthService {
     private JwtProperties jwtProperties;
 
     /**
-     * 登录操作
-     *
-     * @return token值
+     * @author pds
+     * @param bankUserVo
+     * @return com.zl.dc.vo.BaseResult
+     * @description 注册----注册
+     * @date 2019/8/14 10:31
      */
-    public BaseResult login(BankUser bankUser) {
+    public BaseResult registry(BankUserVo bankUserVo){
         try {
-            //1 登录--查询
-            BaseResult result = userClient.queryUser(bankUser);
-            //对数据进行处理
-            return loginMsg(result);
+            BaseResult result = userClient.register(bankUserVo);
+            return result;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //没有登录成功
         return null;
     }
 
     /**
-     * @author: zhanglei
-     * @param: [userPhone, userPassword]
-     * @return:java.lang.String
-     * @description: 通过验证码登录
-     * @data: 2019/8/5 19:15
+     * @author pds
+     * @param bankUser
+     * @return com.zl.dc.vo.BaseResult
+     * @description 使用密码进行登录
+     * @date 2019/8/14 9:17
      */
-    public BaseResult loginBySendSms(BankUserVo bankUser) {
+    public BaseResult login(BankUser bankUser) {
         try {
-            //1 登录--查询
-            BaseResult result = userClient.loginBySendSms(bankUser);
-            //对数据进行处理
+            BaseResult result = userClient.queryUser(bankUser);
             return loginMsg(result);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //没有登录成功
+        return null;
+    }
+
+    /**
+     * @author pds
+     * @param bankUser
+     * @return com.zl.dc.vo.BaseResult
+     * @description 使用验证码进行登录
+     * @date 2019/8/14 9:17
+     */
+    public BaseResult loginBySendSms(BankUserVo bankUser) {
+        try {
+            BaseResult result = userClient.loginBySendSms(bankUser);
+            return loginMsg(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -70,11 +83,10 @@ public class AuthService {
      * @author pds
      * @param baseResult
      * @return com.zl.dc.vo.BaseResult
-     * @description 对登录的返回结果进行处理
-     * @date 2019/8/12 19:36
+     * @description 对登录返回的结果进行处理
+     * @date 2019/8/14 9:18
      */
     public BaseResult loginMsg(BaseResult baseResult) throws Exception{
-        //获取返回的状态值
         Integer errno = (Integer) baseResult.getData().get("errno");
         //如果为0，则是登录成功
         if (errno == 0){
@@ -87,12 +99,28 @@ public class AuthService {
             String token = JwtUtils.generateToken(new UserInfo(bankUser.getUserId(), bankUser.getUserName()), jwtProperties.getPrivateKey(), jwtProperties.getExpire());
             baseResult.append("token",token);
 
+            String userName = bankUser.getUserName();
+            String first = userName.substring(0,1);
+            String end = userName.substring(userName.length()-1);
+            if (userName.length() == 2){
+                bankUser.setUserName(first+"*");
+            }else if(userName.length() >= 3){
+                StringBuffer stringBuffer = new StringBuffer();
+                for (int i = 0;i < userName.length()-2;i++){
+                    stringBuffer.append("*");
+                }
+                bankUser.setUserName(first+stringBuffer.toString()+end);
+            }
+
+            String phone = bankUser.getUserPhone();
+            bankUser.setUserPassword(phone.substring(0,3)+"****"+phone.substring(phone.length()-4));
+
             //将用户的一些信息置空
             bankUser.setUserPassword(null);
             bankUser.setIdCard(null);
             byte status = 0;
             bankUser.setUserStatus(status);
-            bankUser.setDefaultBankCard("0");
+            bankUser.setDefaultBankCard("");
             baseResult.append("user",bankUser);
         }
         return baseResult;

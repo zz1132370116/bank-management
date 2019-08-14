@@ -1,4 +1,4 @@
-package com.zl.dc.util;
+package com.zl.dc.api;
 
 import com.alibaba.fastjson.JSONObject;
 import org.junit.Test;

@@ -24,8 +24,8 @@ import java.util.List;
 /**
  * @version: V1.0
  * @author: lu
- * @className: 单次转账控制层
- * @description:
+ * @className: TransferController
+ * @description: 单次转账控制层
  * @data: 2019/8/11 16:16
  */
 @RestController

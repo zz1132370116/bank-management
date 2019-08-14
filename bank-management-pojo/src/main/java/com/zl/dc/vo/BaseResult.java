@@ -17,7 +17,7 @@ public class BaseResult {
 
     /**
      * 2个必填项
-     * @param errno  提示码,0表示
+     * @param errno  提示码,0表示成功，1表示失败
      * @param errmsg  错误提示信息
      */
     public BaseResult(Integer errno, String errmsg) {
@@ -25,6 +25,7 @@ public class BaseResult {
         data.put("errmsg" , errmsg);
     }
 
+    public BaseResult(){}
 
     public BaseResult append(String key , Object msg){
         data.put(key , msg);
