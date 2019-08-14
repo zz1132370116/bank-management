@@ -163,4 +163,20 @@ public class BankCardService {
 
         return bankCard;
     }
+
+    /**
+     * @author pds
+     * @param bankUser
+     * @return java.util.List<com.zl.dc.pojo.BankCard>
+     * @description 根据用户获取该用户其他银行的银行卡
+     * @date 2019/8/14 12:45
+     */
+    public List<OtherBankCard> getOtherBankCardByUser(BankUser bankUser) {
+        Example example = new Example(OtherBankCard.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("userId", bankUser.getUserId());
+        List<OtherBankCard> otherBankCards = otherBankCardMapper.selectByExample(example);
+
+        return otherBankCards;
+    }
 }
