@@ -1,17 +1,23 @@
 package com.zl.dc.controller;
 
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
+import com.aliyuncs.exceptions.ClientException;
+import com.zl.dc.config.SendUpgradeCard;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.CrossBorderTransferRecord;
 import com.zl.dc.pojo.OtherBankCard;
 import com.zl.dc.service.BankCardService;
 import com.zl.dc.vo.BaseResult;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @version: V1.0
@@ -25,7 +31,8 @@ import java.util.List;
 public class BankCardController {
     @Resource
     private BankCardService bankCardService;
-
+    @Resource
+    private StringRedisTemplate redisTemplate;
     /**
      * @author: zhanglei
      * @param: [bankUser]
@@ -87,5 +94,33 @@ public class BankCardController {
 
         }
         return ResponseEntity.ok(new BaseResult(1,"查询失败"));
+    }
+    @GetMapping("/sendUpgradeCard/{bankCardId}")
+    public ResponseEntity<BaseResult> sendUpgradeCard(@PathVariable("bankCardId") String bankCardId){
+        //非空非null判断
+        if (StringUtils.isNotBlank(bankCardId)){
+
+            //调用service
+            BankCard bankCard = bankCardService.getBankCardBybankCardId(bankCardId);
+            if (bankCard !=null){
+                //1 生产验证码
+                String code = RandomStringUtils.randomNumeric(6);
+                //发短信
+                try {
+                    SendSmsResponse sendSmsResponse = SendUpgradeCard.sendSms(bankCard.getBankCardPhone(), code);
+                    //存redis5分钟，因为用户的信息是使用手机号为key存放到redis中的，为了防止将用户信息覆盖，
+                    redisTemplate.opsForValue().set(bankCard.getBankCardPhone()+code, code, 5, TimeUnit.MINUTES);
+                    if ("OK".equalsIgnoreCase(sendSmsResponse.getCode())) {
+                        return ResponseEntity.ok(new BaseResult(0, "发送成功"));
+                    }else {
+                        return ResponseEntity.ok(new BaseResult(0, sendSmsResponse.getMessage()));
+                    }
+                } catch (ClientException e) {
+                    e.printStackTrace();
+                }
+            }
+            return ResponseEntity.ok(new BaseResult(1, "发送失败"));
+        }
+        return ResponseEntity.ok(new BaseResult(1, "发送失败"));
     }
 }
