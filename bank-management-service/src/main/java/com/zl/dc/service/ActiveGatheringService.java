@@ -1,22 +1,19 @@
 package com.zl.dc.service;
 
-import com.alibaba.fastjson.JSONObject;
+
 import com.zl.dc.mapper.BankCardMapper;
 import com.zl.dc.mapper.ManagerTranscationMapper;
 import com.zl.dc.mapper.TransferRecordMapper;
 import com.zl.dc.pojo.BankCard;
-import com.zl.dc.pojo.BankUser;
+
 import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.TransferRecord;
-import com.zl.dc.util.AccessBank;
 import com.zl.dc.vo.ActiveGatheringVo;
-import org.junit.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;

@@ -1,15 +1,10 @@
 package com.zl.dc.controller;
 
 import com.zl.dc.pojo.BankCard;
-import com.zl.dc.pojo.BankUser;
-import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.service.ActiveGatheringService;
 import com.zl.dc.service.BankCardService;
 import com.zl.dc.vo.ActiveGatheringVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -84,7 +79,7 @@ public class ActiveGatheringController {
         //查询相关收款记录
         List<ActiveGatheringVo> agVOList=null;
         //查询相关提额记录
-        List<ManagerTranscation> mtList=null;
+      //  List<ManagerTranscation> mtList=null;
         return null;
     }
 
