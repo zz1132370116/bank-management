@@ -36,8 +36,8 @@ public class BankUser {
     @Column(name = "user_status")
     private Byte userStatus;
     //    手机号收款的银行卡，默认为空
-    @Column(name = "default_bank_card")
-    private String defaultBankCard;
+    @Column(name = "default_bank_card_id")
+    private Integer defaultBankCardId;
     //    用户身份证号
     @Column(name = "id_card")
     private String idCard;
