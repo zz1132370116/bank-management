@@ -6,18 +6,23 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="bank-management-common" />
-        <module name="bank-management-eureka" />
+        <module name="bank-management-utils" />
         <module name="bank-management-gateway" />
-        <module name="bank-management-pojo" />
         <module name="bank-management-server" />
         <module name="bank-management-service" />
+        <module name="bank-management-pojo" />
+        <module name="bank-management-admin" />
+        <module name="bank-management-eureka" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="bank-management-common" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="bank-management" options="-parameters" />
+      <module name="bank-management-admin" options="-parameters" />
       <module name="bank-management-auth" options="-parameters" />
       <module name="bank-management-common" options="-parameters" />
       <module name="bank-management-eureka" options="-parameters" />
@@ -25,6 +30,7 @@
       <module name="bank-management-pojo" options="-parameters" />
       <module name="bank-management-server" options="-parameters" />
       <module name="bank-management-service" options="-parameters" />
+      <module name="bank-management-utils" options="-parameters" />
     </option>
   </component>
 </project>
