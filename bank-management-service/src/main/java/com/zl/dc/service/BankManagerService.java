@@ -1,15 +1,12 @@
 package com.zl.dc.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.zl.dc.mapper.*;
 import com.zl.dc.pojo.*;
-import com.zl.dc.util.AccessBank;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -70,7 +67,7 @@ public class BankManagerService {
             transferRecord.setUserName(bankUser.getUserName());
             Example example3 = new Example(SubordinateBank.class);
             Example.Criteria criteria3 = example3.createCriteria();
-            criteria3.andEqualTo("bankIdentification",transferRecord.getBankInIdentification());
+            criteria3.andEqualTo("bankIdentification", transferRecord.getBankInIdentification());
             transferRecord.setBankOutCardName("五仁银行");
             //获取转入卡所属银行
             transferRecord.setBankInCardName(subordinateBankMapper.selectOneByExample(example3).getBankName());
@@ -132,7 +129,7 @@ public class BankManagerService {
         Example.Criteria criteria3 = example3.createCriteria();
         //非空判断
         if (!transferRecord.getIdCard().equals("")) {
-            criteria2.andEqualTo("idCard",transferRecord.getIdCard());
+            criteria2.andEqualTo("idCard", transferRecord.getIdCard());
             BankUser bankUser = bankUserMapper.selectOneByExample(example2);
             //拼接条件
             criteria1.andEqualTo("userId", bankUser.getUserId());
@@ -145,14 +142,14 @@ public class BankManagerService {
         }
         //条件查询
         List<TransferRecord> transferRecords = transferRecordMapper.selectByExample(example1);
-       //遍历
+        //遍历
         for (TransferRecord record : transferRecords) {
             //通过用户id查询当前用户信息
             BankUser bankUser = bankUserMapper.selectByPrimaryKey(record.getUserId());
             //赋值
             record.setUserName(bankUser.getUserName());
             //获取转出卡所属银行
-            criteria3.andEqualTo("bankIdentification",record.getBankInIdentification());
+            criteria3.andEqualTo("bankIdentification", record.getBankInIdentification());
             record.setBankOutCardName("五仁银行");
             //获取转入卡所属银行
             record.setBankInCardName(subordinateBankMapper.selectOneByExample(example3).getBankName());
@@ -167,7 +164,7 @@ public class BankManagerService {
      * @description: 处理身份证号码
      * @data: 2019/8/7 11:25
      */
-    public static String handlingIdCards(String idcard) {
+    public String handlingIdCards(String idcard) {
         //处理身份证号
         StringBuilder sb = new StringBuilder(idcard);
         sb.replace(6, 14, "****");
@@ -197,6 +194,7 @@ public class BankManagerService {
         }
         return users;
     }
+
     /**
      * @author: zhanglei
      * @param: [userId]
@@ -211,6 +209,7 @@ public class BankManagerService {
         bankUser.setUserStatus(Byte.parseByte("0"));
         bankUserMapper.updateByPrimaryKeySelective(bankUser);
     }
+
     /**
      * @author: zhanglei
      * @param: [userId]
@@ -225,6 +224,7 @@ public class BankManagerService {
         bankUser.setUserStatus(Byte.parseByte("1"));
         bankUserMapper.updateByPrimaryKeySelective(bankUser);
     }
+
     /**
      * @author: zhanglei
      * @param: []
@@ -235,7 +235,7 @@ public class BankManagerService {
     public List<ManagerTranscation> getManagerTranscations() {
         Example example = new Example(ManagerTranscation.class);
         Example.Criteria criteria = example.createCriteria();
-        criteria.andEqualTo("transcationStatus",0);
+        criteria.andEqualTo("transcationStatus", 0);
         List<ManagerTranscation> managerTranscations = managerTranscationMapper.selectByExample(example);
         for (ManagerTranscation managerTranscation : managerTranscations) {
             BankUser bankUser = bankUserMapper.selectByPrimaryKey(managerTranscation.getUserId());
@@ -243,6 +243,7 @@ public class BankManagerService {
         }
         return managerTranscations;
     }
+
     /**
      * @author: zhanglei
      * @param: [transcationId]
@@ -262,16 +263,17 @@ public class BankManagerService {
         ManagerTranscation managerTranscation1 = managerTranscationMapper.selectByPrimaryKey(transcationId);
         BankCard bankCard = bankCardMapper.selectByPrimaryKey(managerTranscation1.getBankCard());
         //如果类型是普通卡则升级为钻石卡
-        if (bankCard.getBankCardType().equals("普通卡")){
+        if (bankCard.getBankCardType().equals("普通卡")) {
             bankCard.setBankCardType("钻石卡");
         }
         //如果类型是钻石卡则升级为黑卡
-        if ("钻石卡".equals(bankCard.getBankCardType())){
+        if ("钻石卡".equals(bankCard.getBankCardType())) {
             bankCard.setBankCardType("黑卡");
         }
 
         bankCardMapper.updateByPrimaryKeySelective(bankCard);
     }
+
     /**
      * @author: zhanglei
      * @param: [transcationId]

@@ -1,12 +1,12 @@
 package com.zl.dc.service;
 
-import com.sun.org.apache.bcel.internal.generic.RETURN;
+import com.zl.dc.mapper.BankCardDOMapper;
 import com.zl.dc.mapper.BankCardMapper;
 import com.zl.dc.mapper.OtherBankCardMapper;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.OtherBankCard;
-import com.zl.dc.util.MD5;
+import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.TransferValueVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
-import java.io.PrintStream;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * @version: V1.0
@@ -30,7 +30,8 @@ public class BankCardService {
 
     @Resource
     private BankCardMapper bankCardMapper;
-
+    @Resource
+    private BankCardDOMapper bankCardDOMapper;
     @Resource
     private OtherBankCardMapper otherBankCardMapper;
 
@@ -41,7 +42,6 @@ public class BankCardService {
      * @description: 根据VO校验银行卡
      * @data: 2019/8/12 11:06
      */
-
     public BankCard verifyBankCardForVo(TransferValueVo transferValueVo) {
         Example example = new Example(BankCard.class);
         Example.Criteria criteria = example.createCriteria();
@@ -152,17 +152,49 @@ public class BankCardService {
     }
 
     /**
-     * @author: zhanglei
-     * @param: [bankCardId]
-     * @return:com.zl.dc.pojo.BankCard
-     * @description: 根据银行卡ID查询银行卡信息
-     * @data: 2019/8/14 11:35
+     * @author: Redsheep
+     * @Param userId
+     * @return: java.util.List<com.zl.dc.pojo.BankCard>
+     * @description: 根据用户id选出所有状态为100的本行卡信息，包括id、卡号、类型、转账限额
+     * @data: 2019/8/14 9:06
      */
-    public BankCard getBankCardBybankCardId(String bankCardId) {
-        BankCard bankCard = bankCardMapper.selectByPrimaryKey(Integer.parseInt(bankCardId));
-
-        return bankCard;
+    public List<BankCard> getBankCardByUserId(Integer userId) {
+        List<BankCard> bankCards = bankCardDOMapper.selectBankCardListByUserId(userId);
+        ListIterator<BankCard> bankCardListIterator = bankCards.listIterator();
+        BankCard bankCard;
+        String bankCardNumber;
+        // 银行卡号加*
+        while (bankCardListIterator.hasNext()) {
+            bankCard = bankCardListIterator.next();
+            bankCardNumber = bankCard.getBankCardNumber();
+            bankCard.setBankCardNumber(StarUtil.StringAddStar(bankCardNumber, 4, 4));
+            bankCard.setBank("五仁银行");
+        }
+        return bankCards;
     }
+
+    /**
+     * @author: Redsheep
+     * @Param status
+     * @return: java.lang.String
+     * @description: 银行卡状态显义
+     * @data: 2019/8/14 9:14
+     */
+    private String changeBankCardStatus(String status) {
+        switch (status) {
+            case "100":
+                return "正常";
+            case "101":
+                return "挂失";
+            case "102":
+                return "冻结";
+            case "103":
+                return "注销";
+            default:
+                return "未知";
+        }
+    }
+
 
     /**
      * @author pds

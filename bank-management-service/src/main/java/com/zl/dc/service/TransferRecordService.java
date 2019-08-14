@@ -1,10 +1,11 @@
 package com.zl.dc.service;
 
+import com.zl.dc.mapper.BankCardDOMapper;
+import com.zl.dc.mapper.TransferRecordDOMapper;
 import com.zl.dc.mapper.TransferRecordMapper;
 import com.zl.dc.mapper.UserMapper;
-import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.TransferRecord;
-import com.zl.dc.util.AccessBank;
+import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.PageBean;
 import com.zl.dc.vo.TransferValueVo;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +16,7 @@ import tk.mybatis.mapper.entity.Example;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.UUID;
 
 /**
@@ -31,6 +33,12 @@ public class TransferRecordService {
     private TransferRecordMapper transferRecordMapper;
     @Resource
     private TransferRecord transferRecord;
+    @Resource
+    private TransferRecordDOMapper transferRecordDOMapper;
+    @Resource
+    private PageBean pageBean;
+    @Resource
+    private BankCardDOMapper bankCardDOMapper;
     @Resource
     private UserMapper userMapper;
 
@@ -121,14 +129,109 @@ public class TransferRecordService {
     }
 
     /**
-     * @author: redsheep
+     * @author: Redsheep
      * @Param pageBean
+     * @Param month
+     * @Param bankCardId
      * @return: java.util.List<com.zl.dc.pojo.TransferRecord>
-     * @description: 根据月份分页查询用户所有卡的转账记录
-     * @data: 2019/8/13 9:26
+     * @description: 转账记录的分页查询
+     * @data: 2019/8/13 17:23
      */
-    public List<TransferRecord> getTransferRecordByMonth(PageBean pageBean) {
+    public List<TransferRecord> getTransferRecordList(Integer page, Integer month, Integer userId, Integer bankCardId) {
+        // 查询银行卡号
+        String bankCard;
+        if (bankCardId == 0) {
+            bankCard = "";
+        } else {
+            bankCard = bankCardDOMapper.selectBankCardNumberById(bankCardId);
+        }
+        // 分页封装处理
+        pageBean.setPage(page);
+        pageBean.setPageSize(5);
+        pageBean.setIndex((pageBean.getPage() - 1) * pageBean.getPageSize());
+        // 日期字符串的处理
+        StringBuilder startDay = new StringBuilder("2019");
+        StringBuilder endDay = new StringBuilder("2019");
+        if (month <= 9) {
+            startDay.append("0").append(month).append("01");
+            if (month == 9) {
+                endDay.append(month + 1).append("01");
+            } else {
+                endDay.append("0").append(month + 1).append("01");
+            }
+        } else {
+            startDay.append(month).append("01");
+            endDay.append(month + 1).append("01");
+        }
+        // 查询语句
+        List<TransferRecord> transferRecordList = transferRecordDOMapper.selectByUserIdAndMonthAndCard(userId, startDay.toString(), endDay.toString(), pageBean.getIndex(), pageBean.getPageSize(), bankCard);
+        /**
+         * 查询结果的处理
+         * 1.收款银行卡加*
+         * 2.状态和类型显意
+         */
+        ListIterator<TransferRecord> iterator = transferRecordList.listIterator();
+        TransferRecord transferRecord;
+        String status;
+        String type;
+        String bankOutCard;
+        while (iterator.hasNext()) {
+            transferRecord = iterator.next();
+            status = changeTransferStatus(transferRecord.getTransferStatus().toString());
+            transferRecord.setTransferStringStatus(status);
+            type = changeTransferType(transferRecord.getTransferType().toString());
+            transferRecord.setTransferStringType(type);
+            bankOutCard = transferRecord.getBankOutCard();
+            transferRecord.setBankOutCard(StarUtil.StringAddStar(bankOutCard, 4, 4));
+        }
+        return transferRecordList;
+    }
 
-        return null;
+    /**
+     * @author: Redsheep
+     * @Param type
+     * @return: java.lang.String
+     * @description: 转账类型显义
+     * @data: 2019/8/13 17:48
+     */
+    private String changeTransferType(String type) {
+        switch (type) {
+            case "100":
+                return "单次转账";
+            case "101":
+                return "批量转账";
+            case "102":
+                return "主动收款";
+            case "103":
+                return "跨境转账";
+            case "104":
+                return "手机转账";
+            case "105":
+                return "企业转个人";
+            case "106":
+                return "个人转企业";
+            default:
+                return "未知";
+        }
+    }
+
+    /**
+     * @author: Redsheep
+     * @Param status
+     * @return: java.lang.String
+     * @description: 交易状态显义
+     * @data: 2019/8/13 17:48
+     */
+    private String changeTransferStatus(String status) {
+        switch (status) {
+            case "100":
+                return "交易中";
+            case "101":
+                return "成功";
+            case "102":
+                return "失败";
+            default:
+                return "未知";
+        }
     }
 }
