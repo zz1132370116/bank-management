@@ -88,12 +88,11 @@ public class BankCardController {
         //非空非null判断
         if (StringUtils.isNotBlank(bankCardId)) {
             //调用service
-            BankCard bankCard = bankCardService.getBankCardBybankCardId(bankCardId);
+            BankCard bankCard = bankCardService.getBankCardByBankCardId(bankCardId);
             if (bankCard != null) {
                 //返回
                 return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", bankCard));
             }
-
         }
         return ResponseEntity.ok(new BaseResult(1, "查询失败"));
     }
@@ -112,7 +111,7 @@ public class BankCardController {
         if (StringUtils.isNotBlank(bankCardId)) {
 
             //调用service
-            BankCard bankCard = bankCardService.getBankCardBybankCardId(bankCardId);
+            BankCard bankCard = bankCardService.getBankCardByBankCardId(bankCardId);
             if (bankCard != null) {
                 //1 生产验证码
                 String code = RandomStringUtils.randomNumeric(6);
@@ -133,5 +132,45 @@ public class BankCardController {
             return ResponseEntity.ok(new BaseResult(1, "发送失败"));
         }
         return ResponseEntity.ok(new BaseResult(1, "发送失败"));
+    }
+    /**
+     * @author: zhanglei
+     * @param: [bankCard]
+     * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description: 升级银行卡类别
+     * @data: 2019/8/14 15:44
+     */
+    @PostMapping("/UpgradeCard")
+    public ResponseEntity<BaseResult> UpgradeCard(@RequestBody BankCard bankCard){
+        if (bankCard !=null){
+            //从redis获取验证码
+            String code = redisTemplate.opsForValue().get(bankCard.getBankCardPhone()+bankCard.getCode());
+            if (StringUtils.isNotBlank(code)){
+                //申请
+                String s = bankCardService.UpgradeCard(bankCard);
+                if (StringUtils.isNotBlank(s)){
+                    if (s.equals("缺少银行卡信息")){
+                        return ResponseEntity.ok(new BaseResult(1,"缺少银行卡信息")) ;
+                    }
+                    if (s.equals("缺少用户信息")){
+                        return ResponseEntity.ok(new BaseResult(1,"缺少用户信息")) ;
+                    }
+                    if (s.equals("申请成功")){
+                        return ResponseEntity.ok(new BaseResult(0,"申请成功")) ;
+                    }
+                    if (s.equals("申请失败")){
+                        return ResponseEntity.ok(new BaseResult(1,"申请失败")) ;
+                    }
+                }else{
+                    return ResponseEntity.ok(new BaseResult(1,"申请失败")) ;
+                }
+            }else{
+                return ResponseEntity.ok(new BaseResult(1,"验证码错误"));
+            }
+
+        }else{
+            return ResponseEntity.ok(new BaseResult(1,"申请失败")) ;
+        }
+        return ResponseEntity.ok(new BaseResult(1,"申请失败"));
     }
 }
