@@ -195,4 +195,35 @@ public class BankCardService {
         }
     }
 
+
+    /**
+     * @author pds
+     * @param bankUser
+     * @return java.util.List<com.zl.dc.pojo.BankCard>
+     * @description 根据用户获取该用户其他银行的银行卡
+     * @date 2019/8/14 12:45
+     */
+    public List<OtherBankCard> getOtherBankCardByUser(BankUser bankUser) {
+        Example example = new Example(OtherBankCard.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("userId", bankUser.getUserId());
+        List<OtherBankCard> otherBankCards = otherBankCardMapper.selectByExample(example);
+
+        return otherBankCards;
+    }
+    /**
+     * @author: zhanglei
+     * @param: [bankCardId]
+     * @return:com.zl.dc.pojo.BankCard
+     * @description: 根据银行卡ID查询银行卡信息
+     * @data: 2019/8/14 11:35
+     */
+    public BankCard getBankCardBybankCardId(String bankCardId) {
+        BankCard bankCard = bankCardMapper.selectByPrimaryKey(Integer.parseInt(bankCardId));
+        //将银行卡号变成*
+        bankCard.setBankCardNumber(StarUtil.StringAddStar(bankCard.getBankCardNumber(),6,4));
+        //将预留手机号变成*
+        bankCard.setBankCardPhone(StarUtil.StringAddStar(bankCard.getBankCardPhone(),3,4));
+        return bankCard;
+    }
 }

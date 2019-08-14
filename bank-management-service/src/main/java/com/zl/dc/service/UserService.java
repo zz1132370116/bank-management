@@ -94,6 +94,13 @@ public class UserService {
         userMapper.updateByPrimaryKey(user);
     }
 
+    /**
+     * @author pds
+     * @param bankUser
+     * @return java.lang.Integer
+     * @description 添加一个用户
+     * @date 2019/8/14 11:18
+     */
     public Integer addBankUser(BankUser bankUser) {
         int insert = userMapper.insert(bankUser);
         return insert;

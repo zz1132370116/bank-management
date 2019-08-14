@@ -82,3 +82,5 @@ sc:
       # 转账记录
       - /getTransferRecordList    # 查询转账记录----根据月份和银行卡id
       - /getBankCardByUserId      # 根据用户id查询所有本行银行卡
+      - /getBankCardBybankCardId  #根据银行卡ID查询银行卡
+      - /sendUpgradeCard          #升级银行卡(发短信)
