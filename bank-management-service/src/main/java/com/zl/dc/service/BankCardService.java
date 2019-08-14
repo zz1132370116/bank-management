@@ -212,4 +212,19 @@ public class BankCardService {
 
         return otherBankCards;
     }
+    /**
+     * @author: zhanglei
+     * @param: [bankCardId]
+     * @return:com.zl.dc.pojo.BankCard
+     * @description: 根据银行卡ID查询银行卡信息
+     * @data: 2019/8/14 11:35
+     */
+    public BankCard getBankCardBybankCardId(String bankCardId) {
+        BankCard bankCard = bankCardMapper.selectByPrimaryKey(Integer.parseInt(bankCardId));
+        //将银行卡号变成*
+        bankCard.setBankCardNumber(StarUtil.StringAddStar(bankCard.getBankCardNumber(),6,4));
+        //将预留手机号变成*
+        bankCard.setBankCardPhone(StarUtil.StringAddStar(bankCard.getBankCardPhone(),3,4));
+        return bankCard;
+    }
 }

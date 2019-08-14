@@ -8,6 +8,7 @@ import com.zl.dc.config.JwtProperties;
 import com.zl.dc.entity.UserInfo;
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.util.JwtUtils;
+import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.BaseResult;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -113,7 +114,7 @@ public class AuthService {
             }
 
             String phone = bankUser.getUserPhone();
-            bankUser.setUserPassword(phone.substring(0,3)+"****"+phone.substring(phone.length()-4));
+            bankUser.setUserPassword(StarUtil.StringAddStar(phone,3,4));
 
             //将用户的一些信息置空
             bankUser.setUserPassword(null);
