@@ -25,6 +25,7 @@ public class BaseResult {
         data.put("errmsg" , errmsg);
     }
 
+    public BaseResult(){}
 
     public BaseResult append(String key , Object msg){
         data.put(key , msg);

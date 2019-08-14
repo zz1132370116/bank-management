@@ -86,11 +86,16 @@ public class UserService {
      * @author pds
      * @param user
      * @return void
-     * @description 功能描述
+     * @description 将用户的手机号置为null
      * @date 2019/8/12 13:58
      */
-    public void updateBankUserPhoneToEmpty(BankUser user){
-        user.setUserPhone("");
-        userMapper.updateByPrimaryKeySelective(user);
+    public void updateBankUserPhoneToNull(BankUser user){
+        user.setUserPhone(null);
+        userMapper.updateByPrimaryKey(user);
+    }
+
+    public Integer addBankUser(BankUser bankUser) {
+        int insert = userMapper.insert(bankUser);
+        return insert;
     }
 }
