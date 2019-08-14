@@ -218,7 +218,7 @@ public class BankCardService {
      * @description: 根据银行卡ID查询银行卡信息
      * @data: 2019/8/14 11:35
      */
-    public BankCard getBankCardBybankCardId(String bankCardId) {
+    public BankCard getBankCardByBankCardId(String bankCardId) {
         BankCard bankCard = bankCardMapper.selectByPrimaryKey(Integer.parseInt(bankCardId));
         //将银行卡号变成*
         bankCard.setBankCardNumber(StarUtil.StringAddStar(bankCard.getBankCardNumber(),6,4));

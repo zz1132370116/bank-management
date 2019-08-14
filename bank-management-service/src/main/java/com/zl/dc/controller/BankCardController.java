@@ -88,7 +88,7 @@ public class BankCardController {
         //非空非null判断
         if (StringUtils.isNotBlank(bankCardId)) {
             //调用service
-            BankCard bankCard = bankCardService.getBankCardBybankCardId(bankCardId);
+            BankCard bankCard = bankCardService.getBankCardByBankCardId(bankCardId);
             if (bankCard != null) {
                 //返回
                 return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", bankCard));
@@ -112,7 +112,7 @@ public class BankCardController {
         if (StringUtils.isNotBlank(bankCardId)) {
 
             //调用service
-            BankCard bankCard = bankCardService.getBankCardBybankCardId(bankCardId);
+            BankCard bankCard = bankCardService.getBankCardByBankCardId(bankCardId);
             if (bankCard != null) {
                 //1 生产验证码
                 String code = RandomStringUtils.randomNumeric(6);
