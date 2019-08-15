@@ -22,13 +22,13 @@ public class OtherBankCard {
     //    主键
     @Id
     @Column(name = "bank_card_id")
-    private int bankCardId;
+    private Integer bankCardId;
     //    银行卡号
     @Column(name = "bank_card_number")
     private String bankCardNumber;
     //    用户id
     @Column(name = "user_id")
-    private int userId;
+    private Integer userId;
     //    银行标识码
     @Column(name = "subordinate_banks_identification")
     private String subordinateBanksIdentification;
@@ -43,5 +43,10 @@ public class OtherBankCard {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date gmtModified;
 
+    /**
+     * 银行卡所属银行
+     */
+    @Transient
+    private String bankCardName;
 }
 

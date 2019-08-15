@@ -70,6 +70,7 @@ sc:
       - /updatePhoneSms           # 修改手机----获取验证码
       - /updatePhoneVerify        # 修改手机----验证验证码是否正确
       - /updatePhone              # 修改手机----修改手机
+      - /verifiedIdentity         # 实名认证
       # 转账
       - /getAllSubordinateBank    # 单次转账----查询出所有所属银行
       - /verifyBankCardForVo      # 单次转账----转账方法
@@ -84,9 +85,10 @@ sc:
       - /getBankCardByUserId      # 根据用户id查询所有本行银行卡
       - /getBankCardBybankCardId  # 根据银行卡ID查询银行卡
       - /sendUpgradeCard          # 升级银行卡(发短信)
-      - /sendUpgradeCard          #升级银行卡(发短信)
-      - /UpgradeCard              #升级银行卡(申请)
+      - /sendUpgradeCard          # 升级银行卡(发短信)
+      - /UpgradeCard              # 升级银行卡(申请)
       # 他行卡
       - /addOtherBankCard         # 绑定他行卡
       - /deleteOtherBankCard      # 解绑他行卡
       - /getBankCardBybankCardId  #根据银行卡ID查询银行卡
+      - /getOtherBankCardByUserId #根据用户id获取他行卡

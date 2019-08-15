@@ -203,15 +203,15 @@ public class BankCardService {
 
     /**
      * @author pds
-     * @param bankUser
+     * @param userId
      * @return java.util.List<com.zl.dc.pojo.BankCard>
-     * @description 根据用户获取该用户其他银行的银行卡
+     * @description 根据用户Id获取该用户其他银行的银行卡
      * @date 2019/8/14 12:45
      */
-    public List<OtherBankCard> getOtherBankCardByUser(BankUser bankUser) {
+    public List<OtherBankCard> getOtherBankCardByUserId(Integer userId) {
         Example example = new Example(OtherBankCard.class);
         Example.Criteria criteria = example.createCriteria();
-        criteria.andEqualTo("userId", bankUser.getUserId());
+        criteria.andEqualTo("userId", userId);
         List<OtherBankCard> otherBankCards = otherBankCardMapper.selectByExample(example);
 
         return otherBankCards;
