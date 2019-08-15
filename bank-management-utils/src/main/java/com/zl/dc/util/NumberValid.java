@@ -23,7 +23,7 @@ public class NumberValid {
      */
     public static boolean moneyValid(String money) {
 
-        Pattern pattern = Pattern.compile("^(([1-9]{1}\\d{10})|([0]{1}))(\\.(\\d){0,2})?$"); // 判断小数点后2位的数字的正则表达式
+        Pattern pattern = Pattern.compile("^(([1-9]{1}\\d{0,10})|([0]{1}))(\\.(\\d){1,2})?$"); // 判断小数点后2位的数字的正则表达式
         Matcher match = pattern.matcher(money);
         if (match.matches() == false) {
             return false;
