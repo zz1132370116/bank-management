@@ -1,11 +1,14 @@
 package com.zl.dc.service;
 
 
+import com.zl.dc.api.AccessBank;
 import com.zl.dc.mapper.BankCardMapper;
 import com.zl.dc.mapper.ManagerTranscationMapper;
 import com.zl.dc.mapper.TransferRecordMapper;
+import com.zl.dc.mapper.UserMapper;
 import com.zl.dc.pojo.BankCard;
 
+import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.vo.ActiveGatheringVo;
@@ -43,8 +46,10 @@ public class ActiveGatheringService {
     private BankCardMapper bankCardMapper;
     //银行卡实体类
     //session对象
-    @Autowired
+    @Resource
     private HttpSession session;
+    @Resource
+     private UserMapper userMapper;
 
 
     /**
@@ -54,12 +59,11 @@ public class ActiveGatheringService {
      * @description: 查询所有主动收款记录
      * @data: 2019/8/14 19:00
      */
-    public List<ActiveGatheringVo> getActiveGatheringVoList() {
+    public List<ActiveGatheringVo> getActiveGatheringVoList(Integer userId) {
         TransferRecord transferRecord=new TransferRecord();
         Example example = new Example(TransferRecord.class);
         Example.Criteria criteria = example.createCriteria();
-        //从session中获取当前登录用户id
-        Integer userId=25;
+        //获取当前登录用户id
         transferRecord.setUserId(userId);
         //拼接查询条件
         criteria.andEqualTo("transferType","102");
@@ -75,6 +79,9 @@ public class ActiveGatheringService {
         ActiveGatheringVo activeGatheringVo = new ActiveGatheringVo();
 
         for (TransferRecord transfer :transferRecordList){
+
+            //订单id
+            activeGatheringVo.setActiveId(transfer.getTransferRecordId());
             //付款人姓名
             activeGatheringVo.setOutUserName(transfer.getInCardUserName());
             //收款卡
@@ -99,9 +106,6 @@ public class ActiveGatheringService {
      */
     public boolean updateGatheringStatus(String activeId){
         TransferRecord transferRecord=new TransferRecord();
-        //从session中获取当前登录用户id
-        Integer userId=25;
-        transferRecord.setUserId(userId);
         //获取前台要修改的交易记录订单id
         transferRecord.setTransferRecordId(new Integer(activeId));
         //修改交易订单id的状态为取消
@@ -124,13 +128,13 @@ public class ActiveGatheringService {
      * @description: 用户添加主动收款时执行的方法
      * @data: 2019/8/14 19:00
      */
-    public boolean addTransactionTecord(String userPhone,String userBankId , ActiveGatheringVo agvo){
+    public boolean addTransactionTecord(ActiveGatheringVo agvo){
         //根据发起主动收款用户填写的数据添加交易订单
         //agvo 收款订单基本信息
-        if(userPhone==null || userPhone.equals("")){
+        if(agvo.getOutUserPhone()==null){
             return  false;
         }
-        if(userBankId==null || userBankId.equals("")){
+        if(agvo.getInBankId()==null || "".equals(agvo.getInBankId())){
             return  false;
         }
         if(agvo.getMuchMoney()==null || "".equals(agvo.getMuchMoney())){
@@ -153,24 +157,31 @@ public class ActiveGatheringService {
         //添加交易状态为交易中
         transferRecord.setTransferStatus(Byte.parseByte("100"));
 
-        //从session中获取当前登录用户id
-        Integer userId=null;
         //添加收款用户id
-        transferRecord.setUserId(25);
+        transferRecord.setUserId(agvo.getInUserId());
         /*根据收款卡id 查询收款卡
         * userBankId */
+        BankCard card = bankCardMapper.selectByPrimaryKey(agvo.getInBankId());
         //添加收款卡
-        transferRecord.setBankOutCard(userBankId);
+        transferRecord.setBankOutCard(card.getBankCardNumber());
 
 
         /*根据付款人手机号查询付款人姓名
             userPhone 付款人电话*/
+        Example example = new Example(BankUser.class);
+
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("userPhone",agvo.getOutUserPhone());
+        BankUser bankUser = userMapper.selectOneByExample(example);
+        if (bankUser==null){
+            return false;
+        }
         //添加付款人姓名
-        transferRecord.setInCardUserName(userPhone);
+        transferRecord.setInCardUserName(bankUser.getUserName());
         //付款卡标识暂时为空
-        transferRecord.setBankInIdentification(userPhone);
+        transferRecord.setBankInIdentification("0");
         //付款卡暂时为空
-        transferRecord.setBankInCard(userPhone);
+        transferRecord.setBankInCard("0");
 
         transferRecord.setGmtCreate(new Date());
         transferRecord.setGmtModified(new Date());
@@ -193,14 +204,13 @@ public class ActiveGatheringService {
      */
     //获取相关待付款记录
     //getActiveGatheringVo
-    public List<ActiveGatheringVo> getActiveGatheringVo(){
+    public List<ActiveGatheringVo> getActiveGatheringVo(String userName){
         TransferRecord transferRecord=new TransferRecord();
         Example example = new Example(TransferRecord.class);
 
         Example.Criteria criteria = example.createCriteria();
 
-        //从session中获取当前登录用户姓名
-        String userName="testA2";
+        //获取当前登录用户姓名
         //查询付款人是当前登录用户的
         transferRecord.setInCardUserName(userName);
         //拼接查询条件
@@ -217,6 +227,8 @@ public class ActiveGatheringService {
         ActiveGatheringVo activeGatheringVo = new ActiveGatheringVo();
 
         for (TransferRecord transfer :transferRecordList){
+            //收款订单id
+            activeGatheringVo.setActiveId(transfer.getTransferRecordId());
             //收款人
             activeGatheringVo.setInUserId(transfer.getUserId());
             //收款卡
@@ -237,25 +249,25 @@ public class ActiveGatheringService {
      * @description: 用户同意付款时执行的方法
      * @data: 2019/8/14 19:00
      */
-    public  boolean agreeGathering(String transferRecordId,String muchMoney,String bankCardId,String bankCardPassword){
+    public  boolean agreeGathering(ActiveGatheringVo agvo){
         //muchMoney
         //根据用户传的订单id, transferRecordId
         // 银行卡id bankCardId
         // 银行卡密码.bankCardPassword
         //查询付款卡id付款信息
         BankCard  outCard=new BankCard();
-        outCard.setBankCardId(new Integer(bankCardId));
+        outCard.setBankCardId(agvo.getOutBankId());
         outCard = bankCardMapper.selectByPrimaryKey(outCard);
 
         if (outCard==null){
             return false;
         }
         //校验付款卡密码
-        if(!bankCardPassword.equals(outCard.getBankCardPassword())){
+        if(!agvo.getOutBankPassword().equals(outCard.getBankCardPassword())){
             return false;
         }
         //校验付款卡金额是否足够
-        BigDecimal money = new BigDecimal(muchMoney);
+        BigDecimal money = agvo.getMuchMoney();
         money=outCard.getBankCardBalance().subtract(money);
 
         if(money.doubleValue()<0){
@@ -265,7 +277,7 @@ public class ActiveGatheringService {
         //查询要修改的订单
         TransferRecord transferRecord=new TransferRecord();
         //获取前台要修改的交易记录订单id
-        transferRecord.setTransferRecordId(new Integer(transferRecordId));
+        transferRecord.setTransferRecordId(new Integer(agvo.getActiveId()));
 
         transferRecord=transferRecordMapper.selectByPrimaryKey(transferRecord);
         if (transferRecord==null){
@@ -276,16 +288,17 @@ public class ActiveGatheringService {
         Example.Criteria criteria = example.createCriteria();
         BankCard inCard=new BankCard();
         //根据原订单收款卡号查询收款卡
-        inCard.setBankCardNumber(transferRecord.getBankOutCard());
+        criteria.andEqualTo("bankCardNumber",transferRecord.getBankOutCard());
         inCard = bankCardMapper.selectOneByExample(example);
         if(inCard==null){
             return false;
         }
         //付款卡扣钱
-        outCard.setBankCardBalance(outCard.getBankCardBalance().subtract(new BigDecimal(muchMoney)));
+        outCard.setBankCardBalance(outCard.getBankCardBalance().subtract(agvo.getMuchMoney()));
         //收款卡加钱
-        inCard.setBankCardBalance(inCard.getBankCardBalance().add(new BigDecimal(muchMoney)));
-
+        inCard.setBankCardBalance(inCard.getBankCardBalance().add(agvo.getMuchMoney()));
+        outCard.setGmtModified(new Date());
+        inCard.setGmtModified(new Date());
         //银行卡数据修改到数据库
         int outFlag=bankCardMapper.updateByPrimaryKey(outCard);
         if (outFlag<0){
@@ -303,13 +316,8 @@ public class ActiveGatheringService {
         if (transferFlag<0){
             return false;
         }
-
         return true;
-
-
-
     }
-    //agreeGathering
 
     /**
      * @author: nwm
@@ -319,13 +327,12 @@ public class ActiveGatheringService {
      * @data: 2019/8/13 19:00
      */
     //根据当前登录用户id查询升级卡申请的相关记录
-    public  List<ManagerTranscation> getManagerTranscation(){
+    public  List<ManagerTranscation> getManagerTranscation(Integer userId){
         ManagerTranscation managerTranscation=new ManagerTranscation();
         Example example = new Example(ManagerTranscation.class);
 
         Example.Criteria criteria = example.createCriteria();
-        //从session中获取当前登录用户id
-        Integer userId=25;
+        //获取当前登录用户id
         //根据当前登录用户id查询
         managerTranscation.setUserId(userId);
         //查询类型是升级卡申请的
@@ -343,9 +350,10 @@ public class ActiveGatheringService {
      */
 
     public  boolean updateManagerTranscationStatus(String transcationId){
-        ManagerTranscation managerTranscation=new ManagerTranscation();
+        ManagerTranscation managerTranscation=managerTranscationMapper.selectByPrimaryKey(transcationId);
+       // ManagerTranscation managerTranscation=new ManagerTranscation();
         //获取用户要取消申请的订单
-        managerTranscation.setTranscationId(new Integer(transcationId));
+       // managerTranscation.setTranscationId(new Integer(transcationId));
         //设置订单状态为取消
         managerTranscation.setTranscationStatus(Byte.parseByte("2"));
         managerTranscation.setGmtModified(new Date());
@@ -364,18 +372,18 @@ public class ActiveGatheringService {
      * @description: 根据登录的用户查询用户名下的银行卡
      * @data: 2019/8/13 19:00
      */
-    public   List<BankCard>  getBankCardByUser(){
+    public   List<BankCard>  getBankCardByUser(Integer userId){
         BankCard  bankCard=new BankCard();
         //session中获取当前登录用户id
-        Integer uesrId=null;
         //通过用户id查询用户绑定银行卡
-        bankCard.setUserId(26);
+        bankCard.setUserId(userId);
         Example example = new Example(BankCard.class);
         Example.Criteria criteria = example.createCriteria();
         criteria.andEqualTo("userId", bankCard.getUserId());
         List<BankCard> bankCards = bankCardMapper.selectByExample(example);
         for (BankCard bank : bankCards) {
             bank.setBank("五仁银行");
+           // AccessBank.getSubordinateBank(bank.getBankCardNumber())
         }
         //相当于where
         return bankCards;
