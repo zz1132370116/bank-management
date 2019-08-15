@@ -102,3 +102,12 @@ sc:
       - /getBankCardBybankCardId  #根据银行卡ID查询银行卡
       - /getOtherBankCardByUserId #根据用户id获取他行卡
       #企业
+      #消息中心
+      -/getMessageCenter      #根据用户id查询待付款单和升级卡记录
+      - /agreeGathering       #用户通知付款
+      -/updateManagerTranscationStatus #用户主动取消升级卡申请
+      - /getBankCardByUser   #根据用户id查询用户名下所有银行卡
+      #主动收款
+      - /getActiveCollection #查询所有主动收款历史订单
+      - /updateGatheringType #用户取消主动收款
+      - /addTransactionTecord #发起新的主动收款(添加交易订单)
