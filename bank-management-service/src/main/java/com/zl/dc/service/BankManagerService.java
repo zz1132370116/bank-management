@@ -1,7 +1,10 @@
 package com.zl.dc.service;
 
+import com.aliyuncs.exceptions.ClientException;
+import com.zl.dc.config.SendUpgradeCardOK;
 import com.zl.dc.mapper.*;
 import com.zl.dc.pojo.*;
+import com.zl.dc.util.StarUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
@@ -273,6 +276,12 @@ public class BankManagerService {
             bankCard.setBankCardType("黑卡");
         }
         bankCardMapper.updateByPrimaryKeySelective(bankCard);
+        //
+        try {
+            SendUpgradeCardOK.sendSms(bankCard.getBankCardPhone(), StarUtil.StringAddStar(bankCard.getBankCardNumber(),6,4),managerTranscation.getGmtModified());
+        } catch (ClientException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
