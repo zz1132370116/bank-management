@@ -175,6 +175,13 @@ public class BankCardController {
         return ResponseEntity.ok(new BaseResult(1,"申请失败"));
     }
 
+    /**
+     * @author pds
+     * @param userId
+     * @return org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description 根据用户id查询他行银行卡
+     * @date 2019/8/15 9:34
+     */
     @GetMapping("/getOtherBankCardByUserId/{userId}")
     public ResponseEntity<BaseResult> getOtherBankCardByUserId(@PathVariable("userId") Integer userId){
         if (userId == null || userId == 0){
