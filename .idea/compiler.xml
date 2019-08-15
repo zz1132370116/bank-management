@@ -2,18 +2,17 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="bank-management-utils" />
-        <module name="bank-management-gateway" />
-        <module name="bank-management-server" />
-        <module name="bank-management-service" />
-        <module name="bank-management-pojo" />
         <module name="bank-management-admin" />
         <module name="bank-management-eureka" />
+        <module name="bank-management-service" />
+        <module name="bank-management-pojo" />
+        <module name="bank-management-gateway" />
+        <module name="bank-management-server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
