@@ -101,4 +101,5 @@ sc:
       - /deleteOtherBankCard      # 解绑他行卡
       - /getBankCardBybankCardId  #根据银行卡ID查询银行卡
       - /getOtherBankCardByUserId #根据用户id获取他行卡
-      #企业
+      #消息通知
+      - /MessageNotification #根据登录用户id查询消息
