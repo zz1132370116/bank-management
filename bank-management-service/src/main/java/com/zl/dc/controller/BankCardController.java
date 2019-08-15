@@ -1,13 +1,12 @@
 package com.zl.dc.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.zl.dc.config.SendUpgradeCard;
-import com.zl.dc.pojo.BankCard;
-import com.zl.dc.pojo.BankUser;
-import com.zl.dc.pojo.CrossBorderTransferRecord;
-import com.zl.dc.pojo.OtherBankCard;
+import com.zl.dc.pojo.*;
 import com.zl.dc.service.BankCardService;
+import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.BaseResult;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @version: V1.0
@@ -172,5 +173,36 @@ public class BankCardController {
             return ResponseEntity.ok(new BaseResult(1,"申请失败")) ;
         }
         return ResponseEntity.ok(new BaseResult(1,"申请失败"));
+    }
+
+    /**
+     * @author pds
+     * @param userId
+     * @return org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description 根据用户id查询他行银行卡
+     * @date 2019/8/15 9:34
+     */
+    @GetMapping("/getOtherBankCardByUserId/{userId}")
+    public ResponseEntity<BaseResult> getOtherBankCardByUserId(@PathVariable("userId") Integer userId){
+        if (userId == null || userId == 0){
+            return ResponseEntity.ok(new BaseResult(1,"参数错误"));
+        }
+        List<OtherBankCard> otherBankCards = bankCardService.getOtherBankCardByUserId(userId);
+        if (otherBankCards.size() > 0){
+            //从Redis中查询所属银行
+            String subordinateBankJson = redisTemplate.opsForValue().get("subordinateBank");
+            List<SubordinateBank> subordinateBanks = JSON.parseArray(subordinateBankJson, SubordinateBank.class);
+            Map<String, String> subordinateBankMaps = subordinateBanks.stream()
+                    .collect(Collectors.toMap(SubordinateBank::getBankIdentification, SubordinateBank::getBankName,
+                            (key1, key2) -> key2));
+            for (OtherBankCard otherBankCard : otherBankCards) {
+                otherBankCard.setBankCardName(subordinateBankMaps.get(otherBankCard.getSubordinateBanksIdentification()));
+                otherBankCard.setBankCardNumber(StarUtil.StringAddStar(otherBankCard.getBankCardNumber(),6,4));
+            }
+            System.out.println(otherBankCards);
+            return ResponseEntity.ok(new BaseResult(0,"查询成功").append("otherBankCards",otherBankCards));
+        }else {
+            return ResponseEntity.ok(new BaseResult(1,"该用户没有他行银行卡"));
+        }
     }
 }

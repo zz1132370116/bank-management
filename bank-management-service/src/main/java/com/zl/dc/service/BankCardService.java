@@ -51,23 +51,24 @@ public class BankCardService {
         Example example = new Example(BankCard.class);
         Example.Criteria criteria = example.createCriteria();
 //          对VO进非空校验
-        if (transferValueVo != null) {
+        if (transferValueVo == null) {
+            return null;
+        }
 //            对密码进行非空校验
-            if (StringUtils.isNotBlank(transferValueVo.getPassword())) {
+        if (StringUtils.isBlank(transferValueVo.getPassword())) {
+            return null;
+        }
 //                对银行卡id进行非空校验
-                if (transferValueVo.getOutBankCardID() != null) {
+        if (transferValueVo.getOutBankCardID() == null) {
+            return null;
+        }
 //            将传入密码加密处理
 //                    transferValueVo.setPassword(MD5.GetMD5Code(transferValueVo.getPassword()));
 //            拼接条件查询出该银行卡
-                    criteria.andEqualTo("bankCardPassword", transferValueVo.getPassword());
-                    criteria.andEqualTo("bankCardId", transferValueVo.getOutBankCardID());
-                    criteria.andEqualTo("bankCardStatus", "100");
-                    return bankCardMapper.selectOneByExample(example);
-
-                }
-            }
-        }
-        return null;
+        criteria.andEqualTo("bankCardPassword", transferValueVo.getPassword());
+        criteria.andEqualTo("bankCardId", transferValueVo.getOutBankCardID());
+        criteria.andEqualTo("bankCardStatus", "100");
+        return bankCardMapper.selectOneByExample(example);
     }
 
     /**
@@ -203,15 +204,15 @@ public class BankCardService {
 
     /**
      * @author pds
-     * @param bankUser
+     * @param userId
      * @return java.util.List<com.zl.dc.pojo.BankCard>
-     * @description 根据用户获取该用户其他银行的银行卡
+     * @description 根据用户Id获取该用户其他银行的银行卡
      * @date 2019/8/14 12:45
      */
-    public List<OtherBankCard> getOtherBankCardByUser(BankUser bankUser) {
+    public List<OtherBankCard> getOtherBankCardByUserId(Integer userId) {
         Example example = new Example(OtherBankCard.class);
         Example.Criteria criteria = example.createCriteria();
-        criteria.andEqualTo("userId", bankUser.getUserId());
+        criteria.andEqualTo("userId", userId);
         List<OtherBankCard> otherBankCards = otherBankCardMapper.selectByExample(example);
 
         return otherBankCards;

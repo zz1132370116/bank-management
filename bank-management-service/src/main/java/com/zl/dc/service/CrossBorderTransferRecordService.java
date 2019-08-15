@@ -120,7 +120,7 @@ public class CrossBorderTransferRecordService {
                         bankCardMapper.updateByPrimaryKeySelective(bankCard);
                         //创建转账机记录
                         //生成流水号
-                        crossBorderTransferRecord.setTransferRecordUuid(UUID.randomUUID().toString());
+                        crossBorderTransferRecord.setTransferRecordUuid(UUID.randomUUID().toString().replaceAll("-", ""));
                         //生成创建时间
                         crossBorderTransferRecord.setGmtCreate(new Date());
                         //生成转账记录
