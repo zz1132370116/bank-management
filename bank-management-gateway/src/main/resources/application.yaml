@@ -92,6 +92,7 @@ sc:
       - /deletePayeeById            #根据id删除群组用户
       - /addPayee                   #根据VO添加群组收款人
       - /getBankCardBybankCardId  # 根据银行卡ID查询银行卡
+      #升级银行卡
       - /sendUpgradeCard          # 升级银行卡(发短信)
       - /sendUpgradeCard          # 升级银行卡(发短信)
       - /UpgradeCard              # 升级银行卡(申请)
@@ -100,3 +101,4 @@ sc:
       - /deleteOtherBankCard      # 解绑他行卡
       - /getBankCardBybankCardId  #根据银行卡ID查询银行卡
       - /getOtherBankCardByUserId #根据用户id获取他行卡
+      #企业
