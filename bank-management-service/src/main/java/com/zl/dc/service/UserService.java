@@ -1,13 +1,28 @@
 package com.zl.dc.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.zl.dc.api.VerifyIdCard;
 import com.zl.dc.mapper.UserMapper;
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.vo.BankUserVo;
+import com.zl.dc.vo.BaseResult;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 /**
   * @version: V1.0
@@ -20,7 +35,10 @@ import javax.annotation.Resource;
  @Transactional
 public class UserService {
      @Resource
-    private UserMapper userMapper;
+     private UserMapper userMapper;
+     @Resource
+     private StringRedisTemplate redisTemplate;
+
     /**
      * @author: zhanglei
      * @param: [idCard]
@@ -91,7 +109,7 @@ public class UserService {
      */
     public void updateBankUserPhoneToNull(BankUser user){
         user.setUserPhone(null);
-        userMapper.updateByPrimaryKey(user);
+        userMapper.updateByPrimaryKeySelective(user);
     }
 
     /**
@@ -114,5 +132,59 @@ public class UserService {
     */
     public BankUser selectBankUserByUid(Integer uid){
         return userMapper.selectByPrimaryKey(uid);
+    }
+
+
+    /**
+     * @author pds
+     * @param file
+     * @param userId
+     * @return java.lang.Integer
+     * @description 用户进行实名认证
+     * @date 2019/8/15 11:41
+     */
+    public Integer verifiedIdentity(List<MultipartFile> file,Integer userId) throws IOException, ParseException {
+        MultipartFile frontMul = file.get(0);
+        MultipartFile backMul = file.get(1);
+        // 获取文件名
+        String frontFileName = frontMul.getOriginalFilename();
+        String backFileName = backMul.getOriginalFilename();
+        // 获取文件后缀
+        String frontPrefix=frontFileName.substring(frontFileName.lastIndexOf("."));
+        String backPrefix=backFileName.substring(backFileName.lastIndexOf("."));
+        //将MultipartFile转为File
+        File frontFile = File.createTempFile(UUID.randomUUID().toString().replaceAll("-", ""), frontPrefix);
+        frontMul.transferTo(frontFile);
+        File backFile = File.createTempFile(UUID.randomUUID().toString().replaceAll("-", ""), backPrefix);
+        backMul.transferTo(backFile);
+        //校验身份证背面，并判断身份证是否过期
+        String backJson = VerifyIdCard.back(backFile);
+        JSONObject backJsonObject = JSONObject.parseObject(backJson);
+        String expirationDateStr = (String) backJsonObject.getJSONObject("words_result").getJSONObject("失效日期").get("words");
+        String expiration = expirationDateStr.substring(0,4)+"-"+expirationDateStr.substring(4,6)+"-"+expirationDateStr.substring(6);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date expirationDate = simpleDateFormat.parse(expiration);
+        Integer integer = VerifyIdCard.compareDate(expirationDate, new Date());
+        if (integer == -1){
+            return -2;
+        }
+        //校验身份证正面，并获取用户姓名、身份证号码
+        String frontJson = VerifyIdCard.front(frontFile);
+        JSONObject frontJsonObject = JSONObject.parseObject(frontJson);
+        JSONObject wordsResult = frontJsonObject.getJSONObject("words_result");
+        String userName = (String) wordsResult.getJSONObject("姓名").get("words");
+        String idCard = (String) wordsResult.getJSONObject("公民身份号码").get("words");
+
+        BankUser user = new BankUser();
+        user.setUserId(userId);
+        user.setUserName(userName);
+        user.setIdCard(idCard);
+        Integer i = userMapper.updateByPrimaryKeySelective(user);
+        System.out.println(i);
+        System.out.println(user);
+
+        redisTemplate.opsForValue().set(user.getUserId().toString(), JSON.toJSONString(user));
+
+        return i;
     }
 }
