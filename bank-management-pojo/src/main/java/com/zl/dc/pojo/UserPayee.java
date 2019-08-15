@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -16,6 +17,7 @@ import java.util.Objects;
  * @description:
  * @data: 2019/8/6 10:11
  */
+@Component
 @Data
 @ToString
 @Table(name = "user_payee")

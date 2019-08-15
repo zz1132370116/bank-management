@@ -84,3 +84,9 @@ sc:
       - /getBankCardByUserId      # 根据用户id查询所有本行银行卡
       - /getBankCardBybankCardId  #根据银行卡ID查询银行卡
       - /sendUpgradeCard          #升级银行卡(发短信)
+       # 收款群组
+      - /selectPayeeGroupByUid      #根据用户id返回用户所有的用户群组
+      - /selectPayeeById             #根据群组id返回所有的收款人
+      - /addPayeeGroup             #添加一条收款群组
+      - /deletePayeeById            #根据id删除群组用户
+      - /addPayee                   #根据VO添加群组收款人

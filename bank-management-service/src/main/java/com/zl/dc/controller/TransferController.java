@@ -1,6 +1,7 @@
 package com.zl.dc.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.zl.dc.api.AccessBank;
 import com.zl.dc.pojo.*;
 import com.zl.dc.service.BankCardService;
 import com.zl.dc.service.SubordinateBankService;
@@ -81,7 +82,7 @@ public class TransferController {
     @PostMapping("/verifyBankCardForVo")
     public ResponseEntity<BaseResult> verifyBankCardForVo(@RequestBody TransferValueVo transferValueVo) {
         //对转账金额进行校验
-        if(!NumberValid.moneyValid(transferValueVo.getMuchMoney().toString())){
+        if (!NumberValid.moneyValid(transferValueVo.getMuchMoney().toString())) {
             return ResponseEntity.ok(new BaseResult(1, "金额输入有误，请重新转账"));
         }
         //查询银行卡
@@ -91,6 +92,9 @@ public class TransferController {
         }
         if (bankCard.getBankCardBalance().compareTo(transferValueVo.getMuchMoney()) == -1) {
             return ResponseEntity.ok(new BaseResult(1, "余额不足，操作失败"));
+        }
+        if (bankCard.getBankCardTransferLimit() < transferValueVo.getMuchMoney().intValue()) {
+            return ResponseEntity.ok(new BaseResult(1, "交易被限额，操作失败"));
         }
 
         //设置卡号
@@ -110,17 +114,17 @@ public class TransferController {
         }
         if (StringUtils.isBlank(transferValueVo.getBankPhone()) && StringUtils.isNotBlank(transferValueVo.getInBankCard())) {
             if ("BOWR".equals(transferValueVo.getInBank())) {
-            //本行卡查询用户进行校验
+                //本行卡查询用户进行校验
                 Integer userId = bankCardService.selectBankUserByBankCardNum(transferValueVo.getInBankCard());
                 BankUser bankUser = userService.selectBankUserByUid(userId);
-                if (!bankUser.getUserName().equals(transferValueVo.getInBankName())){
+                if (!bankUser.getUserName().equals(transferValueVo.getInBankName())) {
                     return ResponseEntity.ok(new BaseResult(1, "转账失败，收款人与银行卡不符合"));
                 }
-            }else {
+            } else {
                 //模拟调用接口，传输数据给他行，返回他行用户信息
                 OtherBankCard otherBankCard = bankCardService.getBankNameByBankNum(transferValueVo.getInBankCard());
                 BankUser bankUser = userService.selectBankUserByUid(otherBankCard.getUserId());
-                if (!bankUser.getUserName().equals(transferValueVo.getInBankName())){
+                if (!bankUser.getUserName().equals(transferValueVo.getInBankName())) {
                     return ResponseEntity.ok(new BaseResult(1, "转账失败，收款人与银行卡不符合"));
                 }
             }
@@ -152,8 +156,6 @@ public class TransferController {
     }
 
 
-
-
     /**
      * @author: lu
      * @param: 他行银行卡号
@@ -170,7 +172,7 @@ public class TransferController {
         }
 
         OtherBankCard otherBankCard = bankCardService.getBankNameByBankNum(inBankCard);
-        if (otherBankCard==null) {
+        if (otherBankCard == null) {
 //           如果为空表示未查询到该卡
             return ResponseEntity.ok(new BaseResult(1, "为找到该卡所属银行，请用户仔细校验卡号"));
         } else {
