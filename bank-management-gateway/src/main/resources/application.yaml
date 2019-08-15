@@ -102,3 +102,4 @@ sc:
       - /getBankCardBybankCardId  #根据银行卡ID查询银行卡
       - /getOtherBankCardByUserId #根据用户id获取他行卡
       #企业
+      - /bankEnterpriseLogin      # 企业用户登录

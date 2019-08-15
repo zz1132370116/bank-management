@@ -21,7 +21,7 @@ public class BankEnterprise {
     //    公司id
     @Id
     @Column(name = "enterprise_id")
-    private int enterpriseId;
+    private Integer enterpriseId;
     //    公司名
     @Column(name = "enterprise_name")
     private String enterpriseName;
@@ -45,7 +45,7 @@ public class BankEnterprise {
     private String enterpriseBankCard;
     //    企业状态
     @Column(name = "enterprise_status")
-    private byte enterpriseStatus;
+    private Byte enterpriseStatus;
     //    行创建时间
     @Column(name = "gmt_create")
     private Timestamp gmtCreate;
