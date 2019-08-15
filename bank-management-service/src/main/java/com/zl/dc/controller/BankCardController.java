@@ -1,13 +1,12 @@
 package com.zl.dc.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.zl.dc.config.SendUpgradeCard;
-import com.zl.dc.pojo.BankCard;
-import com.zl.dc.pojo.BankUser;
-import com.zl.dc.pojo.CrossBorderTransferRecord;
-import com.zl.dc.pojo.OtherBankCard;
+import com.zl.dc.pojo.*;
 import com.zl.dc.service.BankCardService;
+import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.BaseResult;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @version: V1.0
@@ -88,12 +89,11 @@ public class BankCardController {
         //非空非null判断
         if (StringUtils.isNotBlank(bankCardId)) {
             //调用service
-            BankCard bankCard = bankCardService.getBankCardBybankCardId(bankCardId);
+            BankCard bankCard = bankCardService.getBankCardByBankCardId(bankCardId);
             if (bankCard != null) {
                 //返回
                 return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", bankCard));
             }
-
         }
         return ResponseEntity.ok(new BaseResult(1, "查询失败"));
     }
@@ -112,7 +112,7 @@ public class BankCardController {
         if (StringUtils.isNotBlank(bankCardId)) {
 
             //调用service
-            BankCard bankCard = bankCardService.getBankCardBybankCardId(bankCardId);
+            BankCard bankCard = bankCardService.getBankCardByBankCardId(bankCardId);
             if (bankCard != null) {
                 //1 生产验证码
                 String code = RandomStringUtils.randomNumeric(6);
@@ -133,5 +133,76 @@ public class BankCardController {
             return ResponseEntity.ok(new BaseResult(1, "发送失败"));
         }
         return ResponseEntity.ok(new BaseResult(1, "发送失败"));
+    }
+    /**
+     * @author: zhanglei
+     * @param: [bankCard]
+     * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description: 升级银行卡类别
+     * @data: 2019/8/14 15:44
+     */
+    @PostMapping("/UpgradeCard")
+    public ResponseEntity<BaseResult> UpgradeCard(@RequestBody BankCard bankCard){
+        if (bankCard !=null){
+            //从redis获取验证码
+            String code = redisTemplate.opsForValue().get(bankCard.getBankCardPhone()+bankCard.getCode());
+            if (StringUtils.isNotBlank(code)){
+                //申请
+                String s = bankCardService.UpgradeCard(bankCard);
+                if (StringUtils.isNotBlank(s)){
+                    if (s.equals("缺少银行卡信息")){
+                        return ResponseEntity.ok(new BaseResult(1,"缺少银行卡信息")) ;
+                    }
+                    if (s.equals("缺少用户信息")){
+                        return ResponseEntity.ok(new BaseResult(1,"缺少用户信息")) ;
+                    }
+                    if (s.equals("申请成功")){
+                        return ResponseEntity.ok(new BaseResult(0,"申请成功")) ;
+                    }
+                    if (s.equals("申请失败")){
+                        return ResponseEntity.ok(new BaseResult(1,"申请失败")) ;
+                    }
+                }else{
+                    return ResponseEntity.ok(new BaseResult(1,"申请失败")) ;
+                }
+            }else{
+                return ResponseEntity.ok(new BaseResult(1,"验证码错误"));
+            }
+
+        }else{
+            return ResponseEntity.ok(new BaseResult(1,"申请失败")) ;
+        }
+        return ResponseEntity.ok(new BaseResult(1,"申请失败"));
+    }
+
+    /**
+     * @author pds
+     * @param userId
+     * @return org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description 根据用户id查询他行银行卡
+     * @date 2019/8/15 9:34
+     */
+    @GetMapping("/getOtherBankCardByUserId/{userId}")
+    public ResponseEntity<BaseResult> getOtherBankCardByUserId(@PathVariable("userId") Integer userId){
+        if (userId == null || userId == 0){
+            return ResponseEntity.ok(new BaseResult(1,"参数错误"));
+        }
+        List<OtherBankCard> otherBankCards = bankCardService.getOtherBankCardByUserId(userId);
+        if (otherBankCards.size() > 0){
+            //从Redis中查询所属银行
+            String subordinateBankJson = redisTemplate.opsForValue().get("subordinateBank");
+            List<SubordinateBank> subordinateBanks = JSON.parseArray(subordinateBankJson, SubordinateBank.class);
+            Map<String, String> subordinateBankMaps = subordinateBanks.stream()
+                    .collect(Collectors.toMap(SubordinateBank::getBankIdentification, SubordinateBank::getBankName,
+                            (key1, key2) -> key2));
+            for (OtherBankCard otherBankCard : otherBankCards) {
+                otherBankCard.setBankCardName(subordinateBankMaps.get(otherBankCard.getSubordinateBanksIdentification()));
+                otherBankCard.setBankCardNumber(StarUtil.StringAddStar(otherBankCard.getBankCardNumber(),6,4));
+            }
+            System.out.println(otherBankCards);
+            return ResponseEntity.ok(new BaseResult(0,"查询成功").append("otherBankCards",otherBankCards));
+        }else {
+            return ResponseEntity.ok(new BaseResult(1,"该用户没有他行银行卡"));
+        }
     }
 }

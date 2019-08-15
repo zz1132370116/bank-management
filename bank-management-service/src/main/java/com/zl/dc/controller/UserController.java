@@ -18,10 +18,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -502,5 +504,18 @@ public class UserController {
         return ResponseEntity.ok(new BaseResult(1, "验证码错误或验证码已经过时"));
     }
 
+    /**
+     * @author pds
+     * @param file
+     * @return org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description 实名认证
+     * @date 2019/8/15 9:21
+     */
+    @PostMapping("/verifiedIdentity")
+    public ResponseEntity<BaseResult> verifiedIdentity(@RequestParam(value = "file",required = false) List<MultipartFile> file){
+        MultipartFile frontMul = file.get(0);
+        MultipartFile backMul = file.get(1);
 
+        return ResponseEntity.ok(new BaseResult(0, "验证码错误或验证码已经过时"));
+    }
 }

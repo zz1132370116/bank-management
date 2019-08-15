@@ -1,7 +1,6 @@
 package com.zl.dc.api;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jayway.jsonpath.internal.function.json.Append;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +10,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.prefs.AbstractPreferences;
 
 /**
  * @version: V1.0
