@@ -1,6 +1,7 @@
 package com.zl.dc.service;
 
 import com.zl.dc.mapper.ManagerTranscationMapper;
+
 import com.zl.dc.pojo.ManagerTranscation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,17 @@ public class MessageService {
         criteria.andEqualTo("userId",Integer.parseInt(userId));
         criteria.andNotEqualTo("gmtModified",null);
         criteria.andNotEqualTo("transcationStatus",0);
+        criteria.andNotEqualTo("transcationStatus",100);
         List<ManagerTranscation> managerTranscations = managerTranscationMapper.selectByExample(example);
+
+
         return managerTranscations;
+    }
+
+    public void updateStatus(ManagerTranscation managerTranscation) {
+        if (managerTranscation !=null){
+            managerTranscationMapper.updateByPrimaryKeySelective(managerTranscation);
+        }
+
     }
 }

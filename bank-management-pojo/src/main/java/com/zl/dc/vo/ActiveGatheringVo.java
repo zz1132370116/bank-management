@@ -18,17 +18,26 @@ public class ActiveGatheringVo {
     private String inUserName;
     //收款人银行卡归属行
     private String inBank;
+    //收款人卡号id
+    private Integer inBankId;
     //收款人卡号
     private  String inBankCard;
 
     //付款人id
     private Integer outUserId;
+    //付款人电话
+    private Integer outUserPhone;
     //付款人姓名
     private String outUserName;
     //付款人银行卡归属行
     private String outBank;
+    //付款人卡号id
+    private  Integer outBankId;
     //付款人卡号
     private  String outBankCard;
+    //付款人卡密码
+    private  String outBankPassword;
+
 
     //订单id
     private Integer activeId;

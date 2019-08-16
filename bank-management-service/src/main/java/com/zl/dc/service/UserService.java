@@ -180,9 +180,9 @@ public class UserService {
         user.setUserName(userName);
         user.setIdCard(idCard);
         Integer i = userMapper.updateByPrimaryKeySelective(user);
-        System.out.println(i);
-        System.out.println(user);
 
+        user = userMapper.selectByPrimaryKey(userId);
+        System.out.println(user);
         redisTemplate.opsForValue().set(user.getUserId().toString(), JSON.toJSONString(user));
 
         return i;

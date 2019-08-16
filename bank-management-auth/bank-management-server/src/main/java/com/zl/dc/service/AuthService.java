@@ -18,7 +18,11 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 /**
- * Created by 舍頭襘游泳 on 2018/12/13.
+ * @version V1.0
+ * @author pds
+ * @className AuthService
+ * @description 普通用户注册登录功能
+ * @date 2019/8/15 17:33
  */
 @Service
 @EnableConfigurationProperties(JwtProperties.class)
