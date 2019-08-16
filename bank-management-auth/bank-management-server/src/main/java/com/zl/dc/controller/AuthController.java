@@ -7,15 +7,16 @@ import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.BaseResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
 /**
- * Created by 舍頭襘游泳 on 2018/12/13.
+ * @version V1.0
+ * @author pds
+ * @className AuthController
+ * @description 普通用户登录注册功能
+ * @date 2019/8/15 17:29
  */
 @RestController
 @RequestMapping
@@ -112,5 +113,21 @@ public class AuthController {
         }
         //3 没有token，失败
         return ResponseEntity.ok(new BaseResult(2, "登录失败"));
+    }
+
+    /**
+     * @author pds
+     * @param userId
+     * @return org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description 用户退出登录
+     * @date 2019/8/16 10:24
+     */
+    @GetMapping("/logout/{userId}")
+    public ResponseEntity<BaseResult> logout(@PathVariable("userId") Integer userId){
+        if (userId != null && userId > 0){
+            BaseResult logout = authService.logout(userId);
+            return ResponseEntity.ok(logout);
+        }
+        return ResponseEntity.ok(new BaseResult(1, "退出登录失败"));
     }
 }

@@ -539,4 +539,15 @@ public class UserController {
 
         return ResponseEntity.ok(new BaseResult(1, "认证失败，请稍后重试"));
     }
+
+    @GetMapping("/signOut")
+    public BaseResult signOut(@RequestParam("userId") Integer userId){
+        BankUser user = userService.selectBankUserByUid(userId);
+        Boolean phoneDelete = redisTemplate.delete(user.getUserPhone());
+        Boolean userIdDelete = redisTemplate.delete(userId.toString());
+        if (userIdDelete && phoneDelete){
+            return new BaseResult(0, "退出登录成功");
+        }
+        return new BaseResult(1, "退出登录失败");
+    }
 }
