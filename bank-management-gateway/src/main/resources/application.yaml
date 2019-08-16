@@ -60,6 +60,7 @@ sc:
       - /sendSms                  # 发送短信(用户登录)
       - /login                    # 用户登录(手机号/身份证号)
       - /GetUserByRedis           # 从redis查询用户信息
+      - /logout                   # 退出登录
       # 注册
       - /registrySms              # 注册----获取验证码
       - /registry                 # 注册----注册
@@ -101,6 +102,8 @@ sc:
       - /deleteOtherBankCard      # 解绑他行卡
       - /getBankCardBybankCardId  #根据银行卡ID查询银行卡
       - /getOtherBankCardByUserId #根据用户id获取他行卡
+      # 批量转账
+      - /submitTransferBulk  #批量转账提交
       #企业
       - /bankEnterpriseLogin      # 企业用户登录
       #消息中心

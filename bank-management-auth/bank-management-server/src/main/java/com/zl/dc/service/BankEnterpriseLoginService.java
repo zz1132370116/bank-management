@@ -28,6 +28,13 @@ public class BankEnterpriseLoginService {
     @Resource
     private JwtProperties jwtProperties;
 
+    /**
+     * @author pds
+     * @param bankEnterprise
+     * @return com.zl.dc.vo.BaseResult
+     * @description 企业登录
+     * @date 2019/8/16 10:19
+     */
     public BaseResult bankEnterpriseLogin(BankEnterprise bankEnterprise){
         try {
             BaseResult baseResult = enterpriseClient.bankEnterpriseLogin(bankEnterprise);

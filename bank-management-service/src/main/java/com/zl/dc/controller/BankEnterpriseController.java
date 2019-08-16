@@ -26,6 +26,13 @@ public class BankEnterpriseController {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
+    /**
+     * @author pds
+     * @param bankEnterprise
+     * @return com.zl.dc.vo.BaseResult
+     * @description 企业登录
+     * @date 2019/8/16 10:18
+     */
     @PostMapping("/enterpiseLogin")
     public BaseResult enterpiseLogin(@RequestBody BankEnterprise bankEnterprise){
         BankEnterprise enterpriseBankCard = bankEnterpriseService.getBankEnterpriseByEnterpriseBankCard(bankEnterprise.getEnterpriseBankCard());

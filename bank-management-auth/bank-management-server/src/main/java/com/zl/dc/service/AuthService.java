@@ -133,4 +133,14 @@ public class AuthService {
         }
         return baseResult;
     }
+
+    public BaseResult logout(Integer userId) {
+        try {
+            BaseResult baseResult = userClient.signOut(userId);
+            return baseResult;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new BaseResult(1, "退出登录失败");
+    }
 }
