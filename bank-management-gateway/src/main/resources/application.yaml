@@ -60,6 +60,7 @@ sc:
       - /sendSms                  # 发送短信(用户登录)
       - /login                    # 用户登录(手机号/身份证号)
       - /GetUserByRedis           # 从redis查询用户信息
+      - /logout                   # 退出登录
       # 注册
       - /registrySms              # 注册----获取验证码
       - /registry                 # 注册----注册
