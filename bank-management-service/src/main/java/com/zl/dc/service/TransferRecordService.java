@@ -88,12 +88,28 @@ public class TransferRecordService {
         transferRecord.setGmtCreate(new Date());
         transferRecord.setGmtModified(new Date());
         //添加转账记录
-        transferRecordMapper.insertSelective(transferRecord);
+        insertTransferRecord(transferRecord);
         //拼接查询条件
-        return  selectTransferRecordByUuid(transferRecord.getTransferRecordUuid());
+        return selectTransferRecordByUuid(transferRecord.getTransferRecordUuid());
 
 
     }
+
+    /**
+     * @author: lu
+     * @Param Boolean
+     * @return: TransferRecord
+     * @description: 添加一条转账记录
+     * @data: 2019/8/14 19:05
+     */
+    public Boolean insertTransferRecord(TransferRecord transferRecord) {
+        int status = transferRecordMapper.insertSelective(transferRecord);
+        if (status == 1) {
+            return true;
+        }
+        return false;
+    }
+
 
     /**
      * @author: lu
