@@ -1,6 +1,7 @@
 package com.zl.dc.controller;
 
 
+import com.zl.dc.config.SendUpgradeCardOK;
 import com.zl.dc.pojo.BankManager;
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.ManagerTranscation;
@@ -193,6 +194,7 @@ public class BankManagerController {
     @GetMapping("/adopt")
     public void adopt(@RequestParam("transcationId") Integer transcationId){
         bankManagerService.adopt(transcationId);
+
     }
     /**
      * @author: zhanglei

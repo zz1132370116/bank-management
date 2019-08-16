@@ -11,13 +11,18 @@ import com.zl.dc.util.JwtUtils;
 import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.BaseResult;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
 /**
- * Created by 舍頭襘游泳 on 2018/12/13.
+ * @version V1.0
+ * @author pds
+ * @className AuthService
+ * @description 普通用户注册登录功能
+ * @date 2019/8/15 17:33
  */
 @Service
 @EnableConfigurationProperties(JwtProperties.class)
@@ -101,16 +106,18 @@ public class AuthService {
             baseResult.append("token",token);
 
             String userName = bankUser.getUserName();
-            String first = userName.substring(0,1);
-            String end = userName.substring(userName.length()-1);
-            if (userName.length() == 2){
-                bankUser.setUserName(first+"*");
-            }else if(userName.length() >= 3){
-                StringBuffer stringBuffer = new StringBuffer();
-                for (int i = 0;i < userName.length()-2;i++){
-                    stringBuffer.append("*");
+            if (StringUtils.isNotBlank(userName) && userName.length() > 1){
+                String first = userName.substring(0,1);
+                String end = userName.substring(userName.length()-1);
+                if (userName.length() == 2){
+                    bankUser.setUserName(first+"*");
+                }else if(userName.length() >= 3){
+                    StringBuffer stringBuffer = new StringBuffer();
+                    for (int i = 0;i < userName.length()-2;i++){
+                        stringBuffer.append("*");
+                    }
+                    bankUser.setUserName(first+stringBuffer.toString()+end);
                 }
-                bankUser.setUserName(first+stringBuffer.toString()+end);
             }
 
             String phone = bankUser.getUserPhone();

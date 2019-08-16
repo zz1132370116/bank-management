@@ -3,6 +3,7 @@ package com.zl.dc.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
+import com.zl.dc.api.VerifyIdCard;
 import com.zl.dc.config.SmsChangePassword;
 import com.zl.dc.config.SmsChangePhone;
 import com.zl.dc.config.SmsLogin;
@@ -21,9 +22,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -512,10 +518,25 @@ public class UserController {
      * @date 2019/8/15 9:21
      */
     @PostMapping("/verifiedIdentity")
-    public ResponseEntity<BaseResult> verifiedIdentity(@RequestParam(value = "file",required = false) List<MultipartFile> file){
-        MultipartFile frontMul = file.get(0);
-        MultipartFile backMul = file.get(1);
+    public ResponseEntity<BaseResult> verifiedIdentity(@RequestParam(value = "file") List<MultipartFile> file,@RequestParam("userId") Integer userId) {
+        if (file.size() == 2 && userId > 0){
+            try {
+                Integer identity = userService.verifiedIdentity(file, userId);
+                if (identity == -2){
+                    return ResponseEntity.ok(new BaseResult(2, "身份证已过期，认证失败"));
+                }else if (identity == 0){
+                    return ResponseEntity.ok(new BaseResult(1, "认证失败，请稍后重试"));
+                }
+                return ResponseEntity.ok(new BaseResult(0, "认证成功"));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResponseEntity.ok(new BaseResult(1, "认证失败，请稍后重试"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return ResponseEntity.ok(new BaseResult(1, "认证失败，请稍后重试"));
+            }
+        }
 
-        return ResponseEntity.ok(new BaseResult(0, "验证码错误或验证码已经过时"));
+        return ResponseEntity.ok(new BaseResult(1, "认证失败，请稍后重试"));
     }
 }

@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 /**
- * @author 舍頭襘游泳
- * @date 2018/12/13
+ * @version V1.0
+ * @author pds
+ * @className UserClient
+ * @description 用户接口
+ * @date 2019/8/15 17:33
  */
-
 @FeignClient("web-service")
 public interface UserClient {
 

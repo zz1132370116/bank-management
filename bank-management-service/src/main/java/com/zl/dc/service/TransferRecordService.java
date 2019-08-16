@@ -53,41 +53,60 @@ public class TransferRecordService {
         if (transferValueVo == null) {
             return null;
         }
+        if (transferValueVo.getMuchMoney() == null) {
+            return null;
+        }
+        if (StringUtils.isBlank(transferValueVo.getTransferRemarks())) {
+            return null;
+        }
+        if (transferValueVo.getUserId() == null) {
+            return null;
+        }
+        if (StringUtils.isBlank(transferValueVo.getOutBankCard())) {
+            return null;
+        }
+        if (StringUtils.isBlank(transferValueVo.getInBankName())) {
+            return null;
+        }
+        if (StringUtils.isBlank(transferValueVo.getInBank())) {
+            return null;
+        }
+        if (StringUtils.isBlank(transferValueVo.getInBankCard())) {
+            return null;
+        }
         transferRecord.setTransferRecordUuid(UUID.randomUUID().toString().replaceAll("-", ""));
-        if (transferValueVo.getMuchMoney() != null) {
-            transferRecord.setTransferRecordAmount(transferValueVo.getMuchMoney());
-        }
+        transferRecord.setTransferRecordAmount(transferValueVo.getMuchMoney());
         transferRecord.setTransferRecordTime(null);
-        if (StringUtils.isNotBlank(transferValueVo.getTransferRemarks())) {
-            transferRecord.setTransferNote(transferValueVo.getTransferRemarks());
-        }
+        transferRecord.setTransferNote(transferValueVo.getTransferRemarks());
         transferRecord.setTransferType(Byte.parseByte("100"));
         transferRecord.setTransferStatus(Byte.parseByte("110"));
-        if (transferValueVo.getUserId() != null) {
-            transferRecord.setUserId(transferValueVo.getUserId());
-        }
-        if (StringUtils.isNotBlank(transferValueVo.getOutBankCard())) {
-            transferRecord.setBankOutCard(transferValueVo.getOutBankCard());
-        }
-        if (StringUtils.isNotBlank(transferValueVo.getInBankName())) {
-            transferRecord.setInCardUserName(transferValueVo.getInBankName());
-        }
-        if (StringUtils.isNotBlank(transferValueVo.getInBank())) {
-            transferRecord.setBankInIdentification(transferValueVo.getInBank());
-        }
-        if (StringUtils.isNotBlank(transferValueVo.getInBankCard())) {
-            transferRecord.setBankInCard(transferValueVo.getInBankCard());
-        }
+        transferRecord.setUserId(transferValueVo.getUserId());
+        transferRecord.setBankOutCard(transferValueVo.getOutBankCard());
+        transferRecord.setInCardUserName(transferValueVo.getInBankName());
+        transferRecord.setBankInIdentification(transferValueVo.getInBank());
+        transferRecord.setBankInCard(transferValueVo.getInBankCard());
         transferRecord.setGmtCreate(new Date());
         transferRecord.setGmtModified(new Date());
         //添加转账记录
         transferRecordMapper.insertSelective(transferRecord);
         //拼接查询条件
+        return  selectTransferRecordByUuid(transferRecord.getTransferRecordUuid());
+
+
+    }
+
+    /**
+     * @author: lu
+     * @Param String uuid
+     * @return: TransferRecord
+     * @description: 根据uuid查询转账记录
+     * @data: 2019/8/14 19:05
+     */
+    public TransferRecord selectTransferRecordByUuid(String uuid) {
         Example example = new Example(TransferRecord.class);
         Example.Criteria criteria = example.createCriteria();
-        criteria.andEqualTo("transferRecordUuid", transferRecord.getTransferRecordUuid());
+        criteria.andEqualTo("transferRecordUuid", uuid);
         return transferRecordMapper.selectOneByExample(example);
-
     }
 
     /**

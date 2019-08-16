@@ -87,6 +87,16 @@ sc:
       - /getBankCardBybankCardId  # 根据银行卡ID查询银行卡
       - /reportBankCardLoss       # 根据银行卡id挂失本行卡
       # 升级银行卡
+      - /getBankCardBybankCardId  #根据银行卡ID查询银行卡
+      - /sendUpgradeCard          #升级银行卡(发短信)
+       # 收款群组
+      - /selectPayeeGroupByUid      #根据用户id返回用户所有的用户群组
+      - /selectPayeeById             #根据群组id返回所有的收款人
+      - /addPayeeGroup             #添加一条收款群组
+      - /deletePayeeById            #根据id删除群组用户
+      - /addPayee                   #根据VO添加群组收款人
+      - /getBankCardBybankCardId  # 根据银行卡ID查询银行卡
+      #升级银行卡
       - /sendUpgradeCard          # 升级银行卡(发短信)
       - /sendUpgradeCard          # 升级银行卡(发短信)
       - /UpgradeCard              # 升级银行卡(申请)
@@ -95,3 +105,16 @@ sc:
       - /untiedOtherBankCard      # 解绑他行卡
       - /getOtherBankCardByUserId # 根据用户id获取他行卡
       - /findBankCardIdentification # 根据银行卡号查标识符
+      - /deleteOtherBankCard      # 解绑他行卡
+      - /getOtherBankCardByUserId #根据用户id获取他行卡
+      # 企业
+      - /bankEnterpriseLogin      # 企业用户登录
+      # 消息中心
+      - /getMessageCenter         # 根据用户id查询待付款单和升级卡记录
+      - /agreeGathering           # 用户通知付款
+      - /updateManagerTranscationStatus #用户主动取消升级卡申请
+      - /getBankCardByUser        # 根据用户id查询用户名下所有银行卡
+      # 主动收款
+      - /getActiveCollection      # 查询所有主动收款历史订单
+      - /updateGatheringType      # 用户取消主动收款
+      - /addTransactionTecord     # 发起新的主动收款(添加交易订单)
