@@ -79,7 +79,7 @@ public class TransferRecordService {
         transferRecord.setTransferRecordTime(null);
         transferRecord.setTransferNote(transferValueVo.getTransferRemarks());
         transferRecord.setTransferType(Byte.parseByte("100"));
-        transferRecord.setTransferStatus(Byte.parseByte("110"));
+        transferRecord.setTransferStatus(Byte.parseByte("100"));
         transferRecord.setUserId(transferValueVo.getUserId());
         transferRecord.setBankOutCard(transferValueVo.getOutBankCard());
         transferRecord.setInCardUserName(transferValueVo.getInBankName());
@@ -133,7 +133,7 @@ public class TransferRecordService {
      * @data: 2019/8/12 17:00
      */
     public boolean transferFailedOperation(TransferRecord transferRecord) {
-        transferRecord.setTransferStatus(Byte.parseByte("130"));
+        transferRecord.setTransferStatus(Byte.parseByte("102"));
         transferRecord.setTransferRecordTime(new Date());
         transferRecord.setGmtModified(new Date());
         int status = transferRecordMapper.updateByPrimaryKeySelective(transferRecord);
@@ -152,7 +152,7 @@ public class TransferRecordService {
      * @data: 2019/8/12 17:00
      */
     public boolean transferSuccessfulOperation(TransferRecord transferRecord) {
-        transferRecord.setTransferStatus(Byte.parseByte("120"));
+        transferRecord.setTransferStatus(Byte.parseByte("101"));
         transferRecord.setTransferRecordTime(new Date());
         transferRecord.setGmtModified(new Date());
         int status = transferRecordMapper.updateByPrimaryKeySelective(transferRecord);
