@@ -1,5 +1,6 @@
 package com.zl.dc.service;
 
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.zl.dc.config.SendUpgradeCardOK;
 import com.zl.dc.mapper.*;
@@ -257,28 +258,29 @@ public class BankManagerService {
      */
     public void adopt(Integer transcationId) {
         //创建事务实体类
-        ManagerTranscation managerTranscation = new ManagerTranscation();
-        managerTranscation.setTranscationId(transcationId);
-        managerTranscation.setTranscationStatus(Byte.parseByte("1"));
-        managerTranscation.setGmtModified(new Date());
-        //修改状态
-        managerTranscationMapper.updateByPrimaryKeySelective(managerTranscation);
+        Example example = new Example(BankCard.class);
+        Example.Criteria criteria = example.createCriteria();
         //修改银行卡类型
         //通过主键查询事务
         ManagerTranscation managerTranscation1 = managerTranscationMapper.selectByPrimaryKey(transcationId);
-        BankCard bankCard = bankCardMapper.selectByPrimaryKey(managerTranscation1.getBankCard());
+        managerTranscation1.setTranscationStatus(Byte.parseByte("1"));
+        managerTranscation1.setGmtModified(new Date());
+        managerTranscationMapper.updateByPrimaryKeySelective(managerTranscation1);
+        criteria.andEqualTo("bankCardNumber",managerTranscation1.getBankCard());
+        BankCard bankCard = bankCardMapper.selectOneByExample(example);
         //如果类型是普通卡则升级为钻石卡
         if (bankCard.getBankCardType().equals("普通卡")) {
             bankCard.setBankCardType("钻石卡");
-        }
-        //如果类型是钻石卡则升级为黑卡
-        if ("钻石卡".equals(bankCard.getBankCardType())) {
+        }else if ("钻石卡".equals(bankCard.getBankCardType())) {
+            //如果类型是钻石卡则升级为黑卡
             bankCard.setBankCardType("黑卡");
         }
         bankCardMapper.updateByPrimaryKeySelective(bankCard);
+
         //
         try {
-            SendUpgradeCardOK.sendSms(bankCard.getBankCardPhone(), StarUtil.StringAddStar(bankCard.getBankCardNumber(),6,4),managerTranscation.getGmtModified());
+            SendSmsResponse sendSmsResponse = SendUpgradeCardOK.sendSms(bankCard.getBankCardPhone(), StarUtil.StringAddStar(bankCard.getBankCardNumber(), 6, 4), managerTranscation1.getGmtModified());
+            System.out.println("Message=" + sendSmsResponse.getMessage());
         } catch (ClientException e) {
             e.printStackTrace();
         }
@@ -292,10 +294,22 @@ public class BankManagerService {
      * @data: 2019/8/9 15:17
      */
     public void NoPassage(Integer transcationId) {
-        ManagerTranscation managerTranscation = new ManagerTranscation();
-        managerTranscation.setTranscationId(transcationId);
-        managerTranscation.setTranscationStatus(Byte.parseByte("2"));
-        managerTranscationMapper.updateByPrimaryKeySelective(managerTranscation);
+        //创建事务实体类
+        Example example = new Example(BankCard.class);
+        Example.Criteria criteria = example.createCriteria();
+        //通过主键查询事务
+        ManagerTranscation managerTranscation1 = managerTranscationMapper.selectByPrimaryKey(transcationId);
+
+        managerTranscation1.setTranscationStatus(Byte.parseByte("2"));
+        managerTranscation1.setGmtModified(new Date());
+        managerTranscationMapper.updateByPrimaryKeySelective(managerTranscation1);
+        criteria.andEqualTo("bankCardNumber",managerTranscation1.getBankCard());
+        BankCard bankCard = bankCardMapper.selectOneByExample(example);
+        try {
+            SendUpgradeCardOK.sendSms(bankCard.getBankCardPhone(), StarUtil.StringAddStar(bankCard.getBankCardNumber(),6,4),managerTranscation1.getGmtModified());
+        } catch (ClientException e) {
+            e.printStackTrace();
+        }
     }
 
 }

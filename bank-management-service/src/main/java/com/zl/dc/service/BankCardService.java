@@ -248,7 +248,6 @@ public class BankCardService {
             managerTranscation.setTranscationMsg(bankCard.getTranscationMsg());
         }
         managerTranscation.setGmtCreate(new Date());
-        managerTranscation.setGmtModified(new Date());
         int i = managerTranscationMapper.insertSelective(managerTranscation);
         if (i != 0) {
             return "申请成功";

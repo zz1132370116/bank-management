@@ -117,3 +117,6 @@ sc:
       - /getActiveCollection #查询所有主动收款历史订单
       - /updateGatheringType #用户取消主动收款
       - /addTransactionTecord #发起新的主动收款(添加交易订单)
+      #消息通知
+      - /MessageNotification #根据登录用户id查询消息
+      - /setRedisMessage    #将消息存到redis5天
