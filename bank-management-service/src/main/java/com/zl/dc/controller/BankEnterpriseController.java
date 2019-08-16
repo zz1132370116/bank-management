@@ -140,6 +140,10 @@ public class BankEnterpriseController {
      */
     @PostMapping("/enterpriseTransfer")
     public ResponseEntity<BaseResult> enterpriseTransfer(@RequestBody EnterpriseEmployeeVo enterpriseEmployeeVo){
+        BankEnterprise bankEnterprise = bankEnterpriseService.getBankEnterpriseById(enterpriseEmployeeVo.getEnterpriseId());
+        if (bankEnterprise == null){
+            return ResponseEntity.ok(new BaseResult(1,"转账失败"));
+        }
         List<EnterpriseEmployee> enterpriseEmployees = enterpriseEmployeeVo.getEnterpriseEmployees();
         for (EnterpriseEmployee enterpriseEmployee : enterpriseEmployees) {
             Integer insert = transferRecordService.addTransferRecordDueToBankEnterprise(enterpriseEmployee);
