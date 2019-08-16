@@ -33,32 +33,47 @@ public class NumberValid {
     }
 
     /**
-     * @author pds
      * @param phone
      * @return java.lang.Boolean
+     * @author pds
      * @description 将验证手机号是否正确
      * @date 2019/8/11 17:30
      */
-    public static Boolean verifyPhone(String phone){
+    public static Boolean verifyPhone(String phone) {
         //验证手机号是否正确
         String regex = "^[1][3,4,5,7,8][0-9]{9}$";
-        if (!phone.matches(regex)){
+        if (!phone.matches(regex)) {
             return false;
         }
         return true;
     }
 
     /**
-     * @author pds
      * @param idCard
      * @return java.lang.Boolean
+     * @author pds
      * @description 将验证身份证号是否正确
      * @date 2019/8/11 17:30
      */
-    public static Boolean verifyIdCard(String idCard){
+    public static Boolean verifyIdCard(String idCard) {
         //验证手机号是否正确
         String regex = "(^\\d{18}$)|(^\\d{15}$)";
-        if (!idCard.matches(regex)){
+        if (!idCard.matches(regex)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @param id
+     * @return java.lang.Boolean
+     * @author nwm
+     * @description 校验主键是否是纯数字
+     * @date 2019/8/16 10:30
+     */
+    public static Boolean primaryKey(String id) {
+        String reg = "^\\d+$";
+        if (!id.matches(reg)) {
             return false;
         }
         return true;
