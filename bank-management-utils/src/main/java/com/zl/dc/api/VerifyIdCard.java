@@ -3,6 +3,7 @@ package com.zl.dc.api;
 import com.zl.dc.util.Base64Coded;
 
 import java.io.File;
+import java.util.Date;
 
 /**
  * @version V1.0
@@ -48,4 +49,30 @@ public class VerifyIdCard {
         String jsonResult = TextRecognition.request(httpUrl, httpArg);
         return jsonResult;
     }
+
+    /**
+     * @author pds
+     * @param files
+     * @return void
+     * @description 删除临时文件
+     * @date 2019/8/15 10:33
+     */
+    public static void deleteFile(File... files) {
+        for (File file : files) {
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+    }
+
+    public static Integer compareDate(Date expirationDate, Date nowDate) {
+        if (expirationDate.before(nowDate)) {
+            return -1;
+        } else if (expirationDate.after(nowDate)) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
 }

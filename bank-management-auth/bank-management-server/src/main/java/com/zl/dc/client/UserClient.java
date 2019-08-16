@@ -5,15 +5,18 @@ import com.zl.dc.pojo.BankUser;
 import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.BaseResult;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * @author 舍頭襘游泳
- * @date 2018/12/13
+ * @version V1.0
+ * @author pds
+ * @className UserClient
+ * @description 用户接口
+ * @date 2019/8/15 17:33
  */
-
 @FeignClient("web-service")
 public interface UserClient {
 
@@ -47,5 +50,15 @@ public interface UserClient {
      */
     @PostMapping("loginBySendSms")
     BaseResult loginBySendSms(@RequestBody BankUserVo user);
+
+    /**
+     * @author pds
+     * @param userId
+     * @return com.zl.dc.vo.BaseResult
+     * @description 退出登录
+     * @date 2019/8/16 10:26
+     */
+    @GetMapping("/signOut")
+    BaseResult signOut(@RequestParam("userId") Integer userId);
 
 }

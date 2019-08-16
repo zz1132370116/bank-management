@@ -33,7 +33,7 @@ public class ManagerTranscation {
     private String bankCard;
     //    用户id
     @Column(name = "user_id")
-    private int userId;
+    private Integer userId;
     //    事务状态
     @Column(name = "transcation_status")
     private byte transcationStatus;
