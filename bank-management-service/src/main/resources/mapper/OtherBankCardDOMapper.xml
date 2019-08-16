@@ -17,11 +17,31 @@
         bank_card_id, bank_card_number, subordinate_banks_identification
     </sql>
 
-    <insert id="insertOtherBankCard" parameterType="com.zl.dc.pojo.OtherBankCard">
-        INSERT INTO other_bank_card
-        (<include refid="Base_Column_List"></include>)
-        VALUES ("3123141231",1,"BOC",SYSDATE(),SYSDATE())
-    </insert>
+    <select id="selectByOtherBankCardIdAndPassword" resultType="java.lang.Integer">
+        SELECT bank_card_id
+        FROM other_bank_card
+        WHERE bank_card_id = #{otherBankCardId}
+        AND user_id = #{userId}
+    </select>
+
+    <delete id="deleteByOtherBankCardId" parameterType="java.lang.Integer">
+        DELETE FROM other_bank_card
+        WHERE bank_card_id = #{otherBankCardId}
+    </delete>
+
+    <select id="selectOtherBankCardList" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="View_Column_List"/>
+        FROM other_bank_card
+        WHERE o.user_id = #{userId}
+    </select>
+
+    <select id="selectByUserIdAndCardNumber" parameterType="com.zl.dc.pojo.OtherBankCard"
+            resultType="java.lang.Integer">
+        SELECT bank_card_id from other_bank_card
+        WHERE user_id = #{userId}
+        AND bank_card_number = #{bankCardNumber}
+    </select>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         <!--

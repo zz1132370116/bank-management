@@ -27,6 +27,19 @@
         bank_card_id, bank_card_number, bank_card_type
     </sql>
 
+    <update id="updateBankCardStatus">
+        UPDATE bank_card
+        SET bank_card_status = #{status}
+        WHERE bank_card_id = #{bankCardId}
+    </update>
+
+
+    <select id="selectByBankCardIdAndPassword" resultType="java.lang.Integer">
+        SELECT bank_card_id FROM `bank_card`
+        WHERE bank_card_id = #{bankCardId}
+        AND bank_card_password = #{password}
+        AND user_id = #{userId}
+    </select>
 
     <select id="selectBankCardNumberById" parameterType="java.lang.Integer" resultType="java.lang.String">
         SELECT bank_card_number

@@ -1,9 +1,6 @@
 package com.zl.dc.service;
 
-import com.zl.dc.mapper.BankCardDOMapper;
-import com.zl.dc.mapper.BankCardMapper;
-import com.zl.dc.mapper.ManagerTranscationMapper;
-import com.zl.dc.mapper.OtherBankCardMapper;
+import com.zl.dc.mapper.*;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.ManagerTranscation;
@@ -39,6 +36,8 @@ public class BankCardService {
     private OtherBankCardMapper otherBankCardMapper;
     @Resource
     private ManagerTranscationMapper managerTranscationMapper;
+    @Resource
+    private OtherBankCardDOMapper otherBankCardDOMapper;
 
     /**
      * @author: lu
@@ -202,9 +201,9 @@ public class BankCardService {
 
 
     /**
-     * @author pds
      * @param userId
      * @return java.util.List<com.zl.dc.pojo.BankCard>
+     * @author pds
      * @description 根据用户Id获取该用户其他银行的银行卡
      * @date 2019/8/14 12:45
      */
@@ -216,6 +215,7 @@ public class BankCardService {
 
         return otherBankCards;
     }
+
     /**
      * @author: zhanglei
      * @param: [bankCardId]
@@ -226,11 +226,12 @@ public class BankCardService {
     public BankCard getBankCardByBankCardId(String bankCardId) {
         BankCard bankCard = bankCardMapper.selectByPrimaryKey(Integer.parseInt(bankCardId));
         //将银行卡号变成*
-        bankCard.setBankCardNumber(StarUtil.StringAddStar(bankCard.getBankCardNumber(),6,4));
+        bankCard.setBankCardNumber(StarUtil.StringAddStar(bankCard.getBankCardNumber(), 6, 4));
         //将预留手机号变成*
-        bankCard.setBankCardPhone(StarUtil.StringAddStar(bankCard.getBankCardPhone(),3,4));
+        bankCard.setBankCardPhone(StarUtil.StringAddStar(bankCard.getBankCardPhone(), 3, 4));
         return bankCard;
     }
+
     /**
      * @author: zhanglei
      * @param: [bankCard]
@@ -241,30 +242,105 @@ public class BankCardService {
     public String UpgradeCard(BankCard bankCard) {
 
         ManagerTranscation managerTranscation = new ManagerTranscation();
-        if (StringUtils.isNotBlank(bankCard.getBankCardNumber())){
+        if (StringUtils.isNotBlank(bankCard.getBankCardNumber())) {
             managerTranscation.setBankCard(bankCard.getBankCardNumber());
-        }else{
+        } else {
             return "缺少银行卡信息";
         }
-        if (bankCard.getUserId() !=null){
+        if (bankCard.getUserId() != null) {
             managerTranscation.setUserId(bankCard.getUserId());
-        }else{
+        } else {
             return "缺少用户信息";
         }
         //申请中状态为0
         managerTranscation.setTranscationStatus(Byte.parseByte("0"));
         //申请提升类型 0
         managerTranscation.setTranscationType(Byte.parseByte("0"));
-        if (StringUtils.isNotBlank(bankCard.getTranscationMsg())){
+        if (StringUtils.isNotBlank(bankCard.getTranscationMsg())) {
             managerTranscation.setTranscationMsg(bankCard.getTranscationMsg());
         }
         managerTranscation.setGmtCreate(new Date());
         managerTranscation.setGmtModified(new Date());
         int i = managerTranscationMapper.insertSelective(managerTranscation);
-        if (i !=0){
+        if (i != 0) {
             return "申请成功";
-        }else{
+        } else {
             return "申请失败";
         }
     }
+
+    /**
+     * @author: Redsheep
+     * @Param otherBankCard
+     * @return: boolean
+     * @description: 绑定他行卡
+     * @data: 2019/8/14 16:16
+     */
+    public boolean addOtherBankCard(OtherBankCard otherBankCard) {
+        Date now = new Date();
+        otherBankCard.setGmtModified(now);
+        otherBankCard.setGmtCreate(now);
+        if (otherBankCardDOMapper.insertSelective(otherBankCard) == 1) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @author: Redsheep
+     * @Param otherBankCard
+     * @return: boolean
+     * @description: 查看该银行卡是否已存在数据库中
+     * @data: 2019/8/14 16:24
+     */
+    public boolean selectByUserIdAndCardNumber(OtherBankCard otherBankCard) {
+        return otherBankCardDOMapper.selectByUserIdAndCardNumber(otherBankCard) != null;
+    }
+
+    /**
+     * @author: Redsheep
+     * @Param otherBankCardId
+     * @return: boolean
+     * @description: 解绑他行卡
+     * @data: 2019/8/15 19:14
+     */
+    public boolean deleteByOtherBankCardId(Integer otherBankCardId) {
+        return otherBankCardDOMapper.deleteByOtherBankCardId(otherBankCardId) != null;
+    }
+
+    /**
+     * @author: Redsheep
+     * @Param bankCardId
+     * @return: boolean
+     * @description: 挂失本行卡
+     * @data: 2019/8/15 19:25
+     */
+    public boolean reportBankCardLoss(Integer bankCardId) {
+        return bankCardDOMapper.updateBankCardStatus(bankCardId, Byte.parseByte("101")) != null;
+    }
+
+    /**
+     * @author: Redsheep
+     * @Param bankCardId
+     * @Param password
+     * @return: boolean
+     * @description: 验证银行卡密码是否正确
+     * @data: 2019/8/15 19:27
+     */
+    public boolean verifyBankCardPassword(Integer bankCardId, String password, Integer userId) {
+        return bankCardDOMapper.selectByBankCardIdAndPassword(bankCardId, password, userId) != null;
+    }
+
+    /**
+     * @author: Redsheep
+     * @Param otherBankCardId
+     * @Param userId
+     * @return: boolean
+     * @description: 验证他行卡密码是否正确
+     * @data: 2019/8/15 20:01
+     */
+    public boolean verifyOtherBankCardPassword(Integer otherBankCardId, Integer userId) {
+        return otherBankCardDOMapper.selectByOtherBankCardIdAndPassword(otherBankCardId, userId) != null;
+    }
+
 }

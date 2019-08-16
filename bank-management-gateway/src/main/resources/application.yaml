@@ -82,13 +82,16 @@ sc:
       - /CrossBorderTransfer      # 跨境转账----转账
       # 转账记录
       - /getTransferRecordList    # 查询转账记录----根据月份和银行卡id
+      # 本行卡
       - /getBankCardByUserId      # 根据用户id查询所有本行银行卡
       - /getBankCardBybankCardId  # 根据银行卡ID查询银行卡
+      - /reportBankCardLoss       # 根据银行卡id挂失本行卡
+      # 升级银行卡
       - /sendUpgradeCard          # 升级银行卡(发短信)
       - /sendUpgradeCard          # 升级银行卡(发短信)
       - /UpgradeCard              # 升级银行卡(申请)
       # 他行卡
       - /addOtherBankCard         # 绑定他行卡
-      - /deleteOtherBankCard      # 解绑他行卡
-      - /getBankCardBybankCardId  #根据银行卡ID查询银行卡
-      - /getOtherBankCardByUserId #根据用户id获取他行卡
+      - /untiedOtherBankCard      # 解绑他行卡
+      - /getOtherBankCardByUserId # 根据用户id获取他行卡
+      - /findBankCardIdentification # 根据银行卡号查标识符
