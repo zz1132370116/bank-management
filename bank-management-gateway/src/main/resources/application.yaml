@@ -104,6 +104,8 @@ sc:
       - /getOtherBankCardByUserId #根据用户id获取他行卡
       #企业
       - /bankEnterpriseLogin      # 企业用户登录
+      - /batchImport              # 批量导入收款人
+      - /enterpriseTransfer       # 企业转账
       #消息中心
       - /getMessageCenter      #根据用户id查询待付款单和升级卡记录
       - /agreeGathering       #用户通知付款

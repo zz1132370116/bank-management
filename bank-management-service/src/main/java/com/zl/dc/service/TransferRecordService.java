@@ -6,6 +6,7 @@ import com.zl.dc.mapper.TransferRecordMapper;
 import com.zl.dc.mapper.UserMapper;
 import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.util.StarUtil;
+import com.zl.dc.vo.EnterpriseEmployee;
 import com.zl.dc.vo.PageBean;
 import com.zl.dc.vo.TransferValueVo;
 import org.apache.commons.lang3.StringUtils;
@@ -204,6 +205,20 @@ public class TransferRecordService {
             transferRecord.setBankOutCard(StarUtil.StringAddStar(bankOutCard, 4, 4));
         }
         return transferRecordList;
+    }
+
+    /**
+     * @author pds
+     * @param enterpriseEmployee
+     * @return java.lang.Integer
+     * @description 企业批量转账
+     * @date 2019/8/16 17:03
+     */
+    public Integer addTransferRecordDueToBankEnterprise(EnterpriseEmployee enterpriseEmployee){
+        TransferRecord transferRecord = new TransferRecord();
+
+        Integer insert = transferRecordMapper.insert(transferRecord);
+        return insert;
     }
 
     /**
