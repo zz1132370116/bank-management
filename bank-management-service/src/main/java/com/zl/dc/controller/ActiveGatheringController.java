@@ -1,25 +1,25 @@
 package com.zl.dc.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.zl.dc.pojo.BankCard;
-import com.zl.dc.pojo.BankUser;
+
 import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.service.ActiveGatheringService;
+import com.zl.dc.util.NumberValid;
 import com.zl.dc.vo.ActiveGatheringVo;
+import com.zl.dc.vo.BaseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 /**
  * @version: V1.0
  * @author: nwm
- * @className: ActiveGatheringController
+ * @className: java.util.List<com.zl.dc.pojo.CrossBorderTransferRecord
  * @description: 主动收款相关控制层
  * @data: 2019/8/13
  */
@@ -35,107 +35,138 @@ public class ActiveGatheringController {
     /**
      * @author: nwm
      * @param: * getActiveCollection
-     * @return: * List<ActiveGatheringVo>
+     * @return: * java.util.List<com.zl.dc.pojo.CrossBorderTransferRecord>
      * @description: 用户进入主动转账页面时执行的方法
      * @data: 2019/8/13 19:00
      */
     @GetMapping("/getActiveCollection/{userId}")
     //ResponseEntity<BaseResult>
-     public List<ActiveGatheringVo> getActiveCollection(@PathVariable("userId") Integer userId){
-        String userStr = redisTemplate.opsForValue().get(userId.toString());
-        BankUser user = (BankUser) JSON.parse(userStr);
-
-        return ags.getActiveGatheringVoList(userId);
+     public ResponseEntity<BaseResult> getActiveCollection(@PathVariable("userId") String userId){
+        if (!NumberValid.primaryKey(userId)){
+            return ResponseEntity.ok(new BaseResult(1, "失败"));
+        }
+        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", ags.getActiveGatheringVoList(new Integer(userId))));
+       /* 后台从redis中获取登录的用户信息
+       String userStr = redisTemplate.opsForValue().get(userId.toString());
+        BankUser user = (BankUser) JSON.parse(userStr);*/
      }
 
     /**
      * @author: nwm
      * @param: * updateGatheringStatus
-     * @return: * boolean
+     * @return: * java.util.List<com.zl.dc.pojo.CrossBorderTransferRecord>
      * @description: 用户修改主动收款状态为取消时执行的方法,付款用户拒绝付款时执行的方法
      * @data: 2019/8/13 19:00
      */
     @PostMapping("/updateGatheringType/{activeId}")
-    public boolean  updateGatheringStatus(@PathVariable("activeId") String activeId){
-        //修改该订单id的收款状态为取消
-        return ags.updateGatheringStatus(activeId);
+    public ResponseEntity<BaseResult>  updateGatheringStatus(@PathVariable("activeId") String activeId){
+        if (!NumberValid.primaryKey(activeId)){
+            boolean flag=ags.updateGatheringStatus(activeId);
+            if (flag){
+                return ResponseEntity.ok(new BaseResult(0, "操作成功"));
+            }
+        }
+        return ResponseEntity.ok(new BaseResult(1, "失败"));
     }
     /**
      * @author: nwm
      * @param: * addTransactionTecord
-     * @return: * HashMap<String,Object>
+     * @return: * java.util.List<com.zl.dc.pojo.CrossBorderTransferRecord>
      * @description: 用户添加主动收款时执行的方法
      * @data: 2019/8/13 19:00
      */
     @PostMapping("/addTransactionTecord")
-    public boolean addTransactionTecord(@RequestBody ActiveGatheringVo agvo){
+    public ResponseEntity<BaseResult> addTransactionTecord(@RequestBody ActiveGatheringVo agvo){
         //根据发起主动收款用户填写的数据添加交易订单
         //agvo 收款订单基本信息
         //userPhone 付款人电话
         //userBankId 收款卡id
-        return ags.addTransactionTecord(agvo);
+        if( NumberValid.verifyPhone(agvo.getOutUserPhone())){
+            return ResponseEntity.ok(new BaseResult(1, "失败"));
+        }
+        if(agvo.getInBankId()==null){
+            return ResponseEntity.ok(new BaseResult(1, "失败"));
+        }
+        if(NumberValid.moneyValid(agvo.getMuchMoney().toString())){
+            return ResponseEntity.ok(new BaseResult(1, "失败"));
+        }
+        if(agvo.getTransferRemarks()==null || "".equals(agvo.getTransferRemarks())){
+            return ResponseEntity.ok(new BaseResult(1, "失败"));
+        }
+        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", ags.addTransactionTecord(agvo)));
     }
     //
     /**
      * @author: nwm
      * @param: * TransferRecord
-     * @return: * HashMap<String,Object>
+     * @return: * java.util.List<com.zl.dc.pojo.CrossBorderTransferRecord>
      * @description: 用户进入消息中心页面时执行的方法
      * @data: 2019/8/13 19:00
      */
     @GetMapping("/getMessageCenter/{userId}/{userName}")
-    public Map<String,Object> getMessageCenter(@PathVariable("userId") Integer userId,@PathVariable("userName") String userName){
-        //查询相关收款记录
+    public ResponseEntity<BaseResult> getMessageCenter(@PathVariable("userId") String userId,@PathVariable("userName") String userName){
+        if (!NumberValid.primaryKey(userId)){
+            return ResponseEntity.ok(new BaseResult(1, "失败"));
+        }
+        if (userName==null){
+            return ResponseEntity.ok(new BaseResult(1, "失败"));
+        }
+        //查询相关待付款记录
         List<ActiveGatheringVo> agVOList=ags.getActiveGatheringVo(userName);
         //查询相关提额记录
-         List<ManagerTranscation> mtList=ags.getManagerTranscation(userId);
-        Map<String,Object> map=new HashMap<>();
-        map.put("activeGatheringVo",agVOList);
-        map.put("managerTranscation",mtList);
-        return map;
+         List<ManagerTranscation> mtList=ags.getManagerTranscation(new Integer(userId));
+        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", agVOList).append("data",mtList));
     }
 
     /**
      * @author: nwm
      * @param: * agreeGathering
-     * @return: * HashMap<String,Object>
+     * @return: * java.util.List<com.zl.dc.pojo.CrossBorderTransferRecord>
      * @description: 用户同意付款时执行的方法
      * @data: 2019/8/13 19:00
      */
     @PostMapping("/agreeGathering")
-    public  boolean agreeGathering(@RequestBody ActiveGatheringVo agvo){
-
-        return ags.agreeGathering(agvo);
+    public  ResponseEntity<BaseResult> agreeGathering(@RequestBody ActiveGatheringVo agvo){
+        if(agvo!=null){
+            boolean flag=ags.agreeGathering(agvo);
+            if (flag){
+                 return ResponseEntity.ok(new BaseResult(0, "操作成功"));
+            }
+        }
+        return ResponseEntity.ok(new BaseResult(1, "失败"));
     }
 
     /**
      * @author: nwm
      * @param: * updateManagerTranscationStatus
-     * @return: * HashMap<String,Object>
+     * @return: * java.util.List<com.zl.dc.pojo.CrossBorderTransferRecord>
      * @description: 用户主动取消升级卡申请方法
      * @data: 2019/8/13 19:00
      */
     @PostMapping("/updateManagerTranscationStatus/{transcationId}")
-    public  boolean updateManagerTranscationStatus(@PathVariable("transcationId") String transcationId){
-        //根据事务表id修改订单为取消
-        return  ags.updateManagerTranscationStatus(transcationId);
+    public ResponseEntity<BaseResult> updateManagerTranscationStatus(@PathVariable("transcationId") String transcationId){
+        if (!NumberValid.primaryKey(transcationId)){
+            //根据事务表id修改订单为取消
+            boolean flag=ags.updateManagerTranscationStatus(transcationId);
+            if (flag){
+                return ResponseEntity.ok(new BaseResult(0, "操作成功"));
+            }
+        }
+        return ResponseEntity.ok(new BaseResult(1, "失败"));
     }
-
     /**
      * @author: nwm
      * @param: * getBankCardByUser
-     * @return: * List<BankCard>
+     * @return: * java.util.List<com.zl.dc.pojo.CrossBorderTransferRecord>
      * @description: 根据登录的用户查询用户名下的银行卡
      * @data: 2019/8/13 19:00
      */
     @GetMapping("/getBankCardByUser/{userId}")
-    public   List<BankCard>  getBankCardByUser(@PathVariable("userId") Integer userId){
+    public   ResponseEntity<BaseResult>  getBankCardByUser(@PathVariable("userId") String userId){
+        if (!NumberValid.primaryKey(userId)){
+            return ResponseEntity.ok(new BaseResult(1, "失败"));
+        }
         //获取当前登录用户id
-        return  ags.getBankCardByUser(userId);
+        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data",ags.getBankCardByUser(new Integer(userId))));
     }
-    //
-
-
-
-
 }

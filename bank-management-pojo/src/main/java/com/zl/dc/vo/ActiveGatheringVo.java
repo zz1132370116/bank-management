@@ -26,7 +26,7 @@ public class ActiveGatheringVo {
     //付款人id
     private Integer outUserId;
     //付款人电话
-    private Integer outUserPhone;
+    private String outUserPhone;
     //付款人姓名
     private String outUserName;
     //付款人银行卡归属行
@@ -57,11 +57,15 @@ public class ActiveGatheringVo {
                 "inUserId=" + inUserId +
                 ", inUserName='" + inUserName + '\'' +
                 ", inBank='" + inBank + '\'' +
+                ", inBankId=" + inBankId +
                 ", inBankCard='" + inBankCard + '\'' +
                 ", outUserId=" + outUserId +
+                ", outUserPhone=" + outUserPhone +
                 ", outUserName='" + outUserName + '\'' +
                 ", outBank='" + outBank + '\'' +
+                ", outBankId=" + outBankId +
                 ", outBankCard='" + outBankCard + '\'' +
+                ", outBankPassword='" + outBankPassword + '\'' +
                 ", activeId=" + activeId +
                 ", muchMoney=" + muchMoney +
                 ", transferRemarks='" + transferRemarks + '\'' +
