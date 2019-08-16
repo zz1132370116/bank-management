@@ -91,18 +91,30 @@ public class BankCardService {
     public boolean bankCardTransferBusines(Integer outBankCardId, String inBankCardId, BigDecimal muchMoney) {
 
         BankCard outBankCard = selectBankCardByid(outBankCardId);
-        BankCard inBankCard = selectBankCardByNum(inBankCardId);
-        if (outBankCard == null || inBankCard == null) {
+        if (outBankCard == null) {
             return false;
         }
+        if ("9999".equals(inBankCardId.substring(0, 4))) {
+            BankCard inBankCard = selectBankCardByNum(inBankCardId);
+            if (inBankCard == null) {
+                return false;
+            }
+            //          查询收款卡，收款
+            inBankCard.setBankCardBalance(inBankCard.getBankCardBalance().add(muchMoney));
+            bankCardMapper.updateByPrimaryKeySelective(inBankCard);
+
+        } else {
+            OtherBankCard inBankCard = getBankNameByBankNum(inBankCardId);
+            if (inBankCard == null) {
+                return false;
+            }
+        }
+
         //          查询扣款卡，扣款
         outBankCard.setBankCardBalance(outBankCard.getBankCardBalance().subtract(muchMoney));
         bankCardMapper.updateByPrimaryKeySelective(outBankCard);
-
-        //          查询收款卡，收款
-        inBankCard.setBankCardBalance(inBankCard.getBankCardBalance().add(muchMoney));
-        bankCardMapper.updateByPrimaryKeySelective(inBankCard);
         return true;
+
     }
 
     /**

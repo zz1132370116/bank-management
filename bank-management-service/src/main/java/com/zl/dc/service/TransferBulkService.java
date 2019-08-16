@@ -1,9 +1,11 @@
 package com.zl.dc.service;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.vo.BaseResult;
 import com.zl.dc.vo.NewPayeeVo;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -45,19 +50,22 @@ public class TransferBulkService {
         transferRecord.setTransferType(Byte.parseByte("101"));
         transferRecord.setUserId(bankCard.getUserId());
         transferRecord.setBankOutCard(bankCard.getBankCardNumber());
-        for (int i = 0; i < newPayeeVos.size(); i++) {
+
+
+        for (NewPayeeVo newPayeeVo:newPayeeVos) {
             transferRecord.setTransferRecordUuid(UUID.randomUUID().toString().replaceAll("-", ""));
-            transferRecord.setInCardUserName(newPayeeVos.get(i).getPayeeName());
-            transferRecord.setBankInIdentification(newPayeeVos.get(i).getPayeeBankIdentification());
-            transferRecord.setBankInCard(newPayeeVos.get(i).getPayeeBankCard());
+            transferRecord.setInCardUserName(newPayeeVo.getPayeeName());
+            transferRecord.setBankInIdentification(newPayeeVo.getPayeeBankIdentification());
+            transferRecord.setBankInCard(newPayeeVo.getPayeeBankCard());
             transferRecord.setGmtModified(new Date());
             transferRecord.setGmtCreate(new Date());
+            transferRecord.setTransferRecordAmount(newPayeeVo.getMuchMoney());
 
             insertTransferRecord.insertTransferRecord(transferRecord);
             //新增转账记录
             insertTransferRecord.selectTransferRecordByUuid(transferRecord.getTransferRecordUuid());
             //扣款
-            boolean transferStatus = bankCardService.bankCardTransferBusines(bankCard.getBankCardId(), newPayeeVos.get(i).getPayeeBankCard(), newPayeeVos.get(i).getMuchMoney());
+            boolean transferStatus = bankCardService.bankCardTransferBusines(bankCard.getBankCardId(), newPayeeVo.getPayeeBankCard(), newPayeeVo.getMuchMoney());
             if (transferStatus) {
                 //                成功
                 transferRecordService.transferSuccessfulOperation(transferRecord);
@@ -65,7 +73,6 @@ public class TransferBulkService {
                 //                失败
                 transferRecordService.transferFailedOperation(transferRecord);
             }
-
 
         }
     }
