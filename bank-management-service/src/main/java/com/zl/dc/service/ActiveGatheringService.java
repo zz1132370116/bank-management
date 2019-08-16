@@ -40,6 +40,8 @@ public class ActiveGatheringService {
      private UserMapper userMapper;
     @Resource
     private  SubordinateBankMapper subordinateBankMapper;
+    @Resource
+    BankCardService bankCardService;
 
     /**
      * @author: nwm
@@ -224,7 +226,7 @@ public class ActiveGatheringService {
             return false;
         }
         //校验付款卡密码 /未加密
-        if(!agvo.getOutBankPassword().equals(outCard.getBankCardPassword())){
+        if(bankCardService.BankCardPasswordCheck(outCard,agvo.getOutBankPassword())){
             return false;
         }
         TransferRecord transferRecord=new TransferRecord();
