@@ -21,7 +21,13 @@ public class BankEnterpriseService {
     @Resource
     private BankEnterpriseMapper bankEnterpriseMapper;
 
-
+    /**
+     * @author pds
+     * @param enterpriseBankCard
+     * @return com.zl.dc.pojo.BankEnterprise
+     * @description 根据银行卡获取企业用户信息
+     * @date 2019/8/16 10:18
+     */
     public BankEnterprise getBankEnterpriseByEnterpriseBankCard(String enterpriseBankCard){
         Example example = new Example(BankEnterprise.class);
         Example.Criteria criteria = example.createCriteria();

@@ -23,6 +23,13 @@ public class BankEnterpriseLoginController {
     @Resource
     private BankEnterpriseLoginService enterpriseService;
 
+    /**
+     * @author pds
+     * @param bankEnterprise
+     * @return org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description 企业登录
+     * @date 2019/8/16 10:19
+     */
     @PostMapping("/bankEnterpriseLogin")
     public ResponseEntity<BaseResult> bankEnterpriseLogin(@RequestBody BankEnterprise bankEnterprise){
         if (StringUtils.isNoneBlank(bankEnterprise.getEnterpriseBankCard(),bankEnterprise.getEnterpriseLoginPassword())){
