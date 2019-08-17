@@ -1,10 +1,17 @@
 package com.zl.dc.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.zl.dc.api.AccessBank;
+import com.zl.dc.config.BankCardAsync;
+import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankEnterprise;
+import com.zl.dc.pojo.BankUser;
+import com.zl.dc.pojo.OtherBankCard;
+import com.zl.dc.service.BankCardService;
 import com.zl.dc.service.BankEnterpriseService;
 import com.zl.dc.service.TransferRecordService;
 import com.zl.dc.util.MD5;
+import com.zl.dc.util.NumberValid;
 import com.zl.dc.vo.BaseResult;
 import com.zl.dc.vo.EnterpriseEmployee;
 import com.zl.dc.vo.EnterpriseEmployeeVo;
@@ -18,10 +25,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -30,6 +35,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,6 +54,10 @@ public class BankEnterpriseController {
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private TransferRecordService transferRecordService;
+    @Resource
+    private BankCardAsync bankCardAsync;
+    @Resource
+    private BankCardService bankCardService;
 
     /**
      * @author pds
@@ -73,6 +83,7 @@ public class BankEnterpriseController {
 
     @PostMapping("/batchImport")
     public ResponseEntity<BaseResult> batchImport(@RequestParam("file") MultipartFile file,@RequestParam("enterpriseId") Integer enterpriseId) throws IOException {
+        long currentTimeMillis = System.currentTimeMillis();
         BankEnterprise bankEnterprise = bankEnterpriseService.getBankEnterpriseById(enterpriseId);
         if (bankEnterprise == null){
             return ResponseEntity.ok(new BaseResult(1,"文件解析失败"));
@@ -96,7 +107,7 @@ public class BankEnterpriseController {
         int lastRow = sheet.getLastRowNum();
         // 存放所有解析后的area对象的
         List<EnterpriseEmployee> enterpriseEmployeeList = new ArrayList<>();
-
+        List<OtherBankCard> otherBankCardList = new ArrayList<>();
         for(int i = 1 ; i <= lastRow ; i ++){
             // 4) 获得对应单元格
             Row row = sheet.getRow(i);
@@ -111,7 +122,6 @@ public class BankEnterpriseController {
             String userBankCardNumber = row.getCell(1).getStringCellValue();
             String userBankCardName = row.getCell(2).getStringCellValue();
             String moneyStr = row.getCell(3).getStringCellValue();
-
             BigDecimal money = new BigDecimal(moneyStr);
 
             //将数据封装到EnterpriseEmployee对象
@@ -121,15 +131,30 @@ public class BankEnterpriseController {
             enterpriseEmployee.setUserBankCardNumber(userBankCardNumber);
             enterpriseEmployee.setMoney(money);
 
+            OtherBankCard otherBankCard = new OtherBankCard();
+            otherBankCard.setBankCardNumber(userBankCardNumber);
+            otherBankCard.setSubordinateBanksIdentification("");
+            otherBankCard.setUserId(enterpriseId);
+            otherBankCard.setGmtCreate(new Date());
+            otherBankCard.setGmtModified(new Date());
+            otherBankCardList.add(otherBankCard);
+
             //添加数据到集合
             enterpriseEmployeeList.add(enterpriseEmployee);
         }
+
+        //异步添加他行银行卡
+        bankCardAsync.addOtherBankCardList(otherBankCardList);
+
         //删除和关闭
         workbook.close();
         newFile.delete();
 
+        long currentTimeMillis1 = System.currentTimeMillis();
+        System.out.println("zhu耗时:"+(currentTimeMillis1-currentTimeMillis)+"ms");
         return ResponseEntity.ok(new BaseResult(0,"成功").append("data",enterpriseEmployeeList));
     }
+
 
     /**
      * @author pds
@@ -144,16 +169,41 @@ public class BankEnterpriseController {
         if (bankEnterprise == null){
             return ResponseEntity.ok(new BaseResult(1,"转账失败"));
         }
-        List<EnterpriseEmployee> enterpriseEmployees = enterpriseEmployeeVo.getEnterpriseEmployees();
-        for (EnterpriseEmployee enterpriseEmployee : enterpriseEmployees) {
-            Integer insert = transferRecordService.addTransferRecordDueToBankEnterprise(enterpriseEmployee);
-            if (insert == 0){
-                enterpriseEmployee.setStatus("失败");
-            } else {
-                enterpriseEmployee.setStatus("成功");
-            }
+        BankCard bankCard = bankCardService.selectBankCardByid(bankEnterprise.getEnterpriseBankCardId());
+
+        if (!MD5.GetMD5Code(enterpriseEmployeeVo.getPassword()).equals(bankCard.getBankCardPassword())) {
+            return ResponseEntity.ok(new BaseResult(1, "密码错误"));
+        }
+        if (!"100".equals(bankCard.getBankCardStatus().toString())) {
+            return ResponseEntity.ok(new BaseResult(1, "账户状态异常"));
         }
 
-        return ResponseEntity.ok(new BaseResult(0,"成功").append("data",enterpriseEmployees));
+        BigDecimal mount = new BigDecimal(0);
+        for (EnterpriseEmployee enterpriseEmployee : enterpriseEmployeeVo.getEnterpriseEmployees()) {
+            if (!NumberValid.moneyValid(enterpriseEmployee.getMoney().toString())) {
+                return ResponseEntity.ok(new BaseResult(1, enterpriseEmployee.getUserName()+"的转账金额异常"));
+            }
+            mount.add(enterpriseEmployee.getMoney());
+        }
+        if (bankCard.getBankCardBalance().compareTo(mount) == -1){
+            return ResponseEntity.ok(new BaseResult(1,"公司账户余额不足"));
+        }
+
+        List<EnterpriseEmployee> enterpriseEmployeeList = transferRecordService.addTransferRecordDueToBankEnterprise(enterpriseEmployeeVo.getEnterpriseEmployees(), bankEnterprise);
+
+        return ResponseEntity.ok(new BaseResult(0,"转账成功").append("data",enterpriseEmployeeList));
+    }
+
+    @GetMapping("/enterpiseSignOut")
+    public BaseResult enterpiseSignOut(@RequestParam("enterpiseId") Integer enterpiseId){
+        BankEnterprise bankEnterprise = bankEnterpriseService.getBankEnterpriseById(enterpiseId);
+        if (bankEnterprise == null) {
+            return new BaseResult(1, "退出登录失败");
+        }
+        Boolean delete = stringRedisTemplate.delete(bankEnterprise.getEnterpriseName());
+        if (delete){
+            return new BaseResult(0, "退出登录成功");
+        }
+        return new BaseResult(1, "退出登录失败");
     }
 }

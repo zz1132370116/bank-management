@@ -15,4 +15,5 @@ import java.util.List;
 public class EnterpriseEmployeeVo {
     private List<EnterpriseEmployee> enterpriseEmployees;
     private Integer enterpriseId;
+    private String password;
 }

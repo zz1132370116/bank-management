@@ -50,19 +50,16 @@ public class LoginFilter extends ZuulFilter {
         HttpServletRequest request = currentContext.getRequest();
         // 3.1.2 获得请求路径  , /v1/auth-service/login
         String requestURI = request.getRequestURI();
-
+        //  /v1/auth-service/login  --> ["","v1","auth-service","login"]
+        String[] pathArr = requestURI.split("/");
+        String[] notVerifiedPath = {"loginBySendSms","sendSms","login","registrySms","registry","bankEnterpriseLogin"};
         //3.2 如果路径是 /auth-service/login ，当前拦截不执行
-        for (String path  : filterProperties.getAllowPaths()) {
-            //  /v1/auth-service/login  --> ["","v1","auth-service","login"]
-            String[] pathArr = requestURI.split("/");
-            /*if("loginBySendSms".equals(pathArr[3]) || "login".equals(pathArr[3])){
-                return false;
-            }*/
-            //只要有一个路径匹配的，过滤器不执行
-            if(path.equals("/" + pathArr[3])){
+        for (String path  : notVerifiedPath) {
 
+            if(path.equals(pathArr[3])){
                 return false;
             }
+
         }
 
         //3.3 其他都执行

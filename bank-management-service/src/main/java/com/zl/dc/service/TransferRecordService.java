@@ -4,6 +4,7 @@ import com.zl.dc.mapper.BankCardDOMapper;
 import com.zl.dc.mapper.TransferRecordDOMapper;
 import com.zl.dc.mapper.TransferRecordMapper;
 import com.zl.dc.mapper.UserMapper;
+import com.zl.dc.pojo.BankEnterprise;
 import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.EnterpriseEmployee;
@@ -15,10 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @version: V1.2
@@ -42,6 +40,8 @@ public class TransferRecordService {
     private BankCardDOMapper bankCardDOMapper;
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private BankCardService bankCardService;
 
     /**
      * @author: lu
@@ -225,16 +225,49 @@ public class TransferRecordService {
 
     /**
      * @author pds
-     * @param enterpriseEmployee
-     * @return java.lang.Integer
+     * @param enterpriseEmployees
+     * @return java.util.List<com.zl.dc.vo.EnterpriseEmployee>
      * @description 企业批量转账
-     * @date 2019/8/16 17:03
+     * @date 2019/8/16 20:23
      */
-    public Integer addTransferRecordDueToBankEnterprise(EnterpriseEmployee enterpriseEmployee){
+    public List<EnterpriseEmployee> addTransferRecordDueToBankEnterprise(List<EnterpriseEmployee> enterpriseEmployees, BankEnterprise bankEnterprise){
+        List<EnterpriseEmployee> enterpriseEmployeeList = new ArrayList<>();
         TransferRecord transferRecord = new TransferRecord();
 
-        Integer insert = transferRecordMapper.insert(transferRecord);
-        return insert;
+        transferRecord.setTransferStatus(Byte.parseByte("100"));
+        transferRecord.setTransferType(Byte.parseByte("105"));
+        transferRecord.setUserId(bankEnterprise.getEnterpriseId());
+        transferRecord.setBankOutCard(bankEnterprise.getEnterpriseBankCard());
+
+        for (EnterpriseEmployee enterpriseEmployee : enterpriseEmployees) {
+            transferRecord.setTransferRecordUuid(UUID.randomUUID().toString().replaceAll("-", ""));
+            transferRecord.setInCardUserName(enterpriseEmployee.getUserName());
+            transferRecord.setBankInIdentification("");
+            transferRecord.setBankInCard(enterpriseEmployee.getUserBankCardNumber());
+            transferRecord.setGmtModified(new Date());
+            transferRecord.setGmtCreate(new Date());
+            transferRecord.setTransferRecordAmount(enterpriseEmployee.getMoney());
+
+            this.insertTransferRecord(transferRecord);
+            //新增转账记录
+            this.selectTransferRecordByUuid(transferRecord.getTransferRecordUuid());
+            //扣款
+            boolean transferStatus = bankCardService.bankCardTransferBusines(bankEnterprise.getEnterpriseBankCardId(), enterpriseEmployee.getUserBankCardNumber(), enterpriseEmployee.getMoney());
+
+            if (transferStatus) {
+                //成功
+                this.transferSuccessfulOperation(transferRecord);
+                enterpriseEmployee.setStatus("成功");
+                enterpriseEmployeeList.add(enterpriseEmployee);
+            } else {
+                //失败
+                this.transferFailedOperation(transferRecord);
+                enterpriseEmployee.setStatus("失败");
+                enterpriseEmployeeList.add(enterpriseEmployee);
+            }
+        }
+
+        return enterpriseEmployeeList;
     }
 
     /**

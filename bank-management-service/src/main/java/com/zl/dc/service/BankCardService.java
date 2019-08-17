@@ -267,4 +267,16 @@ public class BankCardService {
             return "申请失败";
         }
     }
+
+    /**
+     * @author pds
+     * @param otherBankCard
+     * @return java.lang.Integer
+     * @description 插入他行银行卡
+     * @date 2019/8/16 20:53
+     */
+    public Integer addOtherBankCard(OtherBankCard otherBankCard){
+        Integer insert = otherBankCardMapper.insert(otherBankCard);
+        return insert;
+    }
 }
