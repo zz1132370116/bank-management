@@ -90,7 +90,7 @@ public class TransferRecordService {
         //添加转账记录
         transferRecordMapper.insertSelective(transferRecord);
         //拼接查询条件
-        return  selectTransferRecordByUuid(transferRecord.getTransferRecordUuid());
+        return selectTransferRecordByUuid(transferRecord.getTransferRecordUuid());
 
 
     }
@@ -229,6 +229,8 @@ public class TransferRecordService {
                 return "企业转个人";
             case "106":
                 return "个人转企业";
+            case "107":
+                return "资金归集";
             default:
                 return "未知";
         }
@@ -253,4 +255,6 @@ public class TransferRecordService {
                 return "未知";
         }
     }
+
+
 }

@@ -118,3 +118,8 @@ sc:
       - /getActiveCollection      # 查询所有主动收款历史订单
       - /updateGatheringType      # 用户取消主动收款
       - /addTransactionTecord     # 发起新的主动收款(添加交易订单)
+      # 资金归集
+      - /getFundCollectionPlanList # 根据用户id所有的归集计划
+      - /addFundCollectionPlan    # 添加归集计划
+      - /shutdownFundCollectionPlan   # 手动终止一个归集计划
+      - /getFundCollectionRecordList  # 查看某个归集计划的记录

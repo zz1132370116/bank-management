@@ -46,6 +46,9 @@
         LIMIT #{index},#{limit}
     </select>
 
+<!--    <select id="selectFundCollectionRecord" resultMap="BaseResultMap">-->
+
+<!--    </select>-->
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         select

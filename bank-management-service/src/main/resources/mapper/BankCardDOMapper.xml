@@ -33,7 +33,6 @@
         WHERE bank_card_id = #{bankCardId}
     </update>
 
-
     <select id="selectByBankCardIdAndPassword" resultType="java.lang.Integer">
         SELECT bank_card_id FROM `bank_card`
         WHERE bank_card_id = #{bankCardId}
@@ -43,7 +42,7 @@
 
     <select id="selectBankCardNumberById" parameterType="java.lang.Integer" resultType="java.lang.String">
         SELECT bank_card_number
-        FROM bank_card
+        FROM `bank_card`
         WHERE bank_card_id = #{bankCardId}
     </select>
 

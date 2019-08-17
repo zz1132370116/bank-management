@@ -3,10 +3,12 @@ package com.zl.dc.controller;
 import com.alibaba.fastjson.JSON;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
-import com.fasterxml.jackson.databind.ser.Serializers;
 import com.zl.dc.api.AccessBank;
 import com.zl.dc.config.SendUpgradeCard;
-import com.zl.dc.pojo.*;
+import com.zl.dc.pojo.BankCard;
+import com.zl.dc.pojo.BankUser;
+import com.zl.dc.pojo.OtherBankCard;
+import com.zl.dc.pojo.SubordinateBank;
 import com.zl.dc.service.BankCardService;
 import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.BaseResult;
@@ -20,7 +22,6 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.BaseStream;
 import java.util.stream.Collectors;
 
 /**
@@ -237,9 +238,7 @@ public class BankCardController {
         if (otherBankCard == null || StringUtils.isBlank(otherBankCard.getBankCardNumber()) || otherBankCard.getUserId() == null) {
             return ResponseEntity.ok(new BaseResult(1, "参数错误"));
         }
-//        if (otherBankCard.getAuthCode() != redisTemplate.opsForValue().get(addBankCardPrefix + otherBankCard.getUserId().toString())) {
-//            return ResponseEntity.ok(new BaseResult(1, "验证码错误"));
-//        }
+        // TODO 校验验证码
         if (bankCardService.selectByUserIdAndCardNumber(otherBankCard)) {
             return ResponseEntity.ok(new BaseResult(1, "该银行卡已被绑定"));
         }
@@ -259,14 +258,18 @@ public class BankCardController {
      * @data: 2019/8/15 17:47
      */
     @PostMapping("/untiedOtherBankCard")
-    public ResponseEntity<BaseResult> untiedOtherBankCard(@RequestParam("password") String password,
-                                                          @RequestParam("otherBankCardId") Integer otherBankCardId,
-                                                          @RequestParam("userId") Integer userId) {
+    public ResponseEntity<BaseResult> untiedOtherBankCard(@RequestBody BankCard bankCard) {
+        if (bankCard == null) {
+            return ResponseEntity.ok(new BaseResult(1, "参数错误"));
+        }
+        Integer otherBankCardId = bankCard.getBankCardId();
+        Integer userId = bankCard.getUserId();
+        String password = bankCard.getBankCardPassword();
         if (password == null || otherBankCardId == null) {
             return ResponseEntity.ok(new BaseResult(1, "参数错误"));
         }
         // TODO 验证用户、银行卡号、密码是否正确
-        if(!bankCardService.verifyOtherBankCardPassword(otherBankCardId,userId)){
+        if (!bankCardService.verifyOtherBankCardPassword(otherBankCardId, userId)) {
             return ResponseEntity.ok(new BaseResult(1, "密码错误"));
         }
         if (bankCardService.deleteByOtherBankCardId(otherBankCardId)) {
@@ -284,9 +287,13 @@ public class BankCardController {
      * @data: 2019/8/15 17:49
      */
     @PostMapping("/reportBankCardLoss")
-    public ResponseEntity<BaseResult> reportBankCardLoss(@RequestParam("password") String password,
-                                                         @RequestParam("bankCardId") Integer bankCardId,
-                                                         @RequestParam("userId") Integer userId) {
+    public ResponseEntity<BaseResult> reportBankCardLoss(@RequestBody BankCard bankCard) {
+        if (bankCard == null) {
+            return ResponseEntity.ok(new BaseResult(1, "参数错误"));
+        }
+        Integer bankCardId = bankCard.getBankCardId();
+        Integer userId = bankCard.getUserId();
+        String password = bankCard.getBankCardPassword();
         if (password == null || bankCardId == null || userId == null) {
             return ResponseEntity.ok(new BaseResult(1, "参数错误"));
         }

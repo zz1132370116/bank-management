@@ -8,7 +8,6 @@ import java.util.List;
 @Mapper
 public interface BankCardDOMapper {
 
-
     /**
      * @author: Redsheep
      * @Param bankCardId 银行卡id
