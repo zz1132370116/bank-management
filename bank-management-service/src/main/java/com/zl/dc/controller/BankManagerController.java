@@ -229,9 +229,9 @@ public class BankManagerController {
      * @data: 2019/8/10 14:35
      */
     @GetMapping("/getManagerTranscations")
-    public List<ManagerTranscation> getManagerTranscations(@RequestBody ManagerTranscation managerTranscation){
-        if (managerTranscation.getPageNum() !=null){
-            List<ManagerTranscation> managerTranscations = bankManagerService.getManagerTranscations(managerTranscation);
+    public List<ManagerTranscation> getManagerTranscations(@RequestParam("pageNum") Integer pageNum){
+        if (pageNum !=null){
+            List<ManagerTranscation> managerTranscations = bankManagerService.getManagerTranscations(pageNum);
             return managerTranscations;
         }
         return null;

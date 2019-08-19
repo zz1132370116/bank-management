@@ -47,13 +47,13 @@ public class BankManagerService {
      */
     public List<BankUser> GetUserList(Integer pageNum) {
         List<BankUser> users = bankUserMapper.GetUserList(pageNum);
-        List<BankUser> users1 = bankUserMapper.selectAll();
 
         for (BankUser user : users) {
-            String s = handlingIdCards(user.getIdCard());
-            user.setIdCard(s);
+            if (user.getIdCard()!=null && !user.getIdCard().equals("")) {
+                String s = handlingIdCards(user.getIdCard());
+                user.setIdCard(s);
 
-
+            }
         }
         return users;
     }
@@ -62,11 +62,12 @@ public class BankManagerService {
      * @author: zhanglei
      * @param: []
      * @return:java.util.List<com.zl.dc.pojo.TransferRecord>
-     * @description: 查询记录数
+     * @description: 查询记录
      * @data: 2019/8/6 14:03
      */
     public List<TransferRecord> GetRecords(Integer pageNum) {
-
+        Example example3 = new Example(SubordinateBank.class);
+        Example.Criteria criteria3 = example3.createCriteria();
         List<TransferRecord> transferRecords = transferRecordMapper.GetRecords(pageNum);
         for (TransferRecord transferRecord : transferRecords) {
             //通过用户id查询当前用户信息
@@ -75,10 +76,11 @@ public class BankManagerService {
             String idCards = handlingIdCards(bankUser.getIdCard());
             bankUser.setIdCard(idCards);
             transferRecord.setUserName(bankUser.getUserName());
-            Example example3 = new Example(SubordinateBank.class);
-            Example.Criteria criteria3 = example3.createCriteria();
-            criteria3.andEqualTo("bankIdentification", transferRecord.getBankInIdentification());
-            transferRecord.setBankOutCardName("五仁银行");
+    if (transferRecord.getBankInIdentification() !=null && !transferRecord.getBankInIdentification().equals("")){
+
+        criteria3.andEqualTo("bankIdentification", transferRecord.getBankInIdentification());
+        transferRecord.setBankOutCardName("五仁银行");
+    }
             //获取转入卡所属银行
             transferRecord.setBankInCardName(subordinateBankMapper.selectOneByExample(example3).getBankName());
         }
@@ -225,8 +227,8 @@ public class BankManagerService {
      * @description: 查询用户申请中的提卡信息
      * @data: 2019/8/9 15:03
      */
-    public List<ManagerTranscation> getManagerTranscations(ManagerTranscation managerTranscation) {
-        List<ManagerTranscation> list =  managerTranscationMapper.getManagerTranscations(managerTranscation.getPageNum());
+    public List<ManagerTranscation> getManagerTranscations(Integer pageNum) {
+        List<ManagerTranscation> list =  managerTranscationMapper.getManagerTranscations(pageNum);
         return list;
     }
 

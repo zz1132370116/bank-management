@@ -1,8 +1,7 @@
 package com.zl.dc.mapper;
 
 import com.zl.dc.pojo.BankUser;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import tk.mybatis.mapper.common.Mapper;
 
 import java.util.List;
@@ -42,6 +41,7 @@ public interface UserMapper extends Mapper<BankUser> {
      * @data: 2019/8/7 14:39
      */
     @Select("SELECT user_id,user_name,user_phone,user_password,user_status,default_bank_card,id_card,gmt_create,gmt_modified FROM bank_user WHERE id_card = #{id_card} and user_id > (#{pageNum}-1)*10 LIMIT 10;")
+    @ResultMap(value="userMap")
     List<BankUser> getUserListByIDCARD(@Param("id_card")String idCard, @Param("pageNum")Integer pageNum);
     /**
      * @author: zhanglei
@@ -50,7 +50,18 @@ public interface UserMapper extends Mapper<BankUser> {
      * @description: 查询会员数
      * @data: 2019/8/6 14:04
      */
-    @Select("user_id,user_name,user_phone,user_password,user_status,default_bank_card,id_card,gmt_create,gmt_modified FROM bank_user where user_id > (#{pageNum}-1)*10 LIMIT 10; ")
+    @Select("select user_id,user_name,user_phone,user_password,user_status,default_bank_card,id_card,gmt_create,gmt_modified FROM bank_user where user_id > (#{pageNum}-1)*10 LIMIT 10; ")
+    @Results(id="userMap", value={
+            @Result(column = "user_id",property = "userId"),
+            @Result(column = "user_name",property = "userName"),
+            @Result(column = "user_phone",property = "userPhone"),
+            @Result(column = "user_password",property = "userPassword"),
+            @Result(column = "user_status",property = "userStatus"),
+            @Result(column = "default_bank_card",property = "defaultBankCard"),
+            @Result(column = "id_card",property = "idCard"),
+            @Result(column = "gmt_create",property = "gmtCreate"),
+            @Result(column = "gmt_modified",property = "gmtModified"),
+    })
     List<BankUser> GetUserList(@Param("pageNum") Integer pageNum);
 }
 

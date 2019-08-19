@@ -126,7 +126,7 @@ public interface AdminClient {
      * @data: 2019/8/9 14:59
      */
     @GetMapping("/getManagerTranscations")
-    List<ManagerTranscation> getManagerTranscations(@RequestBody ManagerTranscation managerTranscation);
+    List<ManagerTranscation> getManagerTranscations(@RequestParam("pageNum") Integer pageNum);
 
     /**
      * @author: zhanglei
@@ -153,7 +153,7 @@ public interface AdminClient {
      * @description: 查询会员数
      * @data: 2019/8/6 13:43
      */
-    @GetMapping("/selectBankUserAll")
+    @GetMapping("/GetUserList")
     List<BankUser> GetUserList(@RequestParam("pageNum") Integer pageNum);
 
     /**
