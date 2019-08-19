@@ -21,17 +21,26 @@
         <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
     </resultMap>
     <sql id="Base_Column_List">
-    plan_id, plan_name, plan_status, collection_amount, user_id, bank_out_card_id, bank_in_card_id,
-    collection_month, collection_day, fail_time, gmt_create, gmt_modified
-  </sql>
+        plan_id, plan_name, plan_status, collection_amount, user_id, bank_out_card_id, bank_in_card_id,
+        collection_month, collection_day, fail_time, gmt_create, gmt_modified
+    </sql>
     <sql id="View_Column_List">
-    plan_id, plan_name, plan_status, collection_amount, bank_out_card_id, bank_in_card_id,
-    collection_month, collection_day
-  </sql>
+        plan_id, plan_name, plan_status, collection_amount, bank_out_card_id, bank_in_card_id,
+        collection_month, collection_day
+    </sql>
 
-    <update id="updateFundCollectionPlanStatus" >
+    <select id="selectFundCollectionBySchedule" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM `fund_collection_plan`
+        WHERE (collection_month = 0 OR collection_month = #{collectionMonth})
+        AND collection_day = #{collectionDay}
+        AND plan_status = 100
+    </select>
+
+    <update id="updateFundCollectionPlanStatus">
         UPDATE `fund_collection_plan`
-        SET plan_status = #{status}
+        SET plan_status = #{status}, gmt_modified = #{gmtModified}
         WHERE plan_id = #{planId}
     </update>
 
@@ -40,7 +49,7 @@
         <include refid="View_Column_List"/>
         FROM `fund_collection_plan`
         WHERE user_id = #{userId}
-  </select>
+    </select>
 
     <insert id="insert" parameterType="com.zl.dc.pojo.FundCollectionPlan">
     insert into fund_collection_plan (plan_name, plan_status,

@@ -46,9 +46,13 @@
         LIMIT #{index},#{limit}
     </select>
 
-<!--    <select id="selectFundCollectionRecord" resultMap="BaseResultMap">-->
-
-<!--    </select>-->
+    <select id="selectFundCollectionRecord" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT r.transfer_record_amount, r.transfer_record_time, r.transfer_status
+        FROM transfer_record r WHERE r.transfer_record_id
+        IN (SELECT pr.record_id
+        FROM fund_collection_record pr
+        WHERE pr.plan_id = #{planId} )
+    </select>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         select
