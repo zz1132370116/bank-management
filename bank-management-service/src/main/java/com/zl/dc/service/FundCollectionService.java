@@ -124,7 +124,7 @@ public class FundCollectionService {
      * @description: 扫描当天的归集计划并执行
      * @data: 2019/8/19 14:07
      */
-    @Scheduled(cron = "0 0 0 1/1 * ? *")
+    @Scheduled(cron = "0 0 0 1/1 * ?")
     public void execFundCollectionPlan() {
         // 查找当天的归集计划
         Date date = new Date();
