@@ -229,6 +229,12 @@ public class BankManagerService {
      */
     public List<ManagerTranscation> getManagerTranscations(Integer pageNum) {
         List<ManagerTranscation> list =  managerTranscationMapper.getManagerTranscations(pageNum);
+        for (ManagerTranscation managerTranscation : list) {
+            if (managerTranscation.getUserId() !=null){
+               managerTranscation.setBankUser(bankUserMapper.selectByPrimaryKey(managerTranscation.getUserId()));
+            }
+
+        }
         return list;
     }
 
