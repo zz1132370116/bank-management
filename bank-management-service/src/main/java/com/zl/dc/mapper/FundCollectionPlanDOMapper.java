@@ -3,6 +3,7 @@ package com.zl.dc.mapper;
 import com.zl.dc.pojo.FundCollectionPlan;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -28,7 +29,7 @@ public interface FundCollectionPlanDOMapper {
      * @description: 更改归集计划的状态
      * @data: 2019/8/16 15:48
      */
-    Integer updateFundCollectionPlanStatus(Integer planId, Byte status);
+    Integer updateFundCollectionPlanStatus(Integer planId, Byte status, Date gmtModified);
 
     /**
      * @author: Redsheep
@@ -40,12 +41,12 @@ public interface FundCollectionPlanDOMapper {
     Integer insert(FundCollectionPlan fundCollectionPlan);
 
     /**
-    * @author: Redsheep
-    * @Param planId
-    * @return: Integer 影响条数
-    * @description: 增加失败次数
-    * @data: 2019/8/19 17:19
-    */
+     * @author: Redsheep
+     * @Param planId
+     * @return: Integer 影响条数
+     * @description: 增加失败次数
+     * @data: 2019/8/19 17:19
+     */
     Integer addFailTime(Integer planId);
 
     /**

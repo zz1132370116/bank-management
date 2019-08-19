@@ -88,7 +88,8 @@ public class FundCollectionService {
      * @data: 2019/8/16 15:56
      */
     public boolean shutdownFundCollectionPlan(Integer planId) {
-        return fundCollectionPlanDOMapper.updateFundCollectionPlanStatus(planId, Byte.parseByte("101")) != null;
+        Date date=new Date();
+        return fundCollectionPlanDOMapper.updateFundCollectionPlanStatus(planId, Byte.parseByte("101"),date) != null;
     }
 
     /**
@@ -99,7 +100,9 @@ public class FundCollectionService {
      * @data: 2019/8/16 15:57
      */
     public boolean cancelFundCollectionPlan(Integer planId) {
-        return fundCollectionPlanDOMapper.updateFundCollectionPlanStatus(planId, Byte.parseByte("102")) != null;
+        Date date=new Date();
+
+        return fundCollectionPlanDOMapper.updateFundCollectionPlanStatus(planId, Byte.parseByte("102"),date) != null;
     }
 
     /**
@@ -110,7 +113,8 @@ public class FundCollectionService {
      * @data: 2019/8/16 15:57
      */
     public boolean endFundCollectionPlan(Integer planId) {
-        return fundCollectionPlanDOMapper.updateFundCollectionPlanStatus(planId, Byte.parseByte("103")) != null;
+        Date date=new Date();
+        return fundCollectionPlanDOMapper.updateFundCollectionPlanStatus(planId, Byte.parseByte("103"),date) != null;
     }
 
     /**
@@ -120,15 +124,14 @@ public class FundCollectionService {
      * @description: 扫描当天的归集计划并执行
      * @data: 2019/8/19 14:07
      */
-//    @Scheduled(cron = "0 0 0 1/1 * ? *")
-    @Scheduled(cron = "0 0 0,18 * * ? ")
+    @Scheduled(cron = "0 0 0 1/1 * ? *")
     public void execFundCollectionPlan() {
         // 查找当天的归集计划
         Date date = new Date();
         Calendar c = Calendar.getInstance();
         c.setTime(date);
         Integer month = c.get(Calendar.MONTH) + 1;
-        Integer day = c.get(Calendar.DATE) + 1;
+        Integer day = c.get(Calendar.DATE);
         List<FundCollectionPlan> fundCollectionPlans;
         fundCollectionPlans = fundCollectionPlanDOMapper.selectFundCollectionBySchedule(month, day);
         if (fundCollectionPlans == null) {
@@ -136,29 +139,34 @@ public class FundCollectionService {
         }
         // 执行归集计划
         String uuid;
+        String bankOutCard;
+        String bankInCard;
         ListIterator<FundCollectionPlan> fundCollectionPlanListIterator = fundCollectionPlans.listIterator();
         while (fundCollectionPlanListIterator.hasNext()) {
             fundCollectionPlan = fundCollectionPlanListIterator.next();
             transferRecord.setGmtCreate(date);
             transferRecord.setGmtModified(date);
             transferRecord.setTransferType(Byte.parseByte("107"));
-            transferRecord.setBankInCard(bankCardService.selectBankCardNumberById(fundCollectionPlan.getBankInCardId()));
-            transferRecord.setBankOutCard(bankCardService.selectBankCardNumberById(fundCollectionPlan.getBankOutCardId()));
+            bankInCard = bankCardService.selectBankCardNumberById(fundCollectionPlan.getBankInCardId());
+            transferRecord.setBankInCard(bankInCard);
+            bankOutCard = bankCardService.selectBankCardNumberById(fundCollectionPlan.getBankOutCardId());
+            transferRecord.setBankOutCard(bankOutCard);
             uuid = UUID.randomUUID().toString().replaceAll("-", "");
             transferRecord.setTransferRecordUuid(uuid);
             transferRecord.setTransferRecordAmount(fundCollectionPlan.getCollectionAmount());
             transferRecord.setTransferRecordTime(date);
             transferRecord.setUserId(fundCollectionPlan.getUserId());
             transferRecord.setTransferNote(fundCollectionPlan.getPlanName());
-            transferRecord.setBankInCardName("本人");
+            transferRecord.setInCardUserName("本人");
             transferRecord.setBankInIdentification("");
-            if (bankCardService.bankCardTransferBusines(fundCollectionPlan.getBankOutCardId(), fundCollectionPlan.getBankInCard(), fundCollectionPlan.getCollectionAmount())) {
+            if (!bankCardService.bankCardTransferBusines(fundCollectionPlan.getBankOutCardId(), bankInCard, fundCollectionPlan.getCollectionAmount())) {
                 transferRecord.setTransferStatus(Byte.parseByte("101"));
                 // 累加归集计划失败次数
                 // 如果失败次数累计超过3次，自动取消归集计划
                 if (fundCollectionPlan.getFailTime() >= 2) {
+                    fundCollectionPlanDOMapper.addFailTime(fundCollectionPlan.getPlanId());
                     cancelFundCollectionPlan(fundCollectionPlan.getPlanId());
-                }else{
+                } else {
                     fundCollectionPlanDOMapper.addFailTime(fundCollectionPlan.getPlanId());
                 }
             } else {
