@@ -52,7 +52,7 @@ public class LoginFilter extends ZuulFilter {
         String requestURI = request.getRequestURI();
         //  /v1/auth-service/login  --> ["","v1","auth-service","login"]
         String[] pathArr = requestURI.split("/");
-        String[] notVerifiedPath = {"loginBySendSms","sendSms","login","registrySms","registry","bankEnterpriseLogin"};
+        String[] notVerifiedPath = {"loginBySendSms","sendSms","login","registrySms","registry","bankEnterpriseLogin","getAllSubordinateBank"};
         //3.2 如果路径是 /auth-service/login ，当前拦截不执行
         for (String path  : notVerifiedPath) {
 

@@ -3,7 +3,6 @@ package com.zl.dc.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
-import com.zl.dc.api.VerifyIdCard;
 import com.zl.dc.config.SmsChangePassword;
 import com.zl.dc.config.SmsChangePhone;
 import com.zl.dc.config.SmsLogin;
@@ -22,14 +21,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -61,9 +57,6 @@ public class UserController {
                 return ResponseEntity.ok(new BaseResult(1,"手机号不正确"));
             }
             String code = RandomStringUtils.randomNumeric(6);
-            /*System.out.println(code);
-            redisTemplate.opsForValue().set(phone+code,code,5,TimeUnit.MINUTES);
-            return ResponseEntity.ok(new BaseResult(0, "发送成功"));*/
 
             SendSmsResponse smsResponse;
             try {
@@ -189,7 +182,7 @@ public class UserController {
         //判断传过来的验证码是否正确
         if (code != null){
             BankUser bankUserByUserPhone = userService.getBankUserByUserPhone(bankUser.getUserPhone());
-
+            redisTemplate.delete(bankUser.getUserPhone()+bankUser.getCode());
             //将修改手机号之后的用户的信息保存到redis中，使用手机号作为key
             redisTemplate.opsForValue().set(bankUserByUserPhone.getUserPhone(),JSONObject.toJSONString(bankUserByUserPhone));
             //将修改手机号之后的用户的信息保存到redis中，使用用户id作为key
@@ -321,6 +314,7 @@ public class UserController {
             String code = redisTemplate.opsForValue().get(user.getUserPhone()+user.getCode());
             //判断传过来的验证码和从redis中获取的验证码是否一致
             if(code != null && !"".equals(code)){
+                redisTemplate.delete(user.getUserPhone()+user.getCode());
                 return ResponseEntity.ok(new BaseResult(0, "验证码正确"));
             }
             return ResponseEntity.ok(new BaseResult(1, "验证码错误或验证码已经过时"));
@@ -468,6 +462,7 @@ public class UserController {
             String code = redisTemplate.opsForValue().get(user.getOldPhone()+user.getCode());
             //判断传过来的验证码和从redis中获取的验证码是否一致
             if(code != null && !"".equals(code)){
+                redisTemplate.delete(user.getOldPhone()+user.getCode());
                 return ResponseEntity.ok(new BaseResult(0, "验证码正确"));
             }
             return ResponseEntity.ok(new BaseResult(1, "验证码错误或验证码已经过时"));
@@ -499,6 +494,7 @@ public class UserController {
                 }
                 //修改手机号
                 BankUser user = userService.updateBankUserPhone(bankUser);
+                redisTemplate.delete(bankUser.getUserPhone()+bankUser.getCode());
                 //将修改手机号之后的用户的信息保存到redis中，使用手机号作为key
                 redisTemplate.opsForValue().set(user.getUserPhone(),JSONObject.toJSONString(user));
                 //将修改手机号之后的用户的信息保存到redis中，使用用户id作为key

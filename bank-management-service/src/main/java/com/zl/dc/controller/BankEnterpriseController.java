@@ -34,10 +34,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @version V1.0
@@ -70,12 +68,32 @@ public class BankEnterpriseController {
     public BaseResult enterpiseLogin(@RequestBody BankEnterprise bankEnterprise){
         BankEnterprise enterpriseBankCard = bankEnterpriseService.getBankEnterpriseByEnterpriseBankCard(bankEnterprise.getEnterpriseBankCard());
         if (enterpriseBankCard != null){
+            //密码错误次数达到3次之后会暂时将账号冻结，冻结今天的剩余时间，即在过了24:00之后就可以登录，在冻结时间之内不允许该用户登录
+            // 这里先从redis里查该用户是否被禁止登录
+            String timesStr = stringRedisTemplate.opsForValue().get(enterpriseBankCard.getEnterpriseName()+"-"+enterpriseBankCard.getEnterpriseId());
+            if (timesStr != null && timesStr.equals("3")){
+                return new BaseResult(1,"您今天的输错密码的次数为3次，请明天再试，或者选择忘记密码");
+            }
+
             String password = MD5.GetMD5Code(bankEnterprise.getEnterpriseLoginPassword());
             if (password.equals(enterpriseBankCard.getEnterpriseLoginPassword())){
                 stringRedisTemplate.opsForValue().set(enterpriseBankCard.getEnterpriseName(), JSON.toJSONString(bankEnterprise));
                 enterpriseBankCard.setGmtCreate(null);
                 enterpriseBankCard.setGmtModified(null);
                 return new BaseResult(0,"登录成功").append("enterprise",enterpriseBankCard);
+            } else {
+                //密码错误
+                //获取当前的小时
+                Calendar calendar = Calendar.getInstance();
+                Integer hour = calendar.get(Calendar.HOUR_OF_DAY);
+                Integer times = 0;
+
+                if(timesStr != null && !"".equals(timesStr)){
+                    times = Integer.parseInt(timesStr);
+                }
+                times += 1;
+                stringRedisTemplate.opsForValue().set(enterpriseBankCard.getEnterpriseName()+"-"+enterpriseBankCard.getEnterpriseId(),times.toString(),24-hour, TimeUnit.HOURS);
+                return new BaseResult(1,"输错密码"+times+"次，只有"+(3-times)+"次机会了");
             }
         }
         return new BaseResult(1,"登录失败，账号或密码错误");
