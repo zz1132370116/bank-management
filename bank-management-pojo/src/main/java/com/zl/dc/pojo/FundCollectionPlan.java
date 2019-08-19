@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -21,6 +22,7 @@ import java.util.Date;
 @Data
 @ToString
 @Table(name = "fund_collection_plan")
+@Component
 public class FundCollectionPlan {
     /**
      * 归集计划id
@@ -36,7 +38,7 @@ public class FundCollectionPlan {
     /**
      * 资金归集计划的状态
      * 100 进行中
-     * 101 已主动取消
+     * 101 已自动取消
      * 102 已手动终止
      * 103 已结束
      */

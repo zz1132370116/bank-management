@@ -82,7 +82,9 @@ public class BankCardService {
 
     /**
      * @author: lu
-     * @param: Integer outBankCardId, Integer inBankCardId, BigDecimal muchMoney
+     * @param: Integer outBankCardId
+     * @param: String inBankCardId
+     * @param: BigDecimal muchMoney
      * @return: * boolean
      * @description: 银行卡转账业务
      * @data: 2019/8/12 16:19
@@ -341,6 +343,13 @@ public class BankCardService {
         return otherBankCardDOMapper.selectByOtherBankCardIdAndPassword(otherBankCardId, userId) != null;
     }
 
+    /**
+     * @author: Redsheep
+     * @Param bankCardId
+     * @return: java.lang.String
+     * @description: 根据银行卡id获得银行卡
+     * @data: 2019/8/19 16:32
+     */
     public String selectBankCardNumberById(Integer bankCardId) {
         return bankCardDOMapper.selectBankCardNumberById(bankCardId);
     }

@@ -33,10 +33,27 @@ public interface FundCollectionPlanDOMapper {
     /**
      * @author: Redsheep
      * @Param fundCollectionPlan
-     * @return: Integer
+     * @return: Integer 影响条数
      * @description: 添加归集计划
      * @data: 2019/8/16 16:15
      */
     Integer insert(FundCollectionPlan fundCollectionPlan);
 
+    /**
+    * @author: Redsheep
+    * @Param planId
+    * @return: Integer 影响条数
+    * @description: 增加失败次数
+    * @data: 2019/8/19 17:19
+    */
+    Integer addFailTime(Integer planId);
+
+    /**
+     * @author: Redsheep
+     * @Param planId
+     * @return: Integer 影响条数
+     * @description: 重置失败次数
+     * @data: 2019/8/19 17:19
+     */
+    Integer resetFailTime(Integer planId);
 }

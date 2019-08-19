@@ -1,7 +1,10 @@
 package com.zl.dc.service;
 
 import com.zl.dc.mapper.FundCollectionPlanDOMapper;
+import com.zl.dc.mapper.FundCollectionRecordDOMapper;
 import com.zl.dc.pojo.FundCollectionPlan;
+import com.zl.dc.pojo.FundCollectionRecordDO;
+import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.TransferValueVo;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -9,10 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 @Service
 @EnableScheduling
@@ -20,9 +20,18 @@ public class FundCollectionService {
     @Resource
     FundCollectionPlanDOMapper fundCollectionPlanDOMapper;
     @Resource
+    FundCollectionRecordDOMapper fundCollectionRecordDOMapper;
+    @Resource
     BankCardService bankCardService;
     @Resource
     TransferRecordService transferRecordService;
+
+    @Resource
+    FundCollectionRecordDO fundCollectionRecordDO;
+    @Resource
+    TransferRecord transferRecord;
+    @Resource
+    FundCollectionPlan fundCollectionPlan;
 
     /**
      * @author: Redsheep
@@ -111,10 +120,10 @@ public class FundCollectionService {
      * @description: 扫描当天的归集计划并执行
      * @data: 2019/8/19 14:07
      */
-    @Scheduled(cron = "0 0 0 1/1 * ? *")
+//    @Scheduled(cron = "0 0 0 1/1 * ? *")
+    @Scheduled(cron = "0 0 0,18 * * ? ")
     public void execFundCollectionPlan() {
-
-        // 1.查找当天的归集计划
+        // 查找当天的归集计划
         Date date = new Date();
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -125,12 +134,51 @@ public class FundCollectionService {
         if (fundCollectionPlans == null) {
             return;
         }
-        TransferValueVo transferValueVo=new TransferValueVo();
-        // 2.遍历执行各个归集计划
-        // 成功要写入两张表，重置失败次数
-        // 失败要写入两张表，增加失败次数
-
-        // 3.判断归集计划是每个月还是一次，一次的话，执行完就结束归集计划
+        // 执行归集计划
+        String uuid;
+        ListIterator<FundCollectionPlan> fundCollectionPlanListIterator = fundCollectionPlans.listIterator();
+        while (fundCollectionPlanListIterator.hasNext()) {
+            fundCollectionPlan = fundCollectionPlanListIterator.next();
+            transferRecord.setGmtCreate(date);
+            transferRecord.setGmtModified(date);
+            transferRecord.setTransferType(Byte.parseByte("107"));
+            transferRecord.setBankInCard(bankCardService.selectBankCardNumberById(fundCollectionPlan.getBankInCardId()));
+            transferRecord.setBankOutCard(bankCardService.selectBankCardNumberById(fundCollectionPlan.getBankOutCardId()));
+            uuid = UUID.randomUUID().toString().replaceAll("-", "");
+            transferRecord.setTransferRecordUuid(uuid);
+            transferRecord.setTransferRecordAmount(fundCollectionPlan.getCollectionAmount());
+            transferRecord.setTransferRecordTime(date);
+            transferRecord.setUserId(fundCollectionPlan.getUserId());
+            transferRecord.setTransferNote(fundCollectionPlan.getPlanName());
+            transferRecord.setBankInCardName("本人");
+            transferRecord.setBankInIdentification("");
+            if (bankCardService.bankCardTransferBusines(fundCollectionPlan.getBankOutCardId(), fundCollectionPlan.getBankInCard(), fundCollectionPlan.getCollectionAmount())) {
+                transferRecord.setTransferStatus(Byte.parseByte("101"));
+                // 累加归集计划失败次数
+                // 如果失败次数累计超过3次，自动取消归集计划
+                if (fundCollectionPlan.getFailTime() >= 2) {
+                    cancelFundCollectionPlan(fundCollectionPlan.getPlanId());
+                }else{
+                    fundCollectionPlanDOMapper.addFailTime(fundCollectionPlan.getPlanId());
+                }
+            } else {
+                transferRecord.setTransferStatus(Byte.parseByte("102"));
+                // 清空归集计划失败次数
+                fundCollectionPlanDOMapper.resetFailTime(fundCollectionPlan.getPlanId());
+            }
+            // 写入转账记录表
+            transferRecordService.insertTransferRecord(transferRecord);
+            // 写入归集记录表
+            fundCollectionRecordDO.setGmtCreate(date);
+            fundCollectionRecordDO.setGmtModified(date);
+            fundCollectionRecordDO.setRecordUuid(uuid);
+            fundCollectionRecordDO.setPlanId(fundCollectionPlan.getPlanId());
+            fundCollectionRecordDOMapper.insert(fundCollectionRecordDO);
+            // 如果归集计划是一次性的，执行完就结束归集计划
+            if (fundCollectionPlan.getCollectionMonth() != 0) {
+                endFundCollectionPlan(fundCollectionPlan.getPlanId());
+            }
+        }
     }
 
     private String switchPlanStatus(String status) {

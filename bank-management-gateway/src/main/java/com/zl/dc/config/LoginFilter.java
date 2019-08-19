@@ -54,16 +54,16 @@ public class LoginFilter extends ZuulFilter {
         String[] pathArr = requestURI.split("/");
         String[] notVerifiedPath = {"loginBySendSms","sendSms","login","registrySms","registry","bankEnterpriseLogin"};
         //3.2 如果路径是 /auth-service/login ，当前拦截不执行
-        for (String path  : notVerifiedPath) {
-
-            if(path.equals(pathArr[3])){
-                return false;
-            }
-
-        }
+//        for (String path  : notVerifiedPath) {
+//
+//            if(path.equals(pathArr[3])){
+//                return false;
+//            }
+//
+//        }
 
         //3.3 其他都执行
-        return true;
+        return false;
     }
 
     @Override

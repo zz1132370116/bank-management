@@ -1,11 +1,9 @@
 package com.zl.dc.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.zl.dc.api.AccessBank;
 import com.zl.dc.config.BankCardAsync;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankEnterprise;
-import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.OtherBankCard;
 import com.zl.dc.service.BankCardService;
 import com.zl.dc.service.BankEnterpriseService;
@@ -23,9 +21,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
