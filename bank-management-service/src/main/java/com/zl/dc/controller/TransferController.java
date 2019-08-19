@@ -2,6 +2,7 @@ package com.zl.dc.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.zl.dc.api.AccessBank;
+import com.zl.dc.config.RedisInsertUtil;
 import com.zl.dc.pojo.*;
 import com.zl.dc.service.BankCardService;
 import com.zl.dc.service.SubordinateBankService;
@@ -19,7 +20,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -86,9 +89,26 @@ public class TransferController {
             return ResponseEntity.ok(new BaseResult(1, "金额输入有误，请重新转账"));
         }
         //查询银行卡
-        BankCard bankCard = bankCardService.verifyBankCardForVo(transferValueVo);
+        BankCard bankCard = bankCardService.selectBankCardByid(transferValueVo.getOutBankCardID());
         if (bankCard == null) {
-            return ResponseEntity.ok(new BaseResult(1, "密码错误"));
+            return ResponseEntity.ok(new BaseResult(1, "未找到用户操作卡，请联系管理员"));
+        }
+        //密码错误次数达到3次之后会暂时将冻结，冻结今天的剩余时间，即在过了24:00之后就可以登录，在冻结时间之内不允许该用户登录
+        //查询redies该卡是否被锁定
+        String timesStr = stringRedisTemplate.opsForValue().get("BankCard"+bankCard.getBankCardId());
+        if (timesStr != null && timesStr.equals("3")){
+            return ResponseEntity.ok(new BaseResult(1, "您今天的输错密码达到上限，请明天再试，或者选择忘记密码"));
+        }
+
+        boolean passwordStatus = bankCardService.BankCardPasswordCheck(bankCard, transferValueVo.getPassword());
+//       当输错密码时
+        if(!passwordStatus){
+            //调用方法在redis缓存中存入错误信息
+            RedisInsertUtil.addingData(stringRedisTemplate,"BankCard"+bankCard.getBankCardId(),timesStr);
+            return ResponseEntity.ok(new BaseResult(1, "密码输入错误，每日限制3次"));
+        }
+        if (!"100".equals(bankCard.getBankCardStatus().toString())) {
+            return ResponseEntity.ok(new BaseResult(1, "银行卡状态异常，请查看该卡状态"));
         }
         if (bankCard.getBankCardBalance().compareTo(transferValueVo.getMuchMoney()) == -1) {
             return ResponseEntity.ok(new BaseResult(1, "余额不足，操作失败"));
@@ -97,26 +117,14 @@ public class TransferController {
             return ResponseEntity.ok(new BaseResult(1, "交易被限额，操作失败"));
         }
 
-        //设置卡号
+        //设置转出卡号
         transferValueVo.setOutBankCard(bankCard.getBankCardNumber());
-        //判断手机为不为空
-        if (StringUtils.isNotBlank(transferValueVo.getBankPhone()) && StringUtils.isBlank(transferValueVo.getInBankCard())) {
-            BankUser bankUser = userService.getBankUserByUserPhone(transferValueVo.getBankPhone());
-
-            if (StringUtils.isBlank(bankUser.getDefaultBankCard())) {
-                return ResponseEntity.ok(new BaseResult(1, "转账失败，收款手机号未绑定银行卡"));
-            }
-            if (!bankUser.getUserName().equals(transferValueVo.getInBankName())) {
-                return ResponseEntity.ok(new BaseResult(1, "转账失败，收款人与银行卡不符合"));
-            }
-            //添加收款银行卡号
-            transferValueVo.setInBankCard(bankUser.getDefaultBankCard());
-        }
+        //如果手机为为空，银行卡号不为空
         if (StringUtils.isBlank(transferValueVo.getBankPhone()) && StringUtils.isNotBlank(transferValueVo.getInBankCard())) {
             if ("BOWR".equals(transferValueVo.getInBank())) {
                 //本行卡查询用户进行校验
-                Integer userId = bankCardService.selectBankUserByBankCardNum(transferValueVo.getInBankCard());
-                BankUser bankUser = userService.selectBankUserByUid(userId);
+                BankCard bankCard1 = bankCardService.selectBankCardByNum(transferValueVo.getInBankCard());
+                BankUser bankUser = userService.selectBankUserByUid(bankCard1.getUserId());
                 if (!bankUser.getUserName().equals(transferValueVo.getInBankName())) {
                     return ResponseEntity.ok(new BaseResult(1, "转账失败，收款人与银行卡不符合"));
                 }
@@ -129,6 +137,22 @@ public class TransferController {
                 }
             }
         }
+        //如果手机为不为空，银行卡号为空
+        if (StringUtils.isNotBlank(transferValueVo.getBankPhone()) && StringUtils.isBlank(transferValueVo.getInBankCard())) {
+            //根据手机查询用户
+            BankUser bankUser = userService.getBankUserByUserPhone(transferValueVo.getBankPhone());
+
+            if (StringUtils.isBlank(bankUser.getDefaultBankCard())) {
+                return ResponseEntity.ok(new BaseResult(1, "转账失败，收款手机号未绑定银行卡"));
+            }
+            if (!bankUser.getUserName().equals(transferValueVo.getInBankName())) {
+                return ResponseEntity.ok(new BaseResult(1, "转账失败，收款人与银行卡不符合"));
+            }
+            //添加收款银行卡号
+            transferValueVo.setInBankCard(bankUser.getDefaultBankCard());
+            transferValueVo.setInBank("BOWR");
+        }
+
 
 //        添加转账记录
         TransferRecord transferRecord = transferRecordService.addTransferRecordforTransferValueVo(transferValueVo);
@@ -136,12 +160,12 @@ public class TransferController {
             return ResponseEntity.ok(new BaseResult(1, "转账记录生成异常请通知管理员"));
         }
         //操作银行卡扣款 转账状态
-        boolean transferStatus = bankCardService.bankCardTransferBusines(transferValueVo);
+        boolean transferStatus = bankCardService.bankCardTransferBusines(transferValueVo.getOutBankCardID(), transferValueVo.getInBankCard(), transferValueVo.getMuchMoney());
 //          如果转账失败
         if (!transferStatus) {
             boolean transferFailedStatus = transferRecordService.transferFailedOperation(transferRecord);
             if (transferFailedStatus) {
-                return ResponseEntity.ok(new BaseResult(1, "转账失败"));
+                return ResponseEntity.ok(new BaseResult(0, "转账失败"));
             } else {
                 return ResponseEntity.ok(new BaseResult(1, "操作异常请通知管理员"));
             }
@@ -149,7 +173,7 @@ public class TransferController {
         //如果转账成功
         boolean transferSuccessfulStatus = transferRecordService.transferSuccessfulOperation(transferRecord);
         if (transferSuccessfulStatus) {
-            return ResponseEntity.ok(new BaseResult(1, "转账成功"));
+            return ResponseEntity.ok(new BaseResult(0, "转账成功"));
         } else {
             return ResponseEntity.ok(new BaseResult(1, "转账记录生成异常请通知管理员"));
         }

@@ -5,6 +5,7 @@ import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.OtherBankCard;
+import com.zl.dc.util.MD5;
 import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.TransferValueVo;
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
@@ -42,64 +44,74 @@ public class BankCardService {
     /**
      * @author: lu
      * @param: TransferValueVo
-     * @return: BankCard
-     * @description: 根据VO校验银行卡
-     * @data: 2019/8/12 11:06
+     * @return: boolean
+     * @description: 银行卡 密码校验
+     * @data: 2019/8/15 11:06
      */
-    public BankCard verifyBankCardForVo(TransferValueVo transferValueVo) {
-        Example example = new Example(BankCard.class);
-        Example.Criteria criteria = example.createCriteria();
-//          对VO进非空校验
-        if (transferValueVo == null) {
-            return null;
-        }
-//            对密码进行非空校验
-        if (StringUtils.isBlank(transferValueVo.getPassword())) {
-            return null;
-        }
-//                对银行卡id进行非空校验
-        if (transferValueVo.getOutBankCardID() == null) {
-            return null;
-        }
+    public boolean BankCardPasswordCheck(BankCard bankCard, String password) {
 //            将传入密码加密处理
-//                    transferValueVo.setPassword(MD5.GetMD5Code(transferValueVo.getPassword()));
-//            拼接条件查询出该银行卡
-        criteria.andEqualTo("bankCardPassword", transferValueVo.getPassword());
-        criteria.andEqualTo("bankCardId", transferValueVo.getOutBankCardID());
-        criteria.andEqualTo("bankCardStatus", "100");
-        return bankCardMapper.selectOneByExample(example);
+//        String BankCardPasswod = MD5.GetMD5Code(password);
+        return password.equals(bankCard.getBankCardPassword());
     }
 
     /**
      * @author: lu
-     * @param: * TransferValueVo
+     * @Param Integer bankCardId
+     * @return: BankCard
+     * @description: 根据银行卡id查询银行卡
+     * @data: 2019/8/15 16:15
+     */
+    public BankCard selectBankCardByid(Integer bankCardId) {
+        return bankCardMapper.selectByPrimaryKey(bankCardId);
+    }
+
+    /**
+     * @author: lu
+     * @Param String bankCardNumber
+     * @return: BankCard
+     * @description: 根据银行卡号查询银行卡
+     * @data: 2019/8/15 16:15
+     */
+    public BankCard selectBankCardByNum(String bankCardNumber) {
+        Example example = new Example(BankCard.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("bankCardNumber", bankCardNumber);
+        return bankCardMapper.selectOneByExample(example);
+    }
+
+
+    /**
+     * @author: lu
+     * @param: Integer outBankCardId, Integer inBankCardId, BigDecimal muchMoney
      * @return: * boolean
      * @description: 银行卡转账业务
      * @data: 2019/8/12 16:19
      */
-    public boolean bankCardTransferBusines(TransferValueVo transferValueVo) {
+    public boolean bankCardTransferBusines(Integer outBankCardId, String inBankCardId, BigDecimal muchMoney) {
+
+        BankCard outBankCard = selectBankCardByid(outBankCardId);
+        if (outBankCard == null) {
+            return false;
+        }
+        if ("9999".equals(inBankCardId.substring(0, 4))) {
+            BankCard inBankCard = selectBankCardByNum(inBankCardId);
+            if (inBankCard == null) {
+                return false;
+            }
+            //          查询收款卡，收款
+            inBankCard.setBankCardBalance(inBankCard.getBankCardBalance().add(muchMoney));
+            bankCardMapper.updateByPrimaryKeySelective(inBankCard);
+
+        } else {
+            OtherBankCard inBankCard = getBankNameByBankNum(inBankCardId);
+            if (inBankCard == null) {
+                return false;
+            }
+        }
 
         //          查询扣款卡，扣款
-        BankCard outBankCard = bankCardMapper.selectByPrimaryKey(transferValueVo.getOutBankCardID());
-        outBankCard.setBankCardBalance(outBankCard.getBankCardBalance().subtract(transferValueVo.getMuchMoney()));
-        int transferOut = bankCardMapper.updateByPrimaryKeySelective(outBankCard);
-
-        if (transferOut != 1) {
-            //转账失败回滚操作
-            return false;
-        }
-
-        //          查询收款卡，收款
-        Example example = new Example(BankCard.class);
-        Example.Criteria criteria = example.createCriteria();
-        criteria.andEqualTo("bankCardNumber", transferValueVo.getInBankCard());
-        BankCard inBankCard = bankCardMapper.selectOneByExample(example);
-        inBankCard.setBankCardBalance(inBankCard.getBankCardBalance().add(transferValueVo.getMuchMoney()));
-        int transfer = bankCardMapper.updateByPrimaryKeySelective(inBankCard);
-        if (transfer != 1) {
-            //转账失败回滚操作
-            return false;
-        }
+        outBankCard.setBankCardBalance(outBankCard.getBankCardBalance().subtract(muchMoney));
+        bankCardMapper.updateByPrimaryKeySelective(outBankCard);
         return true;
 
     }
@@ -141,20 +153,6 @@ public class BankCardService {
         return otherBankCard;
     }
 
-    /**
-     * @author: lu
-     * @Param String 银行卡号
-     * @return: BankUser
-     * @description: 根据银行卡号查询用户id
-     * @data: 2019/8/13 20:32
-     */
-    public Integer selectBankUserByBankCardNum(String bankCardNum) {
-        Example example = new Example(BankCard.class);
-        Example.Criteria criteria = example.createCriteria();
-        criteria.andEqualTo("bankCardNumber", bankCardNum);
-        BankCard bankCard = bankCardMapper.selectOneByExample(example);
-        return bankCard.getUserId();
-    }
 
     /**
      * @author: Redsheep
@@ -261,7 +259,6 @@ public class BankCardService {
             managerTranscation.setTranscationMsg(bankCard.getTranscationMsg());
         }
         managerTranscation.setGmtCreate(new Date());
-        managerTranscation.setGmtModified(new Date());
         int i = managerTranscationMapper.insertSelective(managerTranscation);
         if (i != 0) {
             return "申请成功";

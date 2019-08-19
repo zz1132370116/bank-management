@@ -44,9 +44,9 @@ sc:
     allowPaths:
       # 管理员
       - /getLogin                 # 登录(管理员)
-      - /GetUserList              # 查询用户数量(管理员)
-      - /GetRecords               # 查询记录数(管理员)
-      - /GetAbnormals             # 查询异常数(管理员)
+      - /selectBankUserAll        # 查询用户数量(管理员)
+      - /selectTransferRecordAll  # 查询记录数(管理员)
+      - /selectManagerTranscationAll # 查询异常数(管理员)
       - /getTransferRecords       # 查询所有订单(管理员)
       - /getBankUserList          # 管理员查询所有用户(带条件)
       - /memberStart              # 启用用户状态(管理员)
@@ -60,6 +60,7 @@ sc:
       - /sendSms                  # 发送短信(用户登录)
       - /login                    # 用户登录(手机号/身份证号)
       - /GetUserByRedis           # 从redis查询用户信息
+      - /logout                   # 退出登录
       # 注册
       - /registrySms              # 注册----获取验证码
       - /registry                 # 注册----注册
@@ -88,13 +89,13 @@ sc:
       - /reportBankCardLoss       # 根据银行卡id挂失本行卡
       # 升级银行卡
       - /getBankCardBybankCardId  #根据银行卡ID查询银行卡
-      - /sendUpgradeCard          #升级银行卡(发短信)
+      - /sendUpgradeCard          # 升级银行卡(发短信)
        # 收款群组
-      - /selectPayeeGroupByUid      #根据用户id返回用户所有的用户群组
-      - /selectPayeeById             #根据群组id返回所有的收款人
-      - /addPayeeGroup             #添加一条收款群组
-      - /deletePayeeById            #根据id删除群组用户
-      - /addPayee                   #根据VO添加群组收款人
+      - /selectPayeeGroupByUid    # 根据用户id返回用户所有的用户群组
+      - /selectPayeeById          # 根据群组id返回所有的收款人
+      - /addPayeeGroup            # 添加一条收款群组
+      - /deletePayeeById          # 根据id删除群组用户
+      - /addPayee                 # 根据VO添加群组收款人
       - /getBankCardBybankCardId  # 根据银行卡ID查询银行卡
       #升级银行卡
       - /sendUpgradeCard          # 升级银行卡(发短信)
@@ -106,18 +107,27 @@ sc:
       - /getOtherBankCardByUserId # 根据用户id获取他行卡
       - /findBankCardIdentification # 根据银行卡号查标识符
       - /deleteOtherBankCard      # 解绑他行卡
-      - /getOtherBankCardByUserId #根据用户id获取他行卡
-      # 企业
+      - /getBankCardBybankCardId  # 根据银行卡ID查询银行卡
+      - /getOtherBankCardByUserId # 根据用户id获取他行卡
+      # 批量转账
+      - /submitTransferBulk       # 批量转账提交
+      #企业
       - /bankEnterpriseLogin      # 企业用户登录
-      # 消息中心
+      - /batchImport              # 批量导入收款人
+      - /enterpriseTransfer       # 企业转账
+      - /enterpriseLogout         # 企业退出登录
+      #消息中心
       - /getMessageCenter         # 根据用户id查询待付款单和升级卡记录
       - /agreeGathering           # 用户通知付款
-      - /updateManagerTranscationStatus #用户主动取消升级卡申请
+      - /updateManagerTranscationStatus    # 用户主动取消升级卡申请
       - /getBankCardByUser        # 根据用户id查询用户名下所有银行卡
-      # 主动收款
+      #主动收款
       - /getActiveCollection      # 查询所有主动收款历史订单
       - /updateGatheringType      # 用户取消主动收款
       - /addTransactionTecord     # 发起新的主动收款(添加交易订单)
+      #消息通知
+      - /MessageNotification      # 根据登录用户id查询消息
+      - /setRedisMessage          # 将消息存到redis5天
       # 资金归集
       - /getFundCollectionPlanList # 根据用户id所有的归集计划
       - /addFundCollectionPlan    # 添加归集计划

@@ -56,10 +56,12 @@ public class SendUpgradeCardOK {
         //必填:短信签名-可在短信控制台中找到
         request.setSignName("五仁");			//老袁a洗脚6
         //必填:短信模板-可在短信控制台中找到
-        request.setTemplateCode("SMS_172505077"); 	//SMS_85550034
+        request.setTemplateCode("SMS_172520189"); 	//SMS_85550034
         //可选:模板中的变量替换JSON串,如模板内容为"亲爱的${name},您的验证码为${code}"时,此处的值为
         //${name}您好，请凭取件码：${code}，至${address}取件，若有问题请咨询${phone}。
-        request.setTemplateParam("{\"mtname\":\""+mtname+"\", \"submittime\":\""+submittime+"\"}");
+        SimpleDateFormat ft = new SimpleDateFormat("yyyyMMdd");
+
+        request.setTemplateParam("{\"mtname\":\""+mtname+"\", \"submittime\":\""+ft.format(submittime)+"\"}");
 
         System.out.println(mtname);
         //选填-上行短信扩展码(无特殊需求用户请忽略此字段)
@@ -113,8 +115,9 @@ public class SendUpgradeCardOK {
     	String number = getNumber();
     	/**发送的电话号*/
     	String telephone = "17805202411";
-        //发短信
-        SendSmsResponse response = sendSms(telephone,"1234",new Date());
+        //发短信   //必填-发送日期 支持30天内记录查询，格式yyyyMMdd
+
+        SendSmsResponse response = sendSms(telephone,"621098********0001",new Date());
         System.out.println("短信接口返回的数据----------------");
         System.out.println("Code=" + response.getCode());
         System.out.println("Message=" + response.getMessage());

@@ -28,6 +28,13 @@ public class BankEnterpriseLoginService {
     @Resource
     private JwtProperties jwtProperties;
 
+    /**
+     * @author pds
+     * @param bankEnterprise
+     * @return com.zl.dc.vo.BaseResult
+     * @description 企业登录
+     * @date 2019/8/16 10:19
+     */
     public BaseResult bankEnterpriseLogin(BankEnterprise bankEnterprise){
         try {
             BaseResult baseResult = enterpriseClient.bankEnterpriseLogin(bankEnterprise);
@@ -68,5 +75,22 @@ public class BankEnterpriseLoginService {
             baseResult.append("enterprise",enterprise);
         }
         return baseResult;
+    }
+
+    /**
+     * @author pds
+     * @param enterpriseId
+     * @return com.zl.dc.vo.BaseResult
+     * @description 退出登录
+     * @date 2019/8/17 11:32
+     */
+    public BaseResult enterpriseLogout(Integer enterpriseId) {
+        try {
+            BaseResult baseResult = enterpriseClient.enterpiseSignOut(enterpriseId);
+            return baseResult;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new BaseResult(1, "退出登录失败");
     }
 }

@@ -133,4 +133,21 @@ public class AuthService {
         }
         return baseResult;
     }
+
+    /**
+     * @author pds
+     * @param userId
+     * @return com.zl.dc.vo.BaseResult
+     * @description 退出登录
+     * @date 2019/8/17 11:32
+     */
+    public BaseResult logout(Integer userId) {
+        try {
+            BaseResult baseResult = userClient.signOut(userId);
+            return baseResult;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new BaseResult(1, "退出登录失败");
+    }
 }

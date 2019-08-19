@@ -46,32 +46,24 @@ public class AdminService {
      * @description: 查询会员数
      * @data: 2019/8/6 13:43
      */
-    public List<BankUser> GetUserList() {
-        List<BankUser> list = adminClient.GetUserList();
+    public List<BankUser> GetUserList(Integer pageNum) {
+        List<BankUser> list = adminClient.GetUserList(pageNum);
         return list;
     }
     /**
      * @author: zhanglei
      * @param: []
      * @return:java.util.List<com.zl.dc.pojo.BankManager>
-     * @description: 查询记录数
-     * @data: 2019/8/6 13:44
+     * @description: 查询会员数
+     * @data: 2019/8/6 13:43
      */
-    public List<TransferRecord> GetRecords() {
-        List<TransferRecord> transferRecords = adminClient.GetRecords();
-        return transferRecords;
+    public List<TransferRecord> GetRecords(Integer pageNum) {
+        List<TransferRecord> list = adminClient.GetRecords(pageNum);
+        return list;
     }
-    /**
-     * @author: zhanglei
-     * @param: []
-     * @return:java.util.List<com.zl.dc.pojo.BankManager>
-     * @description: 查询异常数
-     * @data: 2019/8/6 13:45
-     */
-    public List<ManagerTranscation> GetAbnormals() {
-        List<ManagerTranscation> managerTranscations = adminClient.GetAbnormals();
-        return managerTranscations;
-    }
+
+
+
     /**
      * @author: zhanglei
      * @param: []
@@ -92,7 +84,10 @@ public class AdminService {
      */
     public List<TransferRecord> getRecordsByParams(@RequestBody TransferRecord transferRecord) {
         List<TransferRecord> transferRecords =adminClient.getRecordsByParams(transferRecord);
-        return transferRecords;
+        if (transferRecords !=null){
+            return transferRecords;
+        }
+        return null;
     }
     /**
      * @author: zhanglei
@@ -103,7 +98,10 @@ public class AdminService {
      */
     public List<BankUser> getUserListByParams(BankUser bankuser) {
         List<BankUser> users =adminClient.getUserListByParams(bankuser);
-        return users;
+        if (users !=null){
+            return users;
+        }
+        return null;
     }
     /**
      * @author: zhanglei
@@ -143,8 +141,12 @@ public class AdminService {
      * @description: 查询用户申请中的提卡信息
      * @data: 2019/8/9 14:59
      */
-    public List<ManagerTranscation> getManagerTranscations() {
-        return  adminClient.getManagerTranscations();
+    public List<ManagerTranscation> getManagerTranscations(ManagerTranscation managerTranscation) {
+        List<ManagerTranscation> managerTranscations = adminClient.getManagerTranscations(managerTranscation);
+        if (managerTranscations !=null){
+            return managerTranscations;
+        }
+        return null;
     }
     /**
      * @author: zhanglei
@@ -165,5 +167,35 @@ public class AdminService {
      */
     public void NoPassage(Integer transcationId) {
         adminClient.NoPassage(transcationId);
+    }
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.BankManager>
+     * @description: 查询异常数
+     * @data: 2019/8/6 13:45
+     */
+    public List<ManagerTranscation> selectManagerTranscationAll() {
+        return adminClient.selectManagerTranscationAll();
+    }
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.BankManager>
+     * @description: 查询记录数
+     * @data: 2019/8/6 13:44
+     */
+    public List<TransferRecord> selectTransferRecordAll() {
+        return adminClient.selectTransferRecordAll();
+    }
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.BankManager>
+     * @description: 查询会员数
+     * @data: 2019/8/6 13:43
+     */
+    public List<BankUser> selectBankUserAll() {
+        return adminClient.selectBankUserAll();
     }
 }
