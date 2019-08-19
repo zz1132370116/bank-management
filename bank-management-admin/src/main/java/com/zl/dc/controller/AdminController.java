@@ -67,9 +67,9 @@ public class AdminController {
      * @description: 查询会员数
      * @data: 2019/8/6 13:34
      */
-    @GetMapping("/GetUserList")
+    @GetMapping("/selectBankUserAll")
     public ResponseEntity<BaseResult> GetUserList() {
-        List<BankUser> bankUsers = adminService.GetUserList();
+        List<BankUser> bankUsers = adminService.selectBankUserAll();
         return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", bankUsers.size()));
     }
 
@@ -80,9 +80,9 @@ public class AdminController {
      * @description: 查询记录数
      * @data: 2019/8/6 13:40
      */
-    @GetMapping("/GetRecords")
+    @GetMapping("/selectTransferRecordAll")
     public ResponseEntity<BaseResult> GetRecords() {
-        List<TransferRecord> transferRecords = adminService.GetRecords();
+        List<TransferRecord> transferRecords = adminService.selectTransferRecordAll();
         return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", transferRecords.size()));
     }
 
@@ -93,9 +93,9 @@ public class AdminController {
      * @description: 查询异常数
      * @data: 2019/8/6 13:40
      */
-    @GetMapping("/GetAbnormals")
+    @GetMapping("/selectManagerTranscationAll")
     public ResponseEntity<BaseResult> GetAbnormals() {
-        List<ManagerTranscation> managerTranscations = adminService.GetAbnormals();
+        List<ManagerTranscation> managerTranscations = adminService.selectManagerTranscationAll();
         return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", managerTranscations.size()));
     }
 
@@ -113,12 +113,17 @@ public class AdminController {
             if ((transferRecord.getIdCard()!=null && !transferRecord.getIdCard().equals("")) || (transferRecord.getStartDate() !=null && !transferRecord.getStartDate().equals("")) || (transferRecord.getEndDate()!=null && !transferRecord.getEndDate().equals(""))) {
                 //进行条件查询
                 List<TransferRecord> transferRecords = adminService.getRecordsByParams(transferRecord);
-                return ResponseEntity.ok(new BaseResult(0, "条件查询成功").append("data", transferRecords));
+                if (transferRecords !=null){
+                    int totalPageNum = (transferRecords.size() +10 - 1) / 10;
+                    return ResponseEntity.ok(new BaseResult(0, "条件查询成功").append("data", transferRecords).append("data",totalPageNum));
+                }
+                return ResponseEntity.ok(new BaseResult(0, "数据为空"));
             }
 
         //查询所有记录
-        List<TransferRecord> transferRecords = adminService.GetRecords();
-        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", transferRecords));
+        List<TransferRecord> transferRecords = adminService.GetRecords(transferRecord.getPageNum());
+        int totalPageNum = (transferRecords.size() +10 - 1) / 10;
+        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", transferRecords).append("data",totalPageNum));
 
     }
     /**
@@ -133,11 +138,16 @@ public class AdminController {
         //校验条件
         if ((bankUser.getUserName()!=null && !bankUser.getUserName().equals("")) ||(bankUser.getIdCard()!=null && !bankUser.getIdCard().equals(""))){
            List<BankUser> users = adminService.getUserListByParams(bankUser);
-            return ResponseEntity.ok(new BaseResult(0,"条件查询成功").append("data",users));
+           if (users !=null){
+               int totalPageNum = (users.size() +10 - 1) / 10;
+               return ResponseEntity.ok(new BaseResult(0,"条件查询成功").append("data",users).append("data",totalPageNum));
+           }
+            return ResponseEntity.ok(new BaseResult(0,"数据为空"));
         }
         //查询所有
-        List<BankUser> users = adminService.GetUserList();
-        return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",users));
+        List<BankUser> users = adminService.GetUserList(bankUser.getPageNum());
+        int totalPageNum = (users.size() +10 - 1) / 10;
+        return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",users).append("data",totalPageNum));
     }
     /**
      * @author: zhanglei
@@ -192,10 +202,11 @@ public class AdminController {
      * @data: 2019/8/9 14:55
      */
     @GetMapping("/getManagerTranscations")
-    public ResponseEntity<BaseResult> getManagerTranscations(){
-        List<ManagerTranscation> managerTranscations =adminService.getManagerTranscations();
+    public ResponseEntity<BaseResult> getManagerTranscations(@RequestBody ManagerTranscation managerTranscation){
+        List<ManagerTranscation> managerTranscations =adminService.getManagerTranscations(managerTranscation);
         if (managerTranscations != null){
-            return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",managerTranscations));
+            int totalPageNum = (managerTranscations.size() +10 - 1) / 10;
+            return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",managerTranscations).append("data",totalPageNum));
         }
         return ResponseEntity.ok(new BaseResult(1,"查询失败"));
     }

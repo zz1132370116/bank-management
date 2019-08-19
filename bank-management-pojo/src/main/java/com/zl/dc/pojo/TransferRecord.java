@@ -161,5 +161,11 @@ public class TransferRecord {
      */
     @Transient
     private String transferStringStatus;
+    //页码
+    @Transient
+    private Integer pageNum;
+    //总页数
+    @Transient
+    private Integer totalPageNum;
 
 }

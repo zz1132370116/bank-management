@@ -36,4 +36,15 @@ public class BankEnterpriseService {
         return enterprise;
     }
 
+    /**
+     * @author pds
+     * @param id
+     * @return com.zl.dc.pojo.BankEnterprise
+     * @description 根据id获取企业用户信息
+     * @date 2019/8/16 14:50
+     */
+    public BankEnterprise getBankEnterpriseById(Integer id){
+        BankEnterprise enterprise = bankEnterpriseMapper.selectByPrimaryKey(id);
+        return enterprise;
+    }
 }
