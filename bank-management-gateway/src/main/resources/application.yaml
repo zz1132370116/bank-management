@@ -83,8 +83,12 @@ sc:
       - /CrossBorderTransfer      # 跨境转账----转账
       # 转账记录
       - /getTransferRecordList    # 查询转账记录----根据月份和银行卡id
+      # 本行卡
       - /getBankCardByUserId      # 根据用户id查询所有本行银行卡
       - /getBankCardBybankCardId  # 根据银行卡ID查询银行卡
+      - /reportBankCardLoss       # 根据银行卡id挂失本行卡
+      # 升级银行卡
+      - /getBankCardBybankCardId  #根据银行卡ID查询银行卡
       - /sendUpgradeCard          # 升级银行卡(发短信)
        # 收款群组
       - /selectPayeeGroupByUid    # 根据用户id返回用户所有的用户群组
@@ -99,6 +103,9 @@ sc:
       - /UpgradeCard              # 升级银行卡(申请)
       # 他行卡
       - /addOtherBankCard         # 绑定他行卡
+      - /untiedOtherBankCard      # 解绑他行卡
+      - /getOtherBankCardByUserId # 根据用户id获取他行卡
+      - /findBankCardIdentification # 根据银行卡号查标识符
       - /deleteOtherBankCard      # 解绑他行卡
       - /getBankCardBybankCardId  # 根据银行卡ID查询银行卡
       - /getOtherBankCardByUserId # 根据用户id获取他行卡
@@ -121,3 +128,8 @@ sc:
       #消息通知
       - /MessageNotification      # 根据登录用户id查询消息
       - /setRedisMessage          # 将消息存到redis5天
+      # 资金归集
+      - /getFundCollectionPlanList # 根据用户id所有的归集计划
+      - /addFundCollectionPlan    # 添加归集计划
+      - /shutdownFundCollectionPlan   # 手动终止一个归集计划
+      - /getFundCollectionRecordList  # 查看某个归集计划的记录

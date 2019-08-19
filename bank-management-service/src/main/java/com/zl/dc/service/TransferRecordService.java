@@ -92,8 +92,6 @@ public class TransferRecordService {
         insertTransferRecord(transferRecord);
         //拼接查询条件
         return selectTransferRecordByUuid(transferRecord.getTransferRecordUuid());
-
-
     }
 
     /**
@@ -272,6 +270,29 @@ public class TransferRecordService {
 
     /**
      * @author: Redsheep
+     * @Param planId 归集计划id
+     * @return: java.util.List<com.zl.dc.pojo.TransferRecord>
+     * @description: 归集计划记录
+     * @data: 2019/8/19 9:36
+     */
+    public List<TransferRecord> getFundCollectionRecordList(Integer planId) {
+        List<TransferRecord> transferRecordList = transferRecordDOMapper.selectFundCollectionRecord(planId);
+        if (transferRecordList == null) {
+            return null;
+        }
+        ListIterator<TransferRecord> transferRecordListIterator = transferRecordList.listIterator();
+        TransferRecord transferRecord;
+        String type;
+        while (transferRecordListIterator.hasNext()) {
+            transferRecord = transferRecordListIterator.next();
+            type = changeTransferStatus(transferRecord.getTransferStatus().toString());
+            transferRecord.setTransferStringStatus(type);
+        }
+        return transferRecordList;
+    }
+
+    /**
+     * @author: Redsheep
      * @Param type
      * @return: java.lang.String
      * @description: 转账类型显义
@@ -293,6 +314,8 @@ public class TransferRecordService {
                 return "企业转个人";
             case "106":
                 return "个人转企业";
+            case "107":
+                return "资金归集";
             default:
                 return "未知";
         }
@@ -317,4 +340,6 @@ public class TransferRecordService {
                 return "未知";
         }
     }
+
+
 }
