@@ -52,15 +52,15 @@ public class LoginFilter extends ZuulFilter {
         String requestURI = request.getRequestURI();
         //  /v1/auth-service/login  --> ["","v1","auth-service","login"]
         String[] pathArr = requestURI.split("/");
-        String[] notVerifiedPath = {"loginBySendSms","sendSms","login","registrySms","registry","bankEnterpriseLogin"};
+        String[] notVerifiedPath = {"loginBySendSms","sendSms","login","registrySms","registry","bankEnterpriseLogin","getLogin"};
         //3.2 如果路径是 /auth-service/login ，当前拦截不执行
-        for (String path  : notVerifiedPath) {
+     /*   for (String path  : notVerifiedPath) {
 
             if(path.equals(pathArr[3])){
                 return false;
             }
 
-        }
+        }*/
 
         //3.3 其他都执行
         return true;
@@ -81,7 +81,8 @@ public class LoginFilter extends ZuulFilter {
         //2 校验token -- 使用JWT工具类进行解析
         // 2.3 使用工具类，通过公钥获得对应信息
         try {
-            JwtUtils.getInfoFromToken( token , jwtProperties.getPublicKey() );
+         /*   System.out.println("执行了");
+            JwtUtils.getInfoFromToken( token , jwtProperties.getPublicKey() );*/
         } catch (Exception e) {
             // 2.4 如果有异常--没有登录（没有权限）
             //响应的状态码：403
