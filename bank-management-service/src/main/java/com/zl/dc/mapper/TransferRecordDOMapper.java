@@ -10,15 +10,6 @@ import java.util.List;
 public interface TransferRecordDOMapper {
 
     /**
-    * @author: Redsheep
-    * @Param planId 归集计划id
-    * @return: List<TransferRecord>
-    * @description: 选择归集计划id查出归集计划记录
-    * @data: 2019/8/19 9:17
-    */
-    List<TransferRecord> selectFundCollectionRecord(Integer planId);
-
-    /**
      * @version: V1.0
      * @author: redsheep
      * @className: TransferRecordDOMapper
@@ -27,6 +18,8 @@ public interface TransferRecordDOMapper {
      */
     List<TransferRecord> selectByUserIdAndMonthAndCard(Integer userId,String startDay,String endDay,
                                                        Integer index,Integer limit,String bankCard);
+
+//    List<TransferRecord> selectFundCollectionRecord();
 
     int deleteByPrimaryKey(Integer transferRecordId);
 

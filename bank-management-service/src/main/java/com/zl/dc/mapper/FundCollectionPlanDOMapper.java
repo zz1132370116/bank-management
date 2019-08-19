@@ -8,8 +8,6 @@ import java.util.List;
 @Mapper
 public interface FundCollectionPlanDOMapper {
 
-    List<FundCollectionPlan> selectFundCollectionBySchedule(Integer collectionMonth, Integer collectionDay);
-
     /**
      * @author: Redsheep
      * @Param userId 用户id

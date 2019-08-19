@@ -1,5 +1,6 @@
 package com.zl.dc.controller;
 
+import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.FundCollectionPlan;
 import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.service.BankCardService;
@@ -9,6 +10,7 @@ import com.zl.dc.vo.AuthVO;
 import com.zl.dc.vo.BaseResult;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sun.net.www.protocol.http.AuthenticationHeader;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -91,7 +93,7 @@ public class FundCollectionController {
                 || authVO.getData() == null) {
             return ResponseEntity.ok(new BaseResult(1, "参数错误"));
         }
-        if (!bankCardService.verifyBankCardPassword(authVO.getBankCardId(), authVO.getPassword(), authVO.getUserId())) {
+        if (!bankCardService.verifyBankCardPassword(authVO.getBankCardId(),authVO.getPassword(),authVO.getUserId())) {
             return ResponseEntity.ok(new BaseResult(1, "密码错误"));
         }
         if (authVO.getData() instanceof Integer) {
@@ -111,14 +113,9 @@ public class FundCollectionController {
      */
     @GetMapping("/getFundCollectionRecordList/{planId}")
     public ResponseEntity<BaseResult> getFundCollectionRecordList(@PathVariable("planId") Integer planId) {
-        if (planId == null) {
-            return ResponseEntity.ok(new BaseResult(1, "参数错误"));
+        if(planId==null){
+            return ResponseEntity.ok(new BaseResult(1, "密码错误"));
         }
-        List<TransferRecord> transferRecords = transferRecordService.getFundCollectionRecordList(planId);
-        if (transferRecords == null) {
-            return ResponseEntity.ok(new BaseResult(1, "没有查到相关记录"));
-        }
-        return ResponseEntity.ok(new BaseResult(1, "查询成功").append("data", transferRecords));
+        return null;
     }
-
 }
