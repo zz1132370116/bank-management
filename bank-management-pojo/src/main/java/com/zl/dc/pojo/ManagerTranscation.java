@@ -55,5 +55,9 @@ public class ManagerTranscation {
     private Date gmtModified;
     @Transient
     private BankUser bankUser;
+    @Transient
+    private Integer pageNum;
+    @Transient
+    private Integer totalPageNum;
 
 }
