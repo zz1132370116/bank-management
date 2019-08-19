@@ -2,25 +2,27 @@ package com.zl.dc.service;
 
 import com.zl.dc.mapper.FundCollectionPlanDOMapper;
 import com.zl.dc.pojo.FundCollectionPlan;
-import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.util.StarUtil;
+import com.zl.dc.vo.TransferValueVo;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 
 @Service
-@Transactional
+@EnableScheduling
 public class FundCollectionService {
     @Resource
     FundCollectionPlanDOMapper fundCollectionPlanDOMapper;
     @Resource
-    TransferRecord transferRecord;
-    @Resource
     BankCardService bankCardService;
+    @Resource
+    TransferRecordService transferRecordService;
 
     /**
      * @author: Redsheep
@@ -100,6 +102,35 @@ public class FundCollectionService {
      */
     public boolean endFundCollectionPlan(Integer planId) {
         return fundCollectionPlanDOMapper.updateFundCollectionPlanStatus(planId, Byte.parseByte("103")) != null;
+    }
+
+    /**
+     * @author: Redsheep
+     * @param: void
+     * @return: void
+     * @description: 扫描当天的归集计划并执行
+     * @data: 2019/8/19 14:07
+     */
+    @Scheduled(cron = "0 0 0 1/1 * ? *")
+    public void execFundCollectionPlan() {
+
+        // 1.查找当天的归集计划
+        Date date = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        Integer month = c.get(Calendar.MONTH) + 1;
+        Integer day = c.get(Calendar.DATE) + 1;
+        List<FundCollectionPlan> fundCollectionPlans;
+        fundCollectionPlans = fundCollectionPlanDOMapper.selectFundCollectionBySchedule(month, day);
+        if (fundCollectionPlans == null) {
+            return;
+        }
+        TransferValueVo transferValueVo=new TransferValueVo();
+        // 2.遍历执行各个归集计划
+        // 成功要写入两张表，重置失败次数
+        // 失败要写入两张表，增加失败次数
+
+        // 3.判断归集计划是每个月还是一次，一次的话，执行完就结束归集计划
     }
 
     private String switchPlanStatus(String status) {
