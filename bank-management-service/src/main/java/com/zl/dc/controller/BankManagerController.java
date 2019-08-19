@@ -1,6 +1,8 @@
 package com.zl.dc.controller;
 
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zl.dc.config.SendUpgradeCardOK;
 import com.zl.dc.pojo.BankManager;
 import com.zl.dc.pojo.BankUser;
@@ -85,9 +87,48 @@ public class BankManagerController {
      * @description: 查询管理员会员数
      * @data: 2019/8/6 13:53
      */
+    @GetMapping("/selectBankUserAll")
+    public List<BankUser> selectBankUserAll() {
+        List<BankUser> list = bankManagerService.selectBankUserAll();
+        return list;
+    }
+
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.BankManager>
+     * @description: 查询管理员记录数
+     * @data: 2019/8/6 13:53
+     */
+    @GetMapping("/selectTransferRecordAll")
+    public List<TransferRecord> selectTransferRecordAll() {
+        List<TransferRecord> list = bankManagerService.selectTransferRecordAll();
+        return list;
+    }
+
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.BankManager>
+     * @description: 查询管理员异常数
+     * @data: 2019/8/6 13:53
+     */
+    @GetMapping("/selectManagerTranscationAll")
+    public List<ManagerTranscation> selectManagerTranscationAll() {
+        List<ManagerTranscation> list = bankManagerService.selectManagerTranscationAll();
+        return list;
+    }
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.BankManager>
+     * @description: 查询管理员会员数
+     * @data: 2019/8/6 13:53
+     */
     @GetMapping("/GetUserList")
-    public List<BankUser> GetUserList() {
-        List<BankUser> list = bankManagerService.GetUserList();
+    public List<BankUser> GetUserList(@RequestParam("pageNum")Integer pageNum) {
+        List<BankUser> list = bankManagerService.GetUserList(pageNum);
+
         return list;
     }
 
@@ -99,8 +140,8 @@ public class BankManagerController {
      * @data: 2019/8/6 13:53
      */
     @GetMapping("/GetRecords")
-    public List<TransferRecord> GetRecords() {
-        List<TransferRecord> list = bankManagerService.GetRecords();
+    public List<TransferRecord> GetRecords(@RequestParam("pageNum")Integer pageNum) {
+        List<TransferRecord> list = bankManagerService.GetRecords(pageNum);
         return list;
     }
 
@@ -112,8 +153,8 @@ public class BankManagerController {
      * @data: 2019/8/6 13:53
      */
     @GetMapping("/GetAbnormals")
-    public List<ManagerTranscation> GetAbnormals() {
-        List<ManagerTranscation> list = bankManagerService.GetAbnormals();
+    public List<ManagerTranscation> GetAbnormals(@RequestParam("pageNum")Integer pageNum) {
+        List<ManagerTranscation> list = bankManagerService.GetAbnormals(pageNum);
         return list;
     }
     /**
@@ -125,7 +166,11 @@ public class BankManagerController {
      */
     @PostMapping("/getRecordsByParams")
     public List<TransferRecord> getRecordsByParams(@RequestBody TransferRecord transferRecord) {
-        return bankManagerService.getRecordsByParams(transferRecord);
+        List<TransferRecord> recordsByParams = bankManagerService.getRecordsByParams(transferRecord);
+        if (recordsByParams !=null){
+            return recordsByParams;
+        }
+        return null;
 
     }
     /**
@@ -137,8 +182,11 @@ public class BankManagerController {
      */
     @PostMapping("/getUserListByParams")
     public List<BankUser> getUserListByParams(@RequestBody BankUser bankUser) {
-        List<BankUser> users = bankManagerService.getUserListByParams(bankUser.getUserName(), bankUser.getIdCard());
-        return users;
+        List<BankUser> users = bankManagerService.getUserListByParams(bankUser.getUserName(), bankUser.getIdCard(),bankUser.getPageNum());
+        if (users !=null){
+            return users;
+        }
+        return null;
     }
     /**
      * @author: zhanglei
@@ -181,8 +229,12 @@ public class BankManagerController {
      * @data: 2019/8/10 14:35
      */
     @GetMapping("/getManagerTranscations")
-    public List<ManagerTranscation> getManagerTranscations(){
-        return bankManagerService.getManagerTranscations();
+    public List<ManagerTranscation> getManagerTranscations(@RequestBody ManagerTranscation managerTranscation){
+        if (managerTranscation.getPageNum() !=null){
+            List<ManagerTranscation> managerTranscations = bankManagerService.getManagerTranscations(managerTranscation);
+            return managerTranscations;
+        }
+        return null;
     }
     /**
      * @author: zhanglei

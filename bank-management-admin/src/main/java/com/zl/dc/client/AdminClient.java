@@ -39,8 +39,8 @@ public interface AdminClient {
      * @description: 查询会员数
      * @data: 2019/8/6 13:43
      */
-    @GetMapping("/GetUserList")
-    List<BankUser> GetUserList();
+    @GetMapping("/selectBankUserAll")
+    List<BankUser> selectBankUserAll();
 
     /**
      * @author: zhanglei
@@ -49,8 +49,8 @@ public interface AdminClient {
      * @description: 查询记录数
      * @data: 2019/8/6 13:44
      */
-    @GetMapping("/GetRecords")
-    List<TransferRecord> GetRecords();
+    @GetMapping("/selectTransferRecordAll")
+    List<TransferRecord> selectTransferRecordAll();
 
     /**
      * @author: zhanglei
@@ -59,8 +59,8 @@ public interface AdminClient {
      * @description: 查询异常数
      * @data: 2019/8/6 13:45
      */
-    @GetMapping("/GetAbnormals")
-    List<ManagerTranscation> GetAbnormals();
+    @GetMapping("/selectManagerTranscationAll")
+    List<ManagerTranscation> selectManagerTranscationAll();
     /**
      * @author: zhanglei
      * @param: []
@@ -126,7 +126,7 @@ public interface AdminClient {
      * @data: 2019/8/9 14:59
      */
     @GetMapping("/getManagerTranscations")
-    List<ManagerTranscation> getManagerTranscations();
+    List<ManagerTranscation> getManagerTranscations(@RequestBody ManagerTranscation managerTranscation);
 
     /**
      * @author: zhanglei
@@ -146,4 +146,33 @@ public interface AdminClient {
      */
     @GetMapping("/NoPassage")
     void NoPassage(@RequestParam("transcationId") Integer transcationId);
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.BankManager>
+     * @description: 查询会员数
+     * @data: 2019/8/6 13:43
+     */
+    @GetMapping("/selectBankUserAll")
+    List<BankUser> GetUserList(@RequestParam("pageNum") Integer pageNum);
+
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.BankManager>
+     * @description: 查询记录数
+     * @data: 2019/8/6 13:44
+     */
+    @GetMapping("/GetRecords")
+    List<TransferRecord> GetRecords(@RequestParam("pageNum") Integer pageNum);
+
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.BankManager>
+     * @description: 查询异常数
+     * @data: 2019/8/6 13:45
+     */
+    @GetMapping("/GetAbnormals")
+    List<ManagerTranscation> GetAbnormals(@RequestParam("pageNum") Integer pageNum);
 }

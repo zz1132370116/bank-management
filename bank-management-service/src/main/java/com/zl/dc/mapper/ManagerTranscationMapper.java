@@ -1,7 +1,11 @@
 package com.zl.dc.mapper;
 
 import com.zl.dc.pojo.ManagerTranscation;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import tk.mybatis.mapper.common.Mapper;
+
+import java.util.List;
 
 /**
  * @version: V1.0
@@ -12,4 +16,15 @@ import tk.mybatis.mapper.common.Mapper;
  */
 @org.apache.ibatis.annotations.Mapper
 public interface ManagerTranscationMapper extends Mapper<ManagerTranscation> {
+    /**
+     * @author: zhanglei
+     * @param: []
+     * @return:java.util.List<com.zl.dc.pojo.ManagerTranscation>
+     * @description: 查询用户申请中的提卡信息
+     * @data: 2019/8/9 15:03
+     */
+    @Select("SELECT transcation_id,manager_id,bank_card,user_id,transcation_status,transcation_type,transcation_msg,gmt_create,gmt_modified\n" +
+            "\tFROM manager_transcation WHERE transcation_id> (#{pageNum}-1)*10 LIMIT 10;")
+    List<ManagerTranscation> getManagerTranscations(@Param("pageNum") Integer pageNum);
+
 }
