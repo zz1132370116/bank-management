@@ -4,8 +4,10 @@ import com.zl.dc.mapper.BankCardDOMapper;
 import com.zl.dc.mapper.TransferRecordDOMapper;
 import com.zl.dc.mapper.TransferRecordMapper;
 import com.zl.dc.mapper.UserMapper;
+import com.zl.dc.pojo.BankEnterprise;
 import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.util.StarUtil;
+import com.zl.dc.vo.EnterpriseEmployee;
 import com.zl.dc.vo.PageBean;
 import com.zl.dc.vo.TransferValueVo;
 import org.apache.commons.lang3.StringUtils;
@@ -14,10 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @version: V1.2
@@ -41,6 +40,8 @@ public class TransferRecordService {
     private BankCardDOMapper bankCardDOMapper;
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private BankCardService bankCardService;
 
     /**
      * @author: lu
@@ -79,7 +80,7 @@ public class TransferRecordService {
         transferRecord.setTransferRecordTime(null);
         transferRecord.setTransferNote(transferValueVo.getTransferRemarks());
         transferRecord.setTransferType(Byte.parseByte("100"));
-        transferRecord.setTransferStatus(Byte.parseByte("110"));
+        transferRecord.setTransferStatus(Byte.parseByte("100"));
         transferRecord.setUserId(transferValueVo.getUserId());
         transferRecord.setBankOutCard(transferValueVo.getOutBankCard());
         transferRecord.setInCardUserName(transferValueVo.getInBankName());
@@ -133,7 +134,7 @@ public class TransferRecordService {
      * @data: 2019/8/12 17:00
      */
     public boolean transferFailedOperation(TransferRecord transferRecord) {
-        transferRecord.setTransferStatus(Byte.parseByte("130"));
+        transferRecord.setTransferStatus(Byte.parseByte("102"));
         transferRecord.setTransferRecordTime(new Date());
         transferRecord.setGmtModified(new Date());
         int status = transferRecordMapper.updateByPrimaryKeySelective(transferRecord);
@@ -152,7 +153,7 @@ public class TransferRecordService {
      * @data: 2019/8/12 17:00
      */
     public boolean transferSuccessfulOperation(TransferRecord transferRecord) {
-        transferRecord.setTransferStatus(Byte.parseByte("120"));
+        transferRecord.setTransferStatus(Byte.parseByte("101"));
         transferRecord.setTransferRecordTime(new Date());
         transferRecord.setGmtModified(new Date());
         int status = transferRecordMapper.updateByPrimaryKeySelective(transferRecord);
@@ -220,6 +221,53 @@ public class TransferRecordService {
             transferRecord.setBankOutCard(StarUtil.StringAddStar(bankOutCard, 4, 4));
         }
         return transferRecordList;
+    }
+
+    /**
+     * @author pds
+     * @param enterpriseEmployees
+     * @return java.util.List<com.zl.dc.vo.EnterpriseEmployee>
+     * @description 企业批量转账
+     * @date 2019/8/16 20:23
+     */
+    public List<EnterpriseEmployee> addTransferRecordDueToBankEnterprise(List<EnterpriseEmployee> enterpriseEmployees, BankEnterprise bankEnterprise){
+        List<EnterpriseEmployee> enterpriseEmployeeList = new ArrayList<>();
+        TransferRecord transferRecord = new TransferRecord();
+
+        transferRecord.setTransferStatus(Byte.parseByte("100"));
+        transferRecord.setTransferType(Byte.parseByte("105"));
+        transferRecord.setUserId(bankEnterprise.getEnterpriseId());
+        transferRecord.setBankOutCard(bankEnterprise.getEnterpriseBankCard());
+
+        for (EnterpriseEmployee enterpriseEmployee : enterpriseEmployees) {
+            transferRecord.setTransferRecordUuid(UUID.randomUUID().toString().replaceAll("-", ""));
+            transferRecord.setInCardUserName(enterpriseEmployee.getUserName());
+            transferRecord.setBankInIdentification("");
+            transferRecord.setBankInCard(enterpriseEmployee.getUserBankCardNumber());
+            transferRecord.setGmtModified(new Date());
+            transferRecord.setGmtCreate(new Date());
+            transferRecord.setTransferRecordAmount(enterpriseEmployee.getMoney());
+
+            this.insertTransferRecord(transferRecord);
+            //新增转账记录
+            this.selectTransferRecordByUuid(transferRecord.getTransferRecordUuid());
+            //扣款
+            boolean transferStatus = bankCardService.bankCardTransferBusines(bankEnterprise.getEnterpriseBankCardId(), enterpriseEmployee.getUserBankCardNumber(), enterpriseEmployee.getMoney());
+
+            if (transferStatus) {
+                //成功
+                this.transferSuccessfulOperation(transferRecord);
+                enterpriseEmployee.setStatus("成功");
+                enterpriseEmployeeList.add(enterpriseEmployee);
+            } else {
+                //失败
+                this.transferFailedOperation(transferRecord);
+                enterpriseEmployee.setStatus("失败");
+                enterpriseEmployeeList.add(enterpriseEmployee);
+            }
+        }
+
+        return enterpriseEmployeeList;
     }
 
     /**

@@ -5,9 +5,7 @@ import com.zl.dc.service.BankEnterpriseLoginService;
 import com.zl.dc.vo.BaseResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -37,5 +35,21 @@ public class BankEnterpriseLoginController {
             return ResponseEntity.ok(result);
         }
         return ResponseEntity.ok(new BaseResult(1,"登录失败，账号或密码错误"));
+    }
+
+    /**
+     * @author pds
+     * @param enterpriseId
+     * @return org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description 退出登录
+     * @date 2019/8/16 10:24
+     */
+    @GetMapping("/enterpriseLogout/{enterpriseId}")
+    public ResponseEntity<BaseResult> logout(@PathVariable("enterpriseId") Integer enterpriseId){
+        if (enterpriseId != null && enterpriseId > 0){
+            BaseResult logout = enterpriseService.enterpriseLogout(enterpriseId);
+            return ResponseEntity.ok(logout);
+        }
+        return ResponseEntity.ok(new BaseResult(1, "退出登录失败"));
     }
 }
