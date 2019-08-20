@@ -83,14 +83,9 @@ public class ActiveGatheringController {
         //userBankId 收款卡id
         if( NumberValid.verifyPhone(agvo.getOutUserPhone())){
             return ResponseEntity.ok(new BaseResult(1, "失败"));
-        }
-        if(agvo.getInBankId()==null){
+        }else if(agvo.getInBankId()==null){
             return ResponseEntity.ok(new BaseResult(1, "失败"));
-        }
-        if(NumberValid.moneyValid(agvo.getMuchMoney().toString())){
-            return ResponseEntity.ok(new BaseResult(1, "失败"));
-        }
-        if(agvo.getTransferRemarks()==null || "".equals(agvo.getTransferRemarks())){
+        }else if(NumberValid.moneyValid(agvo.getMuchMoney().toString())){
             return ResponseEntity.ok(new BaseResult(1, "失败"));
         }
         return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", ags.addTransactionTecord(agvo)));
