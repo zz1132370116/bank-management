@@ -1,7 +1,7 @@
 package com.zl.dc.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.zl.dc.config.BankCardAsync;
+import com.zl.dc.api.AccessBank;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankEnterprise;
 import com.zl.dc.pojo.OtherBankCard;
@@ -30,10 +30,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @version V1.0
@@ -51,8 +49,6 @@ public class BankEnterpriseController {
     @Resource
     private TransferRecordService transferRecordService;
     @Resource
-    private BankCardAsync bankCardAsync;
-    @Resource
     private BankCardService bankCardService;
 
     /**
@@ -66,12 +62,32 @@ public class BankEnterpriseController {
     public BaseResult enterpiseLogin(@RequestBody BankEnterprise bankEnterprise){
         BankEnterprise enterpriseBankCard = bankEnterpriseService.getBankEnterpriseByEnterpriseBankCard(bankEnterprise.getEnterpriseBankCard());
         if (enterpriseBankCard != null){
+            //密码错误次数达到3次之后会暂时将账号冻结，冻结今天的剩余时间，即在过了24:00之后就可以登录，在冻结时间之内不允许该用户登录
+            // 这里先从redis里查该用户是否被禁止登录
+            String timesStr = stringRedisTemplate.opsForValue().get(enterpriseBankCard.getEnterpriseName()+"-"+enterpriseBankCard.getEnterpriseId());
+            if (timesStr != null && timesStr.equals("3")){
+                return new BaseResult(1,"您今天的输错密码的次数为3次，请明天再试，或者选择忘记密码");
+            }
+
             String password = MD5.GetMD5Code(bankEnterprise.getEnterpriseLoginPassword());
             if (password.equals(enterpriseBankCard.getEnterpriseLoginPassword())){
                 stringRedisTemplate.opsForValue().set(enterpriseBankCard.getEnterpriseName(), JSON.toJSONString(bankEnterprise));
                 enterpriseBankCard.setGmtCreate(null);
                 enterpriseBankCard.setGmtModified(null);
                 return new BaseResult(0,"登录成功").append("enterprise",enterpriseBankCard);
+            } else {
+                //密码错误
+                //获取当前的小时
+                Calendar calendar = Calendar.getInstance();
+                Integer hour = calendar.get(Calendar.HOUR_OF_DAY);
+                Integer times = 0;
+
+                if(timesStr != null && !"".equals(timesStr)){
+                    times = Integer.parseInt(timesStr);
+                }
+                times += 1;
+                stringRedisTemplate.opsForValue().set(enterpriseBankCard.getEnterpriseName()+"-"+enterpriseBankCard.getEnterpriseId(),times.toString(),24-hour, TimeUnit.HOURS);
+                return new BaseResult(1,"输错密码"+times+"次，只有"+(3-times)+"次机会了");
             }
         }
         return new BaseResult(1,"登录失败，账号或密码错误");
@@ -103,7 +119,6 @@ public class BankEnterpriseController {
         int lastRow = sheet.getLastRowNum();
         // 存放所有解析后的area对象的
         List<EnterpriseEmployee> enterpriseEmployeeList = new ArrayList<>();
-        List<OtherBankCard> otherBankCardList = new ArrayList<>();
         for(int i = 1 ; i <= lastRow ; i ++){
             // 4) 获得对应单元格
             Row row = sheet.getRow(i);
@@ -120,27 +135,25 @@ public class BankEnterpriseController {
             String moneyStr = row.getCell(3).getStringCellValue();
             BigDecimal money = new BigDecimal(moneyStr);
 
+            String identify = "";
+            //获取银行卡的标识
+            try {
+                identify = AccessBank.getSubordinateBank(userBankCardNumber);
+            }catch (NullPointerException e){
+                e.printStackTrace();
+            }
+
             //将数据封装到EnterpriseEmployee对象
             EnterpriseEmployee enterpriseEmployee = new EnterpriseEmployee();
             enterpriseEmployee.setUserName(userName);
             enterpriseEmployee.setUserBankCardName(userBankCardName);
             enterpriseEmployee.setUserBankCardNumber(userBankCardNumber);
+            enterpriseEmployee.setBankInIdentification(identify);
             enterpriseEmployee.setMoney(money);
-
-            OtherBankCard otherBankCard = new OtherBankCard();
-            otherBankCard.setBankCardNumber(userBankCardNumber);
-            otherBankCard.setSubordinateBanksIdentification("");
-            otherBankCard.setUserId(enterpriseId);
-            otherBankCard.setGmtCreate(new Date());
-            otherBankCard.setGmtModified(new Date());
-            otherBankCardList.add(otherBankCard);
 
             //添加数据到集合
             enterpriseEmployeeList.add(enterpriseEmployee);
         }
-
-        //异步添加他行银行卡
-        bankCardAsync.addOtherBankCardList(otherBankCardList);
 
         //删除和关闭
         workbook.close();

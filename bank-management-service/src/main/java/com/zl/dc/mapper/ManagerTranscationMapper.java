@@ -2,6 +2,8 @@ package com.zl.dc.mapper;
 
 import com.zl.dc.pojo.ManagerTranscation;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import tk.mybatis.mapper.common.Mapper;
 
@@ -24,7 +26,19 @@ public interface ManagerTranscationMapper extends Mapper<ManagerTranscation> {
      * @data: 2019/8/9 15:03
      */
     @Select("SELECT transcation_id,manager_id,bank_card,user_id,transcation_status,transcation_type,transcation_msg,gmt_create,gmt_modified\n" +
-            "\tFROM manager_transcation WHERE transcation_id> (#{pageNum}-1)*10 LIMIT 10;")
+            "\tFROM manager_transcation WHERE transcation_status=0 and transcation_id> (#{pageNum}-1)*10 LIMIT 10;")
+    @Results(id="transferRecordMap", value={
+            @Result(column = "transcation_id",property = "transcationId"),
+            @Result(column = "manager_id",property = "managerId"),
+            @Result(column = "bank_card",property = "bankCard"),
+            @Result(column = "user_id",property = "userId"),
+            @Result(column = "transcation_status",property = "transcationStatus"),
+            @Result(column = "transcation_type",property = "transcationType"),
+            @Result(column = "transcation_msg",property = "transcationMsg"),
+            @Result(column = "gmt_create",property = "gmtCreate"),
+            @Result(column = "gmt_modified",property = "gmtModified"),
+
+    })
     List<ManagerTranscation> getManagerTranscations(@Param("pageNum") Integer pageNum);
 
 }

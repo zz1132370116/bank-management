@@ -205,13 +205,13 @@ public class AdminController {
      * @description: 查询申请中的提卡信息
      * @data: 2019/8/9 14:55
      */
-    @GetMapping("/getManagerTranscations")
-    public ResponseEntity<BaseResult> getManagerTranscations(@RequestBody Integer pageNum){
+    @GetMapping("/getManagerTranscations/{pageNum}")
+    public ResponseEntity<BaseResult> getManagerTranscations(@PathVariable("pageNum") Integer pageNum){
         List<ManagerTranscation> managerTranscations =adminService.getManagerTranscations(pageNum);
         if (managerTranscations != null){
-
-            int totalPageNum = (managerTranscations.size() +10 - 1) / 10;
-            return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",managerTranscations).append("data",totalPageNum));
+            List<ManagerTranscation> managerTranscations1 = adminService.selectManagerTranscationAll();
+            int totalPageNum = (managerTranscations1.size() +10 - 1) / 10;
+            return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",managerTranscations).append("totalPageNum",totalPageNum));
         }
         return ResponseEntity.ok(new BaseResult(1,"查询失败"));
     }

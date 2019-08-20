@@ -125,7 +125,11 @@ public class ActiveGatheringService {
         //添加交易时间
         transferRecord.setTransferRecordTime(new Date());
         //添加交易备注
-        transferRecord.setTransferNote(agvo.getTransferRemarks());
+        if (agvo.getTransferRemarks()==null){
+            transferRecord.setTransferNote("");
+        }else {
+            transferRecord.setTransferNote(agvo.getTransferRemarks());
+        }
         //添加交易类型为主动收款
         transferRecord.setTransferType(Byte.parseByte("102"));
         //添加交易状态为交易中

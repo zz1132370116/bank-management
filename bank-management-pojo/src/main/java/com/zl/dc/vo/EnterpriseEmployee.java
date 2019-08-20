@@ -17,5 +17,6 @@ public class EnterpriseEmployee {
     private String userBankCardName;
     private String userBankCardNumber;
     private BigDecimal money;
+    private String bankInIdentification;
     private String status;
 }
