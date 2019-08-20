@@ -522,7 +522,7 @@ public class UserController {
                 }else if (identity == 0){
                     return ResponseEntity.ok(new BaseResult(1, "认证失败，请稍后重试"));
                 }else if(identity == -3){
-                    return ResponseEntity.ok(new BaseResult(3, "该身份证已被实名，请使用身份证登录旧账号，如不是您本人认证的，请找管理员处理"));
+                    return ResponseEntity.ok(new BaseResult(3, "该身份证已被实名，请使用身份证登录旧账号，如不是您本人认证的，请到银行柜台进行解绑业务"));
                 }
                 return ResponseEntity.ok(new BaseResult(0, "认证成功"));
             } catch (IOException e) {
