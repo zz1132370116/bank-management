@@ -268,7 +268,6 @@ public class BankCardController {
         if (password == null || otherBankCardId == null) {
             return ResponseEntity.ok(new BaseResult(1, "参数错误"));
         }
-        // TODO 验证用户、银行卡号、密码是否正确
         if (!bankCardService.verifyOtherBankCardPassword(otherBankCardId, userId)) {
             return ResponseEntity.ok(new BaseResult(1, "密码错误"));
         }

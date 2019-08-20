@@ -33,12 +33,12 @@ public class TransferRecordController {
                                                             @RequestParam("userId") Integer userId,
                                                             @RequestParam("bankCardId") Integer bankCardId) {
         // 参数判空
-        if (page == null || userId == null || month == null) {
+        if (page == null || userId == null || month == null || bankCardId == null) {
             return ResponseEntity.ok(new BaseResult(1, "参数错误"));
         }
         List<TransferRecord> transferRecordList = transferRecordService.getTransferRecordList(page, month, userId, bankCardId);
-        if (transferRecordList == null) {
-            return ResponseEntity.ok(new BaseResult(1, "查询不到数据"));
+        if (transferRecordList.size()==0) {
+            return ResponseEntity.ok(new BaseResult(1, "没有更多数据啦"));
         } else {
             return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", transferRecordList));
         }

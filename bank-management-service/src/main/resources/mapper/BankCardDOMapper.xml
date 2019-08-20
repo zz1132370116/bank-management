@@ -24,7 +24,7 @@
         bank_card_status, bank_card_phone, bank_card_transfer_limit, gmt_create, gmt_modified
     </sql>
     <sql id="View_Column_List">
-        bank_card_id, bank_card_number, bank_card_type
+        bank_card_id, bank_card_number, bank_card_type, bank_card_balance
     </sql>
 
     <update id="updateBankCardStatus">
