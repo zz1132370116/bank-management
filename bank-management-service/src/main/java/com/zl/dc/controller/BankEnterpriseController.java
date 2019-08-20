@@ -2,11 +2,8 @@ package com.zl.dc.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.zl.dc.api.AccessBank;
-import com.zl.dc.config.BankCardAsync;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankEnterprise;
-import com.zl.dc.pojo.BankUser;
-import com.zl.dc.pojo.OtherBankCard;
 import com.zl.dc.service.BankCardService;
 import com.zl.dc.service.BankEnterpriseService;
 import com.zl.dc.service.TransferRecordService;
@@ -23,9 +20,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -52,8 +47,6 @@ public class BankEnterpriseController {
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private TransferRecordService transferRecordService;
-    @Resource
-    private BankCardAsync bankCardAsync;
     @Resource
     private BankCardService bankCardService;
 
@@ -125,7 +118,6 @@ public class BankEnterpriseController {
         int lastRow = sheet.getLastRowNum();
         // 存放所有解析后的area对象的
         List<EnterpriseEmployee> enterpriseEmployeeList = new ArrayList<>();
-        List<OtherBankCard> otherBankCardList = new ArrayList<>();
         for(int i = 1 ; i <= lastRow ; i ++){
             // 4) 获得对应单元格
             Row row = sheet.getRow(i);
@@ -142,27 +134,25 @@ public class BankEnterpriseController {
             String moneyStr = row.getCell(3).getStringCellValue();
             BigDecimal money = new BigDecimal(moneyStr);
 
+            String identify = "";
+            //获取银行卡的标识
+            try {
+                identify = AccessBank.getSubordinateBank(userBankCardNumber);
+            }catch (NullPointerException e){
+                e.printStackTrace();
+            }
+
             //将数据封装到EnterpriseEmployee对象
             EnterpriseEmployee enterpriseEmployee = new EnterpriseEmployee();
             enterpriseEmployee.setUserName(userName);
             enterpriseEmployee.setUserBankCardName(userBankCardName);
             enterpriseEmployee.setUserBankCardNumber(userBankCardNumber);
+            enterpriseEmployee.setBankInIdentification(identify);
             enterpriseEmployee.setMoney(money);
-
-            OtherBankCard otherBankCard = new OtherBankCard();
-            otherBankCard.setBankCardNumber(userBankCardNumber);
-            otherBankCard.setSubordinateBanksIdentification("");
-            otherBankCard.setUserId(enterpriseId);
-            otherBankCard.setGmtCreate(new Date());
-            otherBankCard.setGmtModified(new Date());
-            otherBankCardList.add(otherBankCard);
 
             //添加数据到集合
             enterpriseEmployeeList.add(enterpriseEmployee);
         }
-
-        //异步添加他行银行卡
-        bankCardAsync.addOtherBankCardList(otherBankCardList);
 
         //删除和关闭
         workbook.close();

@@ -1,11 +1,11 @@
 server:
   port: 10010
-  ssl:
-    key-store: classpath:server.keystore
-    key-alias: tomcat
-    enabled: true
-    key-store-password: 123456
-    key-store-type: JKS
+#  ssl:
+#    key-store: classpath:tomcat.keystore
+#    key-alias: tomcat
+#    enabled: true
+#    key-store-password: 123456
+#    key-store-type: JKS
 
 spring:
   application:
@@ -78,6 +78,7 @@ sc:
       - /updatePhoneVerify        # 修改手机----验证验证码是否正确
       - /updatePhone              # 修改手机----修改手机
       - /verifiedIdentity         # 实名认证
+      - /setDefaultBankCard       # 设置默认值
       # 转账
       - /getAllSubordinateBank    # 单次转账----查询出所有所属银行
       - /verifyBankCardForVo      # 单次转账----转账方法

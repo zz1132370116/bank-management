@@ -53,6 +53,16 @@ public class LoginFilter extends ZuulFilter {
         //  /v1/auth-service/login  --> ["","v1","auth-service","login"]
         String[] pathArr = requestURI.split("/");
         String[] notVerifiedPath = {"loginBySendSms","sendSms","login","registrySms","registry","bankEnterpriseLogin","getAllSubordinateBank"};
+        String[] adminPermission = {"getLogin","selectBankUserAll","selectTransferRecordAll",
+                "selectManagerTranscationAll","getTransferRecords","getBankUserList","memberStart",
+                "memberStop","loginOut","getManagerTranscations","adopt","NoPassage"};
+
+        //如果是管理员的就不拦截
+        String server = "admin-service";
+        if (server.equals(pathArr[2])){
+            return false;
+        }
+
         //3.2 如果路径是 /auth-service/login ，当前拦截不执行
         for (String path  : notVerifiedPath) {
 

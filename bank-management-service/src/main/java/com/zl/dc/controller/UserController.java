@@ -11,6 +11,7 @@ import com.zl.dc.pojo.BankUser;
 import com.zl.dc.service.UserService;
 import com.zl.dc.util.BankUserPasswordUtil;
 import com.zl.dc.util.NumberValid;
+import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.BaseResult;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -122,8 +123,8 @@ public class UserController {
     @PostMapping("/query")
     public BaseResult queryUser(@RequestBody BankUserVo bankUser) {
         BankUser user;
-        //1 通过手机号查询用户
-        if (bankUser.getUserPhone().equals("")) {
+
+        if (!StringUtils.isNotBlank(bankUser.getUserPhone())) {
             //通过身份证号查询用户信息
             user = this.userService.getBankUserByIdCard(bankUser.getIdCard());
         } else {
@@ -150,7 +151,8 @@ public class UserController {
                 //将修改手机号之后的用户的信息保存到redis中，使用用户id作为key
                 redisTemplate.opsForValue().set(user.getUserId().toString(),JSONObject.toJSONString(user));
                 return new BaseResult(0,"登录成功").append("user",user);
-            }else{
+            }
+            else{
                 //密码错误
                 //获取当前的小时
                 Calendar calendar = Calendar.getInstance();
@@ -219,7 +221,7 @@ public class UserController {
                 //密码错误次数达到3次之后会暂时将账号冻结，在冻结时间之内不允许该用户登录
                 // 这里先从redis里查该用户是否被禁止登录
                 String timesStr = redisTemplate.opsForValue().get(user.getUserPhone()+user.getIdCard());
-                if (timesStr.equals("3")){
+                if (StringUtils.isNotBlank(timesStr) && timesStr.equals("3")){
                     return ResponseEntity.ok(new BaseResult(3,"您今天的输错密码的次数为3次，请明天再试，或者选择忘记密码"));
                 }
 
@@ -229,7 +231,6 @@ public class UserController {
                 //存redis5分钟，因为用户的信息是使用手机号为key存放到redis中的，为了防止将用户信息覆盖，
                 // 因此将这里的key设置为手机号+验证码
                 redisTemplate.opsForValue().set(bankUser.getUserPhone()+code, code, 5, TimeUnit.MINUTES);
-                System.out.println("手机验证码为:" + code);
                 //3 发送短信
                 SendSmsResponse smsResponse = SmsLogin.sendSms(bankUser.getUserPhone(), code);
                 if ("OK".equalsIgnoreCase(smsResponse.getCode())) {
@@ -272,7 +273,6 @@ public class UserController {
             //发送短信
             //1、生成验证码
             String code = RandomStringUtils.randomNumeric(6);
-            System.out.println("手机验证码为:" + code);
             //存redis5分钟，因为用户的信息是使用手机号为key存放到redis中的，为了防止将用户信息覆盖，
             // 因此将这里的key设置为手机号+验证码
             redisTemplate.opsForValue().set(user.getUserPhone()+code,code,5,TimeUnit.MINUTES);
@@ -371,14 +371,14 @@ public class UserController {
      */
     @PostMapping("/updatePhoneSms")
     public ResponseEntity<BaseResult> updatePhoneSms(@RequestBody BankUserVo user){
-        boolean isOldPhone = user.getOldPhone() != null && !"".equals(user.getOldPhone());
+        boolean isOldPhone = StringUtils.isNotBlank(user.getOldPhone());
         if (isOldPhone){
             //验证旧手机号是否正确
             if (!NumberValid.verifyPhone(user.getOldPhone())){
                 return ResponseEntity.ok(new BaseResult(1, "该手机号不正确"));
             }
         }
-        boolean isUserPhone = user.getUserPhone() != null && !"".equals(user.getUserPhone());
+        boolean isUserPhone = StringUtils.isNotBlank(user.getUserPhone());
         if (isUserPhone){
             //验证新手机号是否正确
             if (!NumberValid.verifyPhone(user.getUserPhone())){
@@ -393,7 +393,7 @@ public class UserController {
             if(isOldPhone && !isUserPhone){
                 //从redis中根据手机号获取对应的用户信息
                 String bankUserStr = redisTemplate.opsForValue().get(user.getOldPhone());
-                if (bankUserStr == null || "".equals(bankUserStr)){
+                if (!StringUtils.isNotBlank(bankUserStr)){
                     return ResponseEntity.ok(new BaseResult(1, "该手机未注册账号，请重新输入"));
                 }
 
@@ -425,7 +425,6 @@ public class UserController {
         //存redis5分钟，因为用户的信息是使用手机号为key存放到redis中的，为了防止将用户信息覆盖，
         // 因此将这里的key设置为手机号+验证码
         redisTemplate.opsForValue().set(phone+code,code,5,TimeUnit.MINUTES);
-        System.out.println("手机验证码为:" + code);
         //3、发送短信
         SendSmsResponse smsResponse;
         try {
@@ -478,7 +477,7 @@ public class UserController {
      * @date 2019/8/11 20:26
      */
     @PostMapping("/updatePhone")
-    public ResponseEntity<BaseResult> updatePhone(BankUserVo bankUser){
+    public ResponseEntity<BaseResult> updatePhone(@RequestBody BankUserVo bankUser){
         if (StringUtils.isNoneBlank(bankUser.getUserPhone(),bankUser.getCode())){
             //验证手机号是否正确
             if (!NumberValid.verifyPhone(bankUser.getUserPhone())){
@@ -486,7 +485,7 @@ public class UserController {
             }
 
             String code = redisTemplate.opsForValue().get(bankUser.getUserPhone()+bankUser.getCode());
-            if(code != null && !"".equals(code)){
+            if(StringUtils.isNotBlank(code)){
                 //修改手机号之前先查询是否已经存在
                 BankUser bankUserByUserPhone = userService.getBankUserByUserPhone(bankUser.getUserPhone());
                 if (bankUserByUserPhone != null){
@@ -536,6 +535,13 @@ public class UserController {
         return ResponseEntity.ok(new BaseResult(1, "认证失败，请稍后重试"));
     }
 
+    /**
+     * @author pds
+     * @param userId
+     * @return com.zl.dc.vo.BaseResult
+     * @description 退出登录
+     * @date 2019/8/19 19:52
+     */
     @GetMapping("/signOut")
     public BaseResult signOut(@RequestParam("userId") Integer userId){
         BankUser user = userService.selectBankUserByUid(userId);
@@ -545,5 +551,29 @@ public class UserController {
             return new BaseResult(0, "退出登录成功");
         }
         return new BaseResult(1, "退出登录失败");
+    }
+
+    /**
+     * @author pds
+     * @param bankUserVo
+     * @return org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description 设置默认银行卡
+     * @date 2019/8/19 19:53
+     */
+    @PostMapping("/setDefaultBankCard")
+    public ResponseEntity<BaseResult> setDefaultBankCard(@RequestBody BankUserVo bankUserVo){
+        if (StringUtils.isNotBlank(bankUserVo.getPassword())){
+            Boolean set = userService.setDefaultBankCard(bankUserVo);
+            if (set){
+                BankUser user = userService.selectBankUserByUid(bankUserVo.getUserId());
+                bankUserVo.setDefaultBankCard(StarUtil.StringAddStar(user.getDefaultBankCard(),6,4));
+                bankUserVo.setBankCardId(null);
+                bankUserVo.setPassword(null);
+                return ResponseEntity.ok(new BaseResult(0, "设置成功").append("data",bankUserVo));
+            }else {
+                return ResponseEntity.ok(new BaseResult(1, "设置失败"));
+            }
+        }
+        return ResponseEntity.ok(new BaseResult(1, "设置失败"));
     }
 }

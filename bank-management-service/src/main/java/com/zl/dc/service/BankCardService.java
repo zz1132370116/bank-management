@@ -10,6 +10,7 @@ import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.OtherBankCard;
 import com.zl.dc.util.MD5;
 import com.zl.dc.util.StarUtil;
+import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.TransferValueVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -278,5 +279,58 @@ public class BankCardService {
     public Integer addOtherBankCard(OtherBankCard otherBankCard){
         Integer insert = otherBankCardMapper.insert(otherBankCard);
         return insert;
+    }
+
+    /**
+     * @author pds
+     * @param enterpriseBankCardNumber
+     * @param userBankCardNumber
+     * @param bankInIdentification
+     * @param money
+     * @return java.lang.Boolean
+     * @description 企业批量转账
+     * @date 2019/8/20 13:43
+     */
+    public Boolean enterpriseTransfer(String enterpriseBankCardNumber, String userBankCardNumber, String bankInIdentification, BigDecimal money){
+        BankCard enterpriseBankCard = selectBankCardByNum(enterpriseBankCardNumber);
+        if (enterpriseBankCard == null){
+            return false;
+        }
+        //本行卡
+        if ("999999".equals(userBankCardNumber.substring(0,6))){
+            BankCard bankCard = selectBankCardByNum(userBankCardNumber);
+            if (bankCard == null){
+                return false;
+            }
+            BigDecimal balance = bankCard.getBankCardBalance().add(money);
+            bankCard.setBankCardBalance(balance);
+            Integer user = bankCardMapper.updateByPrimaryKeySelective(bankCard);
+            if (user == 0){
+                return false;
+            }
+        }
+        //非本行卡
+        else {
+            switch (bankInIdentification){
+                case "PSBC":{
+                    //调用中国邮政储蓄银行的转账接口
+                    break;
+                }
+                case "ABC":{
+                    //调用中国农业银行的转账接口
+                    break;
+                }
+                default:{
+
+                }
+            }
+        }
+        BigDecimal enterpriseBalance = enterpriseBankCard.getBankCardBalance().subtract(money);
+        enterpriseBankCard.setBankCardBalance(enterpriseBalance);
+        Integer enterprise = bankCardMapper.updateByPrimaryKeySelective(enterpriseBankCard);
+        if (enterprise == 0){
+            return false;
+        }
+        return true;
     }
 }
