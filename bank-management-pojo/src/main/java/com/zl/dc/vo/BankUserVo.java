@@ -21,7 +21,7 @@ public class BankUserVo {
     private String userPhone;
     private String userPassword;
     private Byte userStatus;
-    private Integer defaultBankCardId;
+    private String defaultBankCard;
     private String idCard;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -29,21 +29,18 @@ public class BankUserVo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date gmtModified;
-
-
     /**
      * 接收验证码
      */
-    @Transient
     private String code;
     /**
      * 修改手机功能的原手机号
      */
-    @Transient
     private String oldPhone;
     /**
      * 修改密码功能的确认密码
      */
-    @Transient
     private String passwordConfig;
+    private Integer bankCardId;
+    private String password;
 }

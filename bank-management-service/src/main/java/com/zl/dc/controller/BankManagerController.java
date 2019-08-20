@@ -48,6 +48,7 @@ public class BankManagerController {
         BankManager bankManager1 = bankManagerService.getLogin(managerName);
         if (bankManager1 != null) {
             //比较用户密码
+            //加密校验
             managerPassword= MD5.GetMD5Code(managerPassword);
             if (managerPassword.equals(bankManager1.getManagerPassword())) {
                 redisTemplate.opsForValue().set(bankManager1.getManagerName(), bankManager1.getManagerPassword());

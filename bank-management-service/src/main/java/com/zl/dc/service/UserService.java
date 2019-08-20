@@ -4,9 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zl.dc.api.VerifyIdCard;
 import com.zl.dc.mapper.UserMapper;
+import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankUser;
+import com.zl.dc.pojo.OtherBankCard;
+import com.zl.dc.util.MD5;
 import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.BaseResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -38,6 +42,8 @@ public class UserService {
      private UserMapper userMapper;
      @Resource
      private StringRedisTemplate redisTemplate;
+     @Autowired
+     private BankCardService bankCardService;
 
     /**
      * @author: zhanglei
@@ -186,5 +192,27 @@ public class UserService {
         redisTemplate.opsForValue().set(user.getUserId().toString(), JSON.toJSONString(user));
 
         return i;
+    }
+
+    /**
+     * @author pds
+     * @param bankUserVo
+     * @return java.lang.Boolean
+     * @description 设置默认银行卡
+     * @date 2019/8/20 9:13
+     */
+    public Boolean setDefaultBankCard(BankUserVo bankUserVo) {
+        BankCard bankCard = bankCardService.selectBankCardByid(bankUserVo.getBankCardId());
+        if (bankCard != null){
+            String password = MD5.GetMD5Code(bankUserVo.getPassword());
+            if (password.equals(bankCard.getBankCardPassword())){
+                BankUser user = new BankUser();
+                user.setUserId(bankUserVo.getUserId());
+                user.setDefaultBankCard(bankCard.getBankCardNumber());
+                userMapper.updateByPrimaryKeySelective(user);
+                return true;
+            }
+        }
+        return false;
     }
 }

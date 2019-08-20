@@ -141,8 +141,10 @@ public class BankManagerService {
             for (TransferRecord record : transferRecords) {
                 BankUser bankUser = bankUserMapper.selectByPrimaryKey(record.getUserId());
                 //赋值
+                record.setBankOutCard(StarUtil.StringAddStar(record.getBankOutCard(),6,4));
+                record.setBankInCard(StarUtil.StringAddStar(record.getBankInCard(),6,4));
                 record.setUserName(bankUser.getUserName());
-                //获取转出卡所属银行
+                //获取转入卡所属银行
                 criteria3.andEqualTo("bankIdentification", record.getBankInIdentification());
                 record.setBankOutCardName("五仁银行");
                 //获取转入卡所属银行
@@ -161,7 +163,7 @@ public class BankManagerService {
      * @description: 处理身份证号码
      * @data: 2019/8/7 11:25
      */
-    public String handlingIdCards(String idcard) {
+    public static String handlingIdCards(String idcard) {
         //处理身份证号
         StringBuilder sb = new StringBuilder(idcard);
         sb.replace(6, 14, "****");
@@ -178,12 +180,24 @@ public class BankManagerService {
     public List<BankUser> getUserListByParams(String userName, String idCard,Integer pageNum) {
         if (StringUtils.isNotBlank(idCard) && StringUtils.isNotBlank(userName)){
             List<BankUser> userListByParams = bankUserMapper.getUserListByParams(userName, idCard, pageNum);
+            for (BankUser userListByParam : userListByParams) {
+
+                userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
+            }
             return userListByParams;
         }else if (StringUtils.isNotBlank(userName)){
             List<BankUser> bankUsers =bankUserMapper.getUserListByUserName(userName,pageNum);
+            for (BankUser userListByParam : bankUsers) {
+
+                userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
+            }
             return bankUsers;
         }else if(StringUtils.isNotBlank(idCard)){
             List<BankUser> bankUsers =bankUserMapper.getUserListByIDCARD(idCard,pageNum);
+            for (BankUser userListByParam : bankUsers) {
+
+                userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
+            }
             return bankUsers;
         }
 
@@ -229,6 +243,16 @@ public class BankManagerService {
      */
     public List<ManagerTranscation> getManagerTranscations(Integer pageNum) {
         List<ManagerTranscation> list =  managerTranscationMapper.getManagerTranscations(pageNum);
+        if (list !=null){
+            for (ManagerTranscation managerTranscation : list) {
+                if (managerTranscation.getUserId() !=null){
+                    managerTranscation.setBankUser(bankUserMapper.selectByPrimaryKey(managerTranscation.getUserId()));
+                    managerTranscation.getBankUser().setIdCard(handlingIdCards(managerTranscation.getBankUser().getIdCard()));
+                }
+
+            }
+        }
+
         return list;
     }
 
@@ -262,13 +286,7 @@ public class BankManagerService {
 
         bankCardMapper.updateByPrimaryKeySelective(bankCard);
 
-        //
-        try {
-            SendSmsResponse sendSmsResponse = SendUpgradeCardOK.sendSms(bankCard.getBankCardPhone(), StarUtil.StringAddStar(bankCard.getBankCardNumber(), 6, 4), managerTranscation1.getGmtModified());
-            System.out.println("Message=" + sendSmsResponse.getMessage());
-        } catch (ClientException e) {
-            e.printStackTrace();
-        }
+
     }
 
     /**
@@ -289,13 +307,7 @@ public class BankManagerService {
         managerTranscation1.setGmtModified(new Date());
         managerTranscation1.setManagerId(2);
         managerTranscationMapper.updateByPrimaryKeySelective(managerTranscation1);
-        criteria.andEqualTo("bankCardNumber",managerTranscation1.getBankCard());
-        BankCard bankCard = bankCardMapper.selectOneByExample(example);
-        try {
-            SendUpgradeCardOK.sendSms(bankCard.getBankCardPhone(), StarUtil.StringAddStar(bankCard.getBankCardNumber(),6,4),managerTranscation1.getGmtModified());
-        } catch (ClientException e) {
-            e.printStackTrace();
-        }
+
     }
 
 

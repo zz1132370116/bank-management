@@ -105,31 +105,33 @@ public class AuthService {
             String token = JwtUtils.generateToken(new UserInfo(bankUser.getUserId(), bankUser.getUserName()), jwtProperties.getPrivateKey(), jwtProperties.getExpire());
             baseResult.append("token",token);
 
+            BankUserVo bankUserVo = new BankUserVo();
+
+            bankUserVo.setUserId(bankUser.getUserId());
             String userName = bankUser.getUserName();
             if (StringUtils.isNotBlank(userName) && userName.length() > 1){
                 String first = userName.substring(0,1);
                 String end = userName.substring(userName.length()-1);
                 if (userName.length() == 2){
-                    bankUser.setUserName(first+"*");
+                    bankUserVo.setUserName(first+"*");
                 }else if(userName.length() >= 3){
                     StringBuffer stringBuffer = new StringBuffer();
                     for (int i = 0;i < userName.length()-2;i++){
                         stringBuffer.append("*");
                     }
-                    bankUser.setUserName(first+stringBuffer.toString()+end);
+                    bankUserVo.setUserName(first+stringBuffer.toString()+end);
                 }
             }
 
             String phone = bankUser.getUserPhone();
-            bankUser.setUserPassword(StarUtil.StringAddStar(phone,3,4));
+            bankUserVo.setUserPhone(StarUtil.StringAddStar(phone,3,4));
 
-            //将用户的一些信息置空
-            bankUser.setUserPassword(null);
-            bankUser.setIdCard(null);
-            byte status = 0;
-            bankUser.setUserStatus(status);
-            bankUser.setDefaultBankCard("");
-            baseResult.append("user",bankUser);
+            if (StringUtils.isNotBlank(bankUser.getDefaultBankCard())){
+                bankUserVo.setDefaultBankCard(StarUtil.StringAddStar(bankUser.getDefaultBankCard(),6,4));
+            } else {
+                bankUserVo.setDefaultBankCard("");
+            }
+            baseResult.append("user",bankUserVo);
         }
         return baseResult;
     }

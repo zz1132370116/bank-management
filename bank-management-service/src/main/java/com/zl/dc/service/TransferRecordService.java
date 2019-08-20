@@ -224,9 +224,10 @@ public class TransferRecordService {
     /**
      * @author pds
      * @param enterpriseEmployees
+     * @param bankEnterprise
      * @return java.util.List<com.zl.dc.vo.EnterpriseEmployee>
      * @description 企业批量转账
-     * @date 2019/8/16 20:23
+     * @date 2019/8/20 13:42
      */
     public List<EnterpriseEmployee> addTransferRecordDueToBankEnterprise(List<EnterpriseEmployee> enterpriseEmployees, BankEnterprise bankEnterprise){
         List<EnterpriseEmployee> enterpriseEmployeeList = new ArrayList<>();
@@ -236,11 +237,12 @@ public class TransferRecordService {
         transferRecord.setTransferType(Byte.parseByte("105"));
         transferRecord.setUserId(bankEnterprise.getEnterpriseId());
         transferRecord.setBankOutCard(bankEnterprise.getEnterpriseBankCard());
+        transferRecord.setTransferNote("企业转账");
 
         for (EnterpriseEmployee enterpriseEmployee : enterpriseEmployees) {
             transferRecord.setTransferRecordUuid(UUID.randomUUID().toString().replaceAll("-", ""));
             transferRecord.setInCardUserName(enterpriseEmployee.getUserName());
-            transferRecord.setBankInIdentification("");
+            transferRecord.setBankInIdentification(enterpriseEmployee.getBankInIdentification());
             transferRecord.setBankInCard(enterpriseEmployee.getUserBankCardNumber());
             transferRecord.setGmtModified(new Date());
             transferRecord.setGmtCreate(new Date());
@@ -250,7 +252,12 @@ public class TransferRecordService {
             //新增转账记录
             this.selectTransferRecordByUuid(transferRecord.getTransferRecordUuid());
             //扣款
-            boolean transferStatus = bankCardService.bankCardTransferBusines(bankEnterprise.getEnterpriseBankCardId(), enterpriseEmployee.getUserBankCardNumber(), enterpriseEmployee.getMoney());
+            boolean transferStatus = bankCardService.enterpriseTransfer(
+                    bankEnterprise.getEnterpriseBankCard(),
+                    enterpriseEmployee.getUserBankCardNumber(),
+                    enterpriseEmployee.getBankInIdentification(),
+                    enterpriseEmployee.getMoney()
+            );
 
             if (transferStatus) {
                 //成功

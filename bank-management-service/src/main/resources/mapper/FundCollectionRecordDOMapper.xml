@@ -22,7 +22,7 @@
 
   <insert id="insert" parameterType="com.zl.dc.pojo.FundCollectionRecordDO">
     insert into fund_collection_record
-    <include refid="Insert_Column_List"/>
+    (<include refid="Insert_Column_List"/>)
     values (#{planId,jdbcType=INTEGER}, #{recordUuid,jdbcType=INTEGER},
       #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP})
   </insert>
