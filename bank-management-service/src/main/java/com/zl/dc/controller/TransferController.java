@@ -2,6 +2,7 @@ package com.zl.dc.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.zl.dc.api.AccessBank;
+import com.zl.dc.config.RedisInsertUtil;
 import com.zl.dc.pojo.*;
 import com.zl.dc.service.BankCardService;
 import com.zl.dc.service.SubordinateBankService;
@@ -19,7 +20,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -90,12 +93,21 @@ public class TransferController {
         if (bankCard == null) {
             return ResponseEntity.ok(new BaseResult(1, "未找到用户操作卡，请联系管理员"));
         }
+        //密码错误次数达到3次之后会暂时将冻结，冻结今天的剩余时间，即在过了24:00之后就可以登录，在冻结时间之内不允许该用户登录
+        //查询redies该卡是否被锁定
+        String timesStr = stringRedisTemplate.opsForValue().get("BankCard"+bankCard.getBankCardId());
+        if (timesStr != null && timesStr.equals("3")){
+            return ResponseEntity.ok(new BaseResult(1, "您今天的输错密码达到上限，请明天再试，或者选择忘记密码"));
+        }
 
         boolean passwordStatus = bankCardService.BankCardPasswordCheck(bankCard, transferValueVo.getPassword());
+//       当输错密码时
         if(!passwordStatus){
-            return ResponseEntity.ok(new BaseResult(1, "密码错误请重新输入"));
+            //调用方法在redis缓存中存入错误信息
+            RedisInsertUtil.addingData(stringRedisTemplate,"BankCard"+bankCard.getBankCardId(),timesStr);
+            return ResponseEntity.ok(new BaseResult(1, "密码输入错误，每日限制3次"));
         }
-        if ("100".equals(bankCard.getBankCardStatus().toString())) {
+        if (!"100".equals(bankCard.getBankCardStatus().toString())) {
             return ResponseEntity.ok(new BaseResult(1, "银行卡状态异常，请查看该卡状态"));
         }
         if (bankCard.getBankCardBalance().compareTo(transferValueVo.getMuchMoney()) == -1) {
@@ -127,7 +139,7 @@ public class TransferController {
         }
         //如果手机为不为空，银行卡号为空
         if (StringUtils.isNotBlank(transferValueVo.getBankPhone()) && StringUtils.isBlank(transferValueVo.getInBankCard())) {
-           //根据手机查询用户
+            //根据手机查询用户
             BankUser bankUser = userService.getBankUserByUserPhone(transferValueVo.getBankPhone());
 
             if (StringUtils.isBlank(bankUser.getDefaultBankCard())) {
@@ -138,6 +150,7 @@ public class TransferController {
             }
             //添加收款银行卡号
             transferValueVo.setInBankCard(bankUser.getDefaultBankCard());
+            transferValueVo.setInBank("BOWR");
         }
 
 
@@ -147,12 +160,12 @@ public class TransferController {
             return ResponseEntity.ok(new BaseResult(1, "转账记录生成异常请通知管理员"));
         }
         //操作银行卡扣款 转账状态
-        boolean transferStatus = bankCardService.bankCardTransferBusines(transferValueVo.getOutBankCardID(),transferValueVo.getInBankCard(),transferValueVo.getMuchMoney());
+        boolean transferStatus = bankCardService.bankCardTransferBusines(transferValueVo.getOutBankCardID(), transferValueVo.getInBankCard(), transferValueVo.getMuchMoney());
 //          如果转账失败
         if (!transferStatus) {
             boolean transferFailedStatus = transferRecordService.transferFailedOperation(transferRecord);
             if (transferFailedStatus) {
-                return ResponseEntity.ok(new BaseResult(1, "转账失败"));
+                return ResponseEntity.ok(new BaseResult(0, "转账失败"));
             } else {
                 return ResponseEntity.ok(new BaseResult(1, "操作异常请通知管理员"));
             }
@@ -160,7 +173,7 @@ public class TransferController {
         //如果转账成功
         boolean transferSuccessfulStatus = transferRecordService.transferSuccessfulOperation(transferRecord);
         if (transferSuccessfulStatus) {
-            return ResponseEntity.ok(new BaseResult(1, "转账成功"));
+            return ResponseEntity.ok(new BaseResult(0, "转账成功"));
         } else {
             return ResponseEntity.ok(new BaseResult(1, "转账记录生成异常请通知管理员"));
         }

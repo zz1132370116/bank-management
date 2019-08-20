@@ -141,8 +141,8 @@ public class AdminService {
      * @description: 查询用户申请中的提卡信息
      * @data: 2019/8/9 14:59
      */
-    public List<ManagerTranscation> getManagerTranscations(ManagerTranscation managerTranscation) {
-        List<ManagerTranscation> managerTranscations = adminClient.getManagerTranscations(managerTranscation);
+    public List<ManagerTranscation> getManagerTranscations(Integer pageNum) {
+        List<ManagerTranscation> managerTranscations = adminClient.getManagerTranscations(pageNum);
         if (managerTranscations !=null){
             return managerTranscations;
         }

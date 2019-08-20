@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.zl.dc.api.AccessBank;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankEnterprise;
+import com.zl.dc.pojo.OtherBankCard;
 import com.zl.dc.service.BankCardService;
 import com.zl.dc.service.BankEnterpriseService;
 import com.zl.dc.service.TransferRecordService;

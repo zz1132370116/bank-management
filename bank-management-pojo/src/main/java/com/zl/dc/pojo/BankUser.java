@@ -20,7 +20,7 @@ import java.util.Date;
 @Table(name = "bank_user")
 public class BankUser {
     /**
-     * 主键自增
+     * 用户id
      */
     @Id
     @Column(name = "user_id")
@@ -36,12 +36,15 @@ public class BankUser {
     @Column(name = "user_phone")
     private String userPhone;
     /**
-     * 用户密码
+     * 登录密码
      */
     @Column(name = "user_password")
     private String userPassword;
     /**
      * 用户状态
+     * 100 未实名
+     * 101 已实名
+     * 102 登录冻结
      */
     @Column(name = "user_status")
     private Byte userStatus;

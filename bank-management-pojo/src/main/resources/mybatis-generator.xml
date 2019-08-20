@@ -70,7 +70,13 @@
         <!--               selectByExampleQueryId="false">-->
         <!--        </table>-->
 
-        <table tableName="other_bank_card" domainObjectName="OtherBankCardDO"
+<!--        <table tableName="other_bank_card" domainObjectName="OtherBankCardDO"-->
+<!--               enableDeleteByExample="false" enableCountByExample="false"-->
+<!--               enableUpdateByExample="false" enableSelectByExample="false"-->
+<!--               selectByExampleQueryId="false">-->
+<!--        </table>-->
+
+        <table tableName="fund_collection_record" domainObjectName="FundCollectionRecordDO"
                enableDeleteByExample="false" enableCountByExample="false"
                enableUpdateByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false">
