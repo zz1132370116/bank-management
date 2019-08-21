@@ -59,6 +59,6 @@ public interface TransferRecordMapper extends Mapper<TransferRecord> {
       * @description: 查询记录数量
       * @data: 2019/8/21 14:35
       */
-    @Select("select count(transfer_record_id) from transfer_record")
+    @Select(" EXPLAIN SELECT * FROM transfer_record")
     Integer selectcount();
 }
