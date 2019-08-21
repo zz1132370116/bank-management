@@ -1,6 +1,5 @@
 package com.zl.dc.vo;
 
-import com.sun.xml.internal.org.jvnet.fastinfoset.sax.FastInfosetReader;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

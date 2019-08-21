@@ -1,11 +1,11 @@
 server:
   port: 10010
-#  ssl:
-#    key-store: classpath:tomcat.keystore
-#    key-alias: tomcat
-#    enabled: true
-#    key-store-password: 123456
-#    key-store-type: JKS
+  ssl:
+    key-store: D:/keys/bank.keystore
+    key-alias: bank
+    enabled: true
+    key-store-password: 123456
+    key-store-type: PKCS12
 
 spring:
   application:
@@ -21,7 +21,7 @@ eureka:
       defaultZone: http://10.1.12.77:10081/eureka
   instance:
     prefer-ip-address: true
-    ip-address: 127.0.0.1
+    ip-address: 10.1.12.182
     instance-id: ${eureka.instance.ip-address}.${server.port}
     lease-renewal-interval-in-seconds: 3
     lease-expiration-duration-in-seconds: 10
@@ -29,6 +29,9 @@ eureka:
 zuul:
   prefix: /v1
   retryable: true
+  host:
+    socket-timeout-millis: 60000
+    connect-timeout-millis: 60000
   routes:
     web-service: /web/**
     auth-service: /auth/**
@@ -46,7 +49,7 @@ hystrix:
       execution:
         isolation:
           thread:
-            timeoutInMilliseconds: 60000
+            timeoutInMilliseconds: 800000
 sc:
   jwt:
     pubKeyPath: D:/rsa/rsa.pub # 公钥地址
