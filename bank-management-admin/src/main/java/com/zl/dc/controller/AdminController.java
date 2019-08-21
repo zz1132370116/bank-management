@@ -142,6 +142,7 @@ public class AdminController {
            List<BankUser> users = adminService.getUserListByParams(bankUser);
            if (users !=null){
                Integer integer = adminService.selectBankUserAll();
+
                int totalPageNum = (integer +10 - 1) / 10;
                return ResponseEntity.ok(new BaseResult(0,"条件查询成功").append("data",users).append("totalPageNum",totalPageNum));
            }
@@ -192,7 +193,7 @@ public class AdminController {
      */
     @GetMapping("/loginOut/{userName}")
     public ResponseEntity<BaseResult>loginOut(@PathVariable("userName")String userName){
-        if (userName !=null && userName.equals("")){
+        if (userName !=null && !userName.equals("")){
             adminService.loginOut(userName);
             return ResponseEntity.ok(new BaseResult(0,"成功"));
         }

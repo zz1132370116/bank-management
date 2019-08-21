@@ -200,4 +200,5 @@ public class AdminService {
         String s = adminClient.selectBankUserAll();
         return Integer.parseInt(s);
     }
+
 }

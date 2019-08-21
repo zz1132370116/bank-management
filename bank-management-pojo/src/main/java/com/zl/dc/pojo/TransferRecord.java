@@ -169,4 +169,7 @@ public class TransferRecord {
     @Transient
     private Integer totalPageNum;
 
+    @Transient
+    private String rows;
+
 }
