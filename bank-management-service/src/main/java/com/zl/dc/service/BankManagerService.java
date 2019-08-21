@@ -192,7 +192,7 @@ public class BankManagerService {
         }else if (StringUtils.isNotBlank(userName)){
             List<BankUser> bankUsers =bankUserMapper.getUserListByUserName(userName,pageNum);
             for (BankUser userListByParam : bankUsers) {
-                if (!userListByParam.getIdCard().equals("") && userListByParam.getIdCard()!=null){
+                if (userListByParam.getIdCard()!=null &&!userListByParam.getIdCard().equals("")  ){
                     userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
                 }
 
@@ -201,7 +201,7 @@ public class BankManagerService {
         }else if(StringUtils.isNotBlank(idCard)){
             List<BankUser> bankUsers =bankUserMapper.getUserListByIDCARD(idCard,pageNum);
             for (BankUser userListByParam : bankUsers) {
-                if (!userListByParam.getIdCard().equals("") && userListByParam.getIdCard()!=null){
+                if (userListByParam.getIdCard()!=null &&!userListByParam.getIdCard().equals("")  ){
                     userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
                 }
             }

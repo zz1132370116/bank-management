@@ -54,7 +54,7 @@ public class AdminService {
      * @author: zhanglei
      * @param: []
      * @return:java.util.List<com.zl.dc.pojo.BankManager>
-     * @description: 查询会员数
+     * @description: 查询转账记录
      * @data: 2019/8/6 13:43
      */
     public List<TransferRecord> GetRecords(Integer pageNum) {
