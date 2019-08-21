@@ -74,8 +74,11 @@ public class BankManagerService {
             //通过用户id查询当前用户信息
             BankUser bankUser = bankUserMapper.selectByPrimaryKey(transferRecord.getUserId());
             //处理身份证号
-            String idCards = handlingIdCards(bankUser.getIdCard());
-            bankUser.setIdCard(idCards);
+            if (bankUser.getIdCard()!=null && !bankUser.getIdCard().equals("")){
+                String idCards = handlingIdCards(bankUser.getIdCard());
+                bankUser.setIdCard(idCards);
+            }
+
             transferRecord.setUserName(bankUser.getUserName());
     if (transferRecord.getBankInIdentification() !=null && !transferRecord.getBankInIdentification().equals("")){
 
@@ -189,15 +192,18 @@ public class BankManagerService {
         }else if (StringUtils.isNotBlank(userName)){
             List<BankUser> bankUsers =bankUserMapper.getUserListByUserName(userName,pageNum);
             for (BankUser userListByParam : bankUsers) {
+                if (!userListByParam.getIdCard().equals("") && userListByParam.getIdCard()!=null){
+                    userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
+                }
 
-                userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
             }
             return bankUsers;
         }else if(StringUtils.isNotBlank(idCard)){
             List<BankUser> bankUsers =bankUserMapper.getUserListByIDCARD(idCard,pageNum);
             for (BankUser userListByParam : bankUsers) {
-
-                userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
+                if (!userListByParam.getIdCard().equals("") && userListByParam.getIdCard()!=null){
+                    userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
+                }
             }
             return bankUsers;
         }
