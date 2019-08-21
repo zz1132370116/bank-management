@@ -63,5 +63,14 @@ public interface UserMapper extends Mapper<BankUser> {
             @Result(column = "gmt_modified",property = "gmtModified"),
     })
     List<BankUser> GetUserList(@Param("pageNum") Integer pageNum);
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 查询用户数量
+      * @data: 2019/8/21 14:32
+      */
+    @Select("SELECT COUNT(user_id) FROM bank_user ")
+    Integer selectcount();
 }
 

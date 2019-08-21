@@ -310,17 +310,37 @@ public class BankManagerService {
 
     }
 
-
-    public List<ManagerTranscation> selectManagerTranscationAll() {
-        List<ManagerTranscation> managerTranscations = managerTranscationMapper.selectAll();
-        return managerTranscations;
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 查询事务数量
+      * @data: 2019/8/21 14:35
+      */
+    public String selectManagerTranscationAll() {
+        Integer selectcount = managerTranscationMapper.selectcount();
+        return selectcount.toString();
     }
-
-    public List<TransferRecord> selectTransferRecordAll() {
-        return transferRecordMapper.selectAll();
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 查询转账记录数量
+      * @data: 2019/8/21 14:35
+      */
+    public String selectTransferRecordAll() {
+        Integer selectcount = transferRecordMapper.selectcount();
+        return selectcount .toString();
     }
-
-    public List<BankUser> selectBankUserAll() {
-        return bankUserMapper.selectAll();
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 查询用户数量
+      * @data: 2019/8/21 14:35
+      */
+    public String  selectBankUserAll() {
+        Integer i = bankUserMapper.selectcount();
+        return i.toString();
     }
 }

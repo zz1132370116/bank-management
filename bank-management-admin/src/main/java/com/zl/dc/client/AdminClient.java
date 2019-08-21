@@ -40,27 +40,27 @@ public interface AdminClient {
      * @data: 2019/8/6 13:43
      */
     @GetMapping("/selectBankUserAll")
-    List<BankUser> selectBankUserAll();
+   String selectBankUserAll();
 
     /**
      * @author: zhanglei
      * @param: []
      * @return:java.util.List<com.zl.dc.pojo.BankManager>
-     * @description: 查询记录数
+     * @description: 查询转账记录数
      * @data: 2019/8/6 13:44
      */
     @GetMapping("/selectTransferRecordAll")
-    List<TransferRecord> selectTransferRecordAll();
+   String  selectTransferRecordAll();
 
     /**
      * @author: zhanglei
      * @param: []
      * @return:java.util.List<com.zl.dc.pojo.BankManager>
-     * @description: 查询异常数
+     * @description: 查询事务数
      * @data: 2019/8/6 13:45
      */
     @GetMapping("/selectManagerTranscationAll")
-    List<ManagerTranscation> selectManagerTranscationAll();
+   String selectManagerTranscationAll();
     /**
      * @author: zhanglei
      * @param: []
