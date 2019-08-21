@@ -50,6 +50,7 @@ public class BankManagerService {
 
         for (BankUser user : users) {
             if (user.getIdCard()!=null && !user.getIdCard().equals("")) {
+
                 String s = handlingIdCards(user.getIdCard());
                 user.setIdCard(s);
 
@@ -246,10 +247,12 @@ public class BankManagerService {
         if (list !=null){
             for (ManagerTranscation managerTranscation : list) {
                 if (managerTranscation.getUserId() !=null){
-                    managerTranscation.setBankUser(bankUserMapper.selectByPrimaryKey(managerTranscation.getUserId()));
-                    managerTranscation.getBankUser().setIdCard(handlingIdCards(managerTranscation.getBankUser().getIdCard()));
+                    BankUser bankUser = bankUserMapper.selectByPrimaryKey(managerTranscation.getUserId());
+                            managerTranscation.setBankUser(bankUser);
+                    if (bankUser.getIdCard()!=null && !bankUser.getIdCard().equals("")){
+                        managerTranscation.getBankUser().setIdCard(handlingIdCards(managerTranscation.getBankUser().getIdCard()));
+                    }
                 }
-
             }
         }
 
