@@ -52,4 +52,13 @@ public interface TransferRecordMapper extends Mapper<TransferRecord> {
             @Result(column = "gmt_modified",property = "gmtModified")
     })
     List<TransferRecord> GetRecords(@Param("pageNum") Integer pageNum);
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 查询记录数量
+      * @data: 2019/8/21 14:35
+      */
+    @Select("select count(transfer_record_id) from transfer_record")
+    Integer selectcount();
 }

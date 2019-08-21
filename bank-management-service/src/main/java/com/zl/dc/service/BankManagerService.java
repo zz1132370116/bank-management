@@ -50,6 +50,7 @@ public class BankManagerService {
 
         for (BankUser user : users) {
             if (user.getIdCard()!=null && !user.getIdCard().equals("")) {
+
                 String s = handlingIdCards(user.getIdCard());
                 user.setIdCard(s);
 
@@ -73,8 +74,11 @@ public class BankManagerService {
             //通过用户id查询当前用户信息
             BankUser bankUser = bankUserMapper.selectByPrimaryKey(transferRecord.getUserId());
             //处理身份证号
-            String idCards = handlingIdCards(bankUser.getIdCard());
-            bankUser.setIdCard(idCards);
+            if (bankUser.getIdCard()!=null && !bankUser.getIdCard().equals("")){
+                String idCards = handlingIdCards(bankUser.getIdCard());
+                bankUser.setIdCard(idCards);
+            }
+
             transferRecord.setUserName(bankUser.getUserName());
     if (transferRecord.getBankInIdentification() !=null && !transferRecord.getBankInIdentification().equals("")){
 
@@ -188,15 +192,18 @@ public class BankManagerService {
         }else if (StringUtils.isNotBlank(userName)){
             List<BankUser> bankUsers =bankUserMapper.getUserListByUserName(userName,pageNum);
             for (BankUser userListByParam : bankUsers) {
+                if (userListByParam.getIdCard()!=null &&!userListByParam.getIdCard().equals("")  ){
+                    userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
+                }
 
-                userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
             }
             return bankUsers;
         }else if(StringUtils.isNotBlank(idCard)){
             List<BankUser> bankUsers =bankUserMapper.getUserListByIDCARD(idCard,pageNum);
             for (BankUser userListByParam : bankUsers) {
-
-                userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
+                if (userListByParam.getIdCard()!=null &&!userListByParam.getIdCard().equals("")  ){
+                    userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
+                }
             }
             return bankUsers;
         }
@@ -246,10 +253,12 @@ public class BankManagerService {
         if (list !=null){
             for (ManagerTranscation managerTranscation : list) {
                 if (managerTranscation.getUserId() !=null){
-                    managerTranscation.setBankUser(bankUserMapper.selectByPrimaryKey(managerTranscation.getUserId()));
-                    managerTranscation.getBankUser().setIdCard(handlingIdCards(managerTranscation.getBankUser().getIdCard()));
+                    BankUser bankUser = bankUserMapper.selectByPrimaryKey(managerTranscation.getUserId());
+                            managerTranscation.setBankUser(bankUser);
+                    if (bankUser.getIdCard()!=null && !bankUser.getIdCard().equals("")){
+                        managerTranscation.getBankUser().setIdCard(handlingIdCards(managerTranscation.getBankUser().getIdCard()));
+                    }
                 }
-
             }
         }
 
@@ -310,17 +319,37 @@ public class BankManagerService {
 
     }
 
-
-    public List<ManagerTranscation> selectManagerTranscationAll() {
-        List<ManagerTranscation> managerTranscations = managerTranscationMapper.selectAll();
-        return managerTranscations;
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 查询事务数量
+      * @data: 2019/8/21 14:35
+      */
+    public String selectManagerTranscationAll() {
+        Integer selectcount = managerTranscationMapper.selectcount();
+        return selectcount.toString();
     }
-
-    public List<TransferRecord> selectTransferRecordAll() {
-        return transferRecordMapper.selectAll();
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 查询转账记录数量
+      * @data: 2019/8/21 14:35
+      */
+    public String selectTransferRecordAll() {
+        Integer selectcount = transferRecordMapper.selectcount();
+        return selectcount .toString();
     }
-
-    public List<BankUser> selectBankUserAll() {
-        return bankUserMapper.selectAll();
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 查询用户数量
+      * @data: 2019/8/21 14:35
+      */
+    public String  selectBankUserAll() {
+        Integer i = bankUserMapper.selectcount();
+        return i.toString();
     }
 }

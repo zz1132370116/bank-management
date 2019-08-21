@@ -40,5 +40,13 @@ public interface ManagerTranscationMapper extends Mapper<ManagerTranscation> {
 
     })
     List<ManagerTranscation> getManagerTranscations(@Param("pageNum") Integer pageNum);
-
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 查询事务数量
+      * @data: 2019/8/21 14:36
+      */
+    @Select("select count(transcation_id) from manager_transcation")
+    Integer selectcount();
 }
