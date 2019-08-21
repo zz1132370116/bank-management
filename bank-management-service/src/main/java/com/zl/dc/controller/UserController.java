@@ -1,5 +1,6 @@
 package com.zl.dc.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
@@ -101,7 +102,7 @@ public class UserController {
             bankUser.setUserPhone(bankUserVo.getUserPhone());
             bankUser.setUserPassword(BankUserPasswordUtil.generate(bankUserVo.getUserPassword()));
             bankUser.setUserName("");
-            Byte status = 0;
+            Byte status = 100;
             bankUser.setUserStatus(status);
             bankUser.setDefaultBankCard("");
             bankUser.setGmtCreate(new Date());
@@ -146,9 +147,8 @@ public class UserController {
             if (verifyPassword) {
                 //登录成功，移除登录失败次数
                 redisTemplate.delete(user.getUserPhone()+user.getIdCard());
-                //将修改手机号之后的用户的信息保存到redis中，使用手机号作为key
+                redisTemplate.opsForValue().set("user-"+user.getUserId().toString()+"-userInfo", JSON.toJSONString(user));
                 redisTemplate.opsForValue().set(user.getUserPhone(),JSONObject.toJSONString(user));
-                //将修改手机号之后的用户的信息保存到redis中，使用用户id作为key
                 redisTemplate.opsForValue().set(user.getUserId().toString(),JSONObject.toJSONString(user));
                 return new BaseResult(0,"登录成功").append("user",user);
             }
@@ -185,9 +185,8 @@ public class UserController {
         if (code != null){
             BankUser bankUserByUserPhone = userService.getBankUserByUserPhone(bankUser.getUserPhone());
             redisTemplate.delete(bankUser.getUserPhone()+bankUser.getCode());
-            //将修改手机号之后的用户的信息保存到redis中，使用手机号作为key
+            redisTemplate.opsForValue().set("user-"+bankUserByUserPhone.getUserId().toString()+"-userInfo", JSON.toJSONString(bankUserByUserPhone));
             redisTemplate.opsForValue().set(bankUserByUserPhone.getUserPhone(),JSONObject.toJSONString(bankUserByUserPhone));
-            //将修改手机号之后的用户的信息保存到redis中，使用用户id作为key
             redisTemplate.opsForValue().set(bankUserByUserPhone.getUserId().toString(),JSONObject.toJSONString(bankUserByUserPhone));
             return new BaseResult(0,"登录成功").append("user",bankUserByUserPhone);
         }else{

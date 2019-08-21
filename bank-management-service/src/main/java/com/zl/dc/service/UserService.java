@@ -186,6 +186,8 @@ public class UserService {
         user.setUserId(userId);
         user.setUserName(userName);
         user.setIdCard(idCard);
+        Byte status = 101;
+        user.setUserStatus(status);
         Integer i = 0;
         try{
             i = userMapper.updateByPrimaryKeySelective(user);
@@ -195,7 +197,8 @@ public class UserService {
         }
 
         user = userMapper.selectByPrimaryKey(userId);
-        redisTemplate.opsForValue().set(user.getUserId().toString(), JSON.toJSONString(user));
+        redisTemplate.opsForValue().set("user-"+user.getUserId().toString()+"-userInfo", JSON.toJSONString(user));
+        redisTemplate.opsForValue().set(user.getUserPhone(), JSON.toJSONString(user));
 
         return i;
     }
