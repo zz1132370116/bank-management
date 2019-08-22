@@ -1,6 +1,7 @@
 package com.zl.dc.service;
 
 
+import com.alibaba.druid.sql.visitor.functions.If;
 import com.zl.dc.api.AccessBank;
 import com.zl.dc.mapper.*;
 import com.zl.dc.pojo.*;
@@ -42,6 +43,8 @@ public class ActiveGatheringService {
     private  SubordinateBankMapper subordinateBankMapper;
     @Resource
     BankCardService bankCardService;
+    @Resource
+    GatheringMapper gatheringMapper;
 
     /**
      * @author: nwm
@@ -102,6 +105,14 @@ public class ActiveGatheringService {
         //通过transferRecordMapper操作记录表
         int status = transferRecordMapper.updateByPrimaryKeySelective(transferRecord);
         if (status > 0) {
+            transferRecord=transferRecordMapper.selectByPrimaryKey(activeId);
+            Gathering gathering=new Gathering();
+            Example exampleGathering = new Example(Gathering.class);
+            Example.Criteria criteriaGathering = exampleGathering.createCriteria();
+            criteriaGathering.andEqualTo("transactionRecordUUID",transferRecord.getTransferRecordUuid());
+            gathering=gatheringMapper.selectOneByExample(exampleGathering);
+            gathering.setGatheringStatus(101);
+            gatheringMapper.updateByPrimaryKeySelective(gathering);
             return true;
         } else {
             return false;
@@ -119,11 +130,13 @@ public class ActiveGatheringService {
         //agvo 收款订单基本信息
         TransferRecord transferRecord=new TransferRecord();
         //添加自动生成的交易流水号
-        transferRecord.setTransferRecordUuid(UUID.randomUUID().toString().replaceAll("-", ""));
+        String uuid=UUID.randomUUID().toString().replaceAll("-", "");
+        transferRecord.setTransferRecordUuid(uuid);
         //添加交易额
         transferRecord.setTransferRecordAmount(agvo.getMuchMoney());
         //添加交易时间
-        transferRecord.setTransferRecordTime(new Date());
+         Date  date=new  Date();
+        transferRecord.setTransferRecordTime(date);
         //添加交易备注
         if (agvo.getTransferRemarks()==null){
             transferRecord.setTransferNote("");
@@ -156,10 +169,19 @@ public class ActiveGatheringService {
         transferRecord.setBankInIdentification("0");
         //付款卡暂时为空
         transferRecord.setBankInCard("0");
-        transferRecord.setGmtCreate(new Date());
-        transferRecord.setGmtModified(new Date());
+        transferRecord.setGmtCreate(date);
+        transferRecord.setGmtModified(date);
         //添加转账记录
         int status=transferRecordMapper.insertSelective(transferRecord);
+
+        //添加收款记录
+        Gathering gathering=new Gathering();
+        gathering.setTransactionRecordUUID(uuid);
+        gathering.setPaymentUserId(bankUser.getUserId());
+        gathering.setGatheringStatus(100);
+        gathering.setCreationTime(date);
+        gathering.setModificationTime(date);
+        System.out.println(gatheringMapper.insertSelective(gathering));
         if (status > 0) {
             return true;
         } else {
@@ -174,19 +196,29 @@ public class ActiveGatheringService {
      * @description: 查询相关待付款记录
      * @data: 2019/8/14 19:00
      */
-    public List<ActiveGatheringVo> getActiveGatheringVo(String userName){
-        //获取当前登录用户姓名 userName
+    public List<ActiveGatheringVo> getActiveGatheringVo(String userId){
+        //获取当前登录用户ID userID
+        System.out.println("\n"+userId);
+        //查询收款记录表
+        Example exampleGathering = new Example(Gathering.class);
+        Example.Criteria criteriaGathering = exampleGathering.createCriteria();
+        criteriaGathering.andEqualTo("paymentUserId",userId);
+        List<Gathering> gatheringList=gatheringMapper.selectByExample(exampleGathering);
+        System.out.println("\n"+gatheringList);
+        //查询转账记录表
         TransferRecord transferRecord=new TransferRecord();
         Example example = new Example(TransferRecord.class);
-        Example.Criteria criteria = example.createCriteria();
-        //查询付款人是当前登录用户的
-        transferRecord.setInCardUserName(userName);
-        //拼接查询条件
-        criteria.andEqualTo("transferStatus","100");
-        criteria.andEqualTo("transferType","102");
-        criteria.andEqualTo("inCardUserName",transferRecord.getInCardUserName());
-        //获取相关记录
-        List<TransferRecord> transferRecordList = transferRecordMapper.selectByExample(example);
+
+        List<TransferRecord> transferRecordList=new ArrayList<>();
+        for(Gathering gathering:gatheringList){
+            Example.Criteria criteria = example.createCriteria();
+            criteria.andEqualTo("transferRecordUuid",gathering.getTransactionRecordUUID());
+            transferRecord=transferRecordMapper.selectOneByExample(example);
+            transferRecordList.add(transferRecord);
+        }
+        System.out.println("\n"+transferRecordList);
+
+
         //拼接到ActiveGatheringVo
         List<ActiveGatheringVo> activeGatheringVoList=new ArrayList<ActiveGatheringVo>();
         for (TransferRecord transfer :transferRecordList){
@@ -208,6 +240,7 @@ public class ActiveGatheringService {
             activeGatheringVo.setTransferRemarks(transfer.getTransferNote());
             activeGatheringVoList.add(activeGatheringVo);
         }
+        System.out.println("\n"+activeGatheringVoList);
         return  activeGatheringVoList;
     }
     /**
@@ -275,11 +308,24 @@ public class ActiveGatheringService {
         transferRecord.setTransferStatus(new Byte("101"));
         transferRecord.setGmtModified(new Date());
         transferRecord.setBankInCard(outCard.getBankCardNumber());
-         transferRecord.setBankInIdentification(AccessBank.getSubordinateBank(outCard.getBankCardNumber()));
+        String  bankInIdentification=AccessBank.getSubordinateBank(outCard.getBankCardNumber());
+        if(bankInIdentification ==null || "".equals(bankInIdentification)){
+            bankInIdentification="BOWR";
+        }
+         transferRecord.setBankInIdentification(bankInIdentification);
+        System.out.println(transferRecord);
         int transferFlag=transferRecordMapper.updateByPrimaryKey(transferRecord);
         if (transferFlag<0){
             return false;
         }
+
+        Gathering gathering=new Gathering();
+        Example exampleGathering = new Example(Gathering.class);
+        Example.Criteria criteriaGathering = exampleGathering.createCriteria();
+        criteriaGathering.andEqualTo("transactionRecordUUID",transferRecord.getTransferRecordUuid());
+        gathering=gatheringMapper.selectOneByExample(exampleGathering);
+        gathering.setGatheringStatus(101);
+        gatheringMapper.updateByPrimaryKeySelective(gathering);
         return true;
     }
 
@@ -364,6 +410,8 @@ public class ActiveGatheringService {
         }
         return bankCards;
     }
+
+    /*返回根据银行卡号返回对应银行*/
         public String getBankName(String bankCardNumber){
             String subordinateBanksIdentification=AccessBank.getSubordinateBank(bankCardNumber);
             if (subordinateBanksIdentification==null ||"".equals(subordinateBanksIdentification)){
