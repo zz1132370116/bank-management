@@ -271,10 +271,6 @@ public class BankCardService {
      */
     public BankCard getBankCardByBankCardId(String bankCardId) {
         BankCard bankCard = bankCardMapper.selectByPrimaryKey(Integer.parseInt(bankCardId));
-        //将银行卡号变成*
-        bankCard.setBankCardNumber(StarUtil.StringAddStar(bankCard.getBankCardNumber(), 4, 4));
-        //将预留手机号变成*
-        bankCard.setBankCardPhone(StarUtil.StringAddStar(bankCard.getBankCardPhone(), 3, 4));
         return bankCard;
     }
 
@@ -286,15 +282,15 @@ public class BankCardService {
      * @data: 2019/8/14 16:00
      */
     public String UpgradeCard(BankCard bankCard) {
-
+        BankCard bankCard1 = bankCardMapper.selectByPrimaryKey(bankCard);
         ManagerTranscation managerTranscation = new ManagerTranscation();
-        if (StringUtils.isNotBlank(bankCard.getBankCardNumber())) {
-            managerTranscation.setBankCard(bankCard.getBankCardNumber());
+        if (StringUtils.isNotBlank(bankCard1.getBankCardNumber())) {
+            managerTranscation.setBankCard(bankCard1.getBankCardNumber());
         } else {
             return "缺少银行卡信息";
         }
         if (bankCard.getUserId() != null) {
-            managerTranscation.setUserId(bankCard.getUserId());
+            managerTranscation.setUserId(bankCard1.getUserId());
         } else {
             return "缺少用户信息";
         }
