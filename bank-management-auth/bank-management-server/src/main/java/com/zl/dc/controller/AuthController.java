@@ -3,6 +3,7 @@ package com.zl.dc.controller;
 
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.service.AuthService;
+import com.zl.dc.util.StringValid;
 import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.BaseResult;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +35,7 @@ public class AuthController {
     @PostMapping("/registry")
     public ResponseEntity<BaseResult> registry(@RequestBody BankUserVo bankUserVo){
 
-        if (StringUtils.isNoneBlank(bankUserVo.getUserPhone(),bankUserVo.getUserPassword(),bankUserVo.getPasswordConfig(),bankUserVo.getCode())){
+        if (StringValid.isBlank(bankUserVo.getUserPhone(),bankUserVo.getUserPassword(),bankUserVo.getPasswordConfig(),bankUserVo.getCode())){
             if (!bankUserVo.getUserPassword().equals(bankUserVo.getPasswordConfig())){
                 return ResponseEntity.ok(new BaseResult(2,"确认密码与密码不相等"));
             }

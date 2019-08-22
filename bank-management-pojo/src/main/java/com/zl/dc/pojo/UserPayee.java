@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Objects;
+
 /**
  * @version: V1.0
  * @author: lu
@@ -44,12 +45,12 @@ public class UserPayee {
     @Column(name = "payee_bank_identification")
     private String payeeBankIdentification;
     /**
-     *  所属收款群组
+     * 所属收款群组
      */
     @Column(name = "payee_group_id")
     private Integer payeeGroupId;
     /**
-     *  添加时间
+     * 添加时间
      */
     @Column(name = "gmt_create")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -63,5 +64,10 @@ public class UserPayee {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date gmtModified;
 
-
+    /**
+     * 自定义属性
+     * 所属银行名
+     */
+    @Transient
+    private String bankCardName;
 }

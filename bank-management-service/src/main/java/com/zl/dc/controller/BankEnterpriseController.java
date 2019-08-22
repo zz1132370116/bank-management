@@ -5,12 +5,12 @@ import com.zl.dc.api.AccessBank;
 import com.zl.dc.config.RedisInsertUtil;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankEnterprise;
-import com.zl.dc.pojo.OtherBankCard;
 import com.zl.dc.service.BankCardService;
 import com.zl.dc.service.BankEnterpriseService;
 import com.zl.dc.service.TransferRecordService;
 import com.zl.dc.util.MD5;
 import com.zl.dc.util.NumberValid;
+import com.zl.dc.util.StringValid;
 import com.zl.dc.vo.BaseResult;
 import com.zl.dc.vo.EnterpriseEmployee;
 import com.zl.dc.vo.EnterpriseEmployeeVo;
@@ -32,7 +32,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @version V1.0
@@ -124,7 +123,7 @@ public class BankEnterpriseController {
 
             row.getCell(3).setCellType(Cell.CELL_TYPE_STRING);
 
-            if(!StringUtils.isNoneBlank(row.getCell(0).getStringCellValue(),row.getCell(1).getStringCellValue(),row.getCell(3).getStringCellValue())){
+            if(!StringValid.isBlank(row.getCell(0).getStringCellValue(),row.getCell(1).getStringCellValue(),row.getCell(3).getStringCellValue())){
                 return ResponseEntity.ok(new BaseResult(1,"名字，银行卡号，金额不能为空"));
             }
 
