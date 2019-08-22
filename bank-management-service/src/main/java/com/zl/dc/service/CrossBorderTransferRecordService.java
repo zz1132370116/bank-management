@@ -97,8 +97,7 @@ public class CrossBorderTransferRecordService {
     public String CrossBorderTransfer(CrossBorderTransferRecord crossBorderTransferRecord) {
 
         //非空判断
-        if (StringUtils.isNotBlank(crossBorderTransferRecord.getBankOutCard())
-                && StringUtils.isNotBlank(crossBorderTransferRecord.getBankInCard())
+        if (StringUtils.isNotBlank(crossBorderTransferRecord.getBankInCard())
                 && StringUtils.isNotBlank(crossBorderTransferRecord.getCurrencyType())) {
             //类型转换
             int from = crossBorderTransferRecord.getTransferRecordAmountFrom().compareTo(BigDecimal.ZERO);
@@ -121,6 +120,8 @@ public class CrossBorderTransferRecordService {
                         crossBorderTransferRecord.setTransferRecordUuid(UUID.randomUUID().toString().replaceAll("-", ""));
                         //生成创建时间
                         crossBorderTransferRecord.setGmtCreate(new Date());
+                        //交易时间
+                        crossBorderTransferRecord.setTransferRecordTime(new Date());
                         //生成转账记录
                         crossBorderTransferRecordMapper.insertSelective(crossBorderTransferRecord);
                         return "转账成功";
