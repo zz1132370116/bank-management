@@ -3,6 +3,7 @@ package com.zl.dc.controller;
 import com.zl.dc.pojo.UserPayee;
 import com.zl.dc.pojo.UserPayeeGroup;
 import com.zl.dc.service.PayeeGroupService;
+import com.zl.dc.service.SubordinateBankService;
 import com.zl.dc.service.UserPayeeService;
 import com.zl.dc.vo.BaseResult;
 import com.zl.dc.vo.NewPayeeGroupVo;
@@ -30,6 +31,9 @@ public class PayeeGroupController {
     private PayeeGroupService payeeGroupService;
     @Autowired
     private UserPayeeService UserPayeeService;
+    @Autowired
+    private SubordinateBankService subordinateBankService;
+
 
     /**
      * @author: lu
@@ -60,6 +64,11 @@ public class PayeeGroupController {
             return ResponseEntity.ok(new BaseResult(1, "异常状态请联系管理员"));
         }
         List<UserPayee> userPayees = UserPayeeService.selectPayeeById(payeeGroupId);
+        for (UserPayee userPayee : userPayees) {
+            //查询所属银行进行回显
+            String bankCarkForName = subordinateBankService.selectBankNameByBankCardIdentification(userPayee.getPayeeBankIdentification());
+            userPayee.setPayeeBankIdentification(bankCarkForName);
+        }
         return ResponseEntity.ok(new BaseResult(0, "成功").append("data", userPayees));
     }
 

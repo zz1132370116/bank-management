@@ -10,6 +10,8 @@ import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.TransferValueVo;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
@@ -41,6 +43,8 @@ public class BankCardService {
     private ManagerTranscationMapper managerTranscationMapper;
     @Resource
     private OtherBankCardDOMapper otherBankCardDOMapper;
+    @Resource
+    private UserService userService;
 
     /**
      * @author: lu
@@ -51,8 +55,8 @@ public class BankCardService {
      */
     public boolean BankCardPasswordCheck(BankCard bankCard, String password) {
 //            将传入密码加密处理
-//        String BankCardPasswod = MD5.GetMD5Code(password);
-        return password.equals(bankCard.getBankCardPassword());
+        String BankCardPasswod = MD5.GetMD5Code(password);
+        return BankCardPasswod.equals(bankCard.getBankCardPassword());
     }
 
     /**
@@ -117,6 +121,46 @@ public class BankCardService {
         bankCardMapper.updateByPrimaryKeySelective(outBankCard);
         return true;
 
+    }
+
+    /**
+     * @author: lu
+     * @Param String username 用户名
+     * @Param String bankCardNumber 银行卡号
+     * @return: null
+     * @description: 校验收款卡和收款人
+     * @data: 2019/8/22 13:57
+     */
+    public boolean checkNameAndBankCard(String username, String bankCardNumber) {
+        //校验是否是本行卡
+        if ("9999".equals(bankCardNumber.substring(0, 4))) {
+            BankCard bankCard = selectBankCardByNum(bankCardNumber);
+            if (bankCard==null){
+                return false;
+            }
+            BankUser bankUser = userService.selectBankUserByUid(bankCard.getUserId());
+            if (bankUser==null){
+                return false;
+            }
+            if (username.equals(bankUser.getUserName())){
+                return true;
+            }
+            return false;
+        }else {
+            //模拟调用接口，传输数据给他行，返回他行用户信息
+            OtherBankCard otherBankCard =getBankNameByBankNum(bankCardNumber);
+            if (otherBankCard==null){
+                return false;
+            }
+            BankUser bankUser = userService.selectBankUserByUid(otherBankCard.getUserId());
+            if (bankUser==null){
+                return false;
+            }
+            if (username.equals(bankUser.getUserName())){
+                return true;
+            }
+            return false;
+        }
     }
 
     /**
@@ -227,10 +271,6 @@ public class BankCardService {
      */
     public BankCard getBankCardByBankCardId(String bankCardId) {
         BankCard bankCard = bankCardMapper.selectByPrimaryKey(Integer.parseInt(bankCardId));
-        //将银行卡号变成*
-        bankCard.setBankCardNumber(StarUtil.StringAddStar(bankCard.getBankCardNumber(), 4, 4));
-        //将预留手机号变成*
-        bankCard.setBankCardPhone(StarUtil.StringAddStar(bankCard.getBankCardPhone(), 3, 4));
         return bankCard;
     }
 
@@ -242,15 +282,15 @@ public class BankCardService {
      * @data: 2019/8/14 16:00
      */
     public String UpgradeCard(BankCard bankCard) {
-
+        BankCard bankCard1 = bankCardMapper.selectByPrimaryKey(bankCard);
         ManagerTranscation managerTranscation = new ManagerTranscation();
-        if (StringUtils.isNotBlank(bankCard.getBankCardNumber())) {
-            managerTranscation.setBankCard(bankCard.getBankCardNumber());
+        if (StringUtils.isNotBlank(bankCard1.getBankCardNumber())) {
+            managerTranscation.setBankCard(bankCard1.getBankCardNumber());
         } else {
             return "缺少银行卡信息";
         }
         if (bankCard.getUserId() != null) {
-            managerTranscation.setUserId(bankCard.getUserId());
+            managerTranscation.setUserId(bankCard1.getUserId());
         } else {
             return "缺少用户信息";
         }

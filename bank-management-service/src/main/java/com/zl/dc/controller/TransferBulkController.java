@@ -48,7 +48,7 @@ public class TransferBulkController {
      */
     @PostMapping("/submitTransferBulk")
     public ResponseEntity<BaseResult> submitTransferBulk(@RequestBody TransferBulkVo payees) {
-        //密码校验
+
         if (payees.getBankCard() == null) {
             return ResponseEntity.ok(new BaseResult(1, "异常状态请联系管理员"));
         }

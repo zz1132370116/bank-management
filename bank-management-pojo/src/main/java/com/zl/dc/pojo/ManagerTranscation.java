@@ -59,5 +59,7 @@ public class ManagerTranscation {
     private Integer pageNum;
     @Transient
     private Integer totalPageNum;
+    @Transient
+    private Integer bankCardId;
 
 }
