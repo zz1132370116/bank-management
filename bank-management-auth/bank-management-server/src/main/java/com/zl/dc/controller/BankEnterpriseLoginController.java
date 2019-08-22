@@ -2,8 +2,8 @@ package com.zl.dc.controller;
 
 import com.zl.dc.pojo.BankEnterprise;
 import com.zl.dc.service.BankEnterpriseLoginService;
+import com.zl.dc.util.StringValid;
 import com.zl.dc.vo.BaseResult;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +30,7 @@ public class BankEnterpriseLoginController {
      */
     @PostMapping("/bankEnterpriseLogin")
     public ResponseEntity<BaseResult> bankEnterpriseLogin(@RequestBody BankEnterprise bankEnterprise){
-        if (StringUtils.isNoneBlank(bankEnterprise.getEnterpriseBankCard(),bankEnterprise.getEnterpriseLoginPassword())){
+        if (StringValid.isBlank(bankEnterprise.getEnterpriseBankCard(),bankEnterprise.getEnterpriseLoginPassword())){
             BaseResult result = enterpriseService.bankEnterpriseLogin(bankEnterprise);
             return ResponseEntity.ok(result);
         }
