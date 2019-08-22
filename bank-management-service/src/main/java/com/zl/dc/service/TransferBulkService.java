@@ -52,7 +52,7 @@ public class TransferBulkService {
         transferRecord.setBankOutCard(bankCard.getBankCardNumber());
 
 
-        for (NewPayeeVo newPayeeVo:newPayeeVos) {
+        for (NewPayeeVo newPayeeVo : newPayeeVos) {
             transferRecord.setTransferRecordUuid(UUID.randomUUID().toString().replaceAll("-", ""));
             transferRecord.setInCardUserName(newPayeeVo.getPayeeName());
             transferRecord.setBankInIdentification(newPayeeVo.getPayeeBankIdentification());
@@ -61,19 +61,25 @@ public class TransferBulkService {
             transferRecord.setGmtCreate(new Date());
             transferRecord.setTransferRecordAmount(newPayeeVo.getMuchMoney());
 
-            insertTransferRecord.insertTransferRecord(transferRecord);
             //新增转账记录
+            insertTransferRecord.insertTransferRecord(transferRecord);
             insertTransferRecord.selectTransferRecordByUuid(transferRecord.getTransferRecordUuid());
-            //扣款
-            boolean transferStatus = bankCardService.bankCardTransferBusines(bankCard.getBankCardId(), newPayeeVo.getPayeeBankCard(), newPayeeVo.getMuchMoney());
-            if (transferStatus) {
-                //                成功
-                transferRecordService.transferSuccessfulOperation(transferRecord);
+            //做收款人姓名校验，如果失败，将转账设定为失败
+            boolean nameCheck = bankCardService.checkNameAndBankCard(newPayeeVo.getPayeeName(), newPayeeVo.getPayeeBankCard());
+            if (nameCheck) {
+                //扣款
+                boolean transferStatus = bankCardService.bankCardTransferBusines(bankCard.getBankCardId(), newPayeeVo.getPayeeBankCard(), newPayeeVo.getMuchMoney());
+                if (transferStatus) {
+                    //                转账记录添加成功操作
+                    transferRecordService.transferSuccessfulOperation(transferRecord);
+                } else {
+                    //                转账记录添加失败操作
+                    transferRecordService.transferFailedOperation(transferRecord);
+                }
             } else {
-                //                失败
+                //                转账记录添加失败操作
                 transferRecordService.transferFailedOperation(transferRecord);
             }
-
         }
     }
 
