@@ -99,19 +99,17 @@ public class ActiveGatheringController {
      * @description: 用户进入消息中心页面时执行的方法
      * @data: 2019/8/13 19:00
      */
-    @GetMapping("/getMessageCenter/{userId}/{userName}")
-    public ResponseEntity<BaseResult> getMessageCenter(@PathVariable("userId") String userId,@PathVariable("userName") String userName){
+    @GetMapping("/getMessage/{userId}")
+    public ResponseEntity<BaseResult> getMessageCenter(@PathVariable("userId") String userId){
         if (!NumberValid.primaryKey(userId)){
             return ResponseEntity.ok(new BaseResult(1, "失败"));
         }
-        if (userName==null){
-            return ResponseEntity.ok(new BaseResult(1, "失败"));
-        }
+
         //查询相关待付款记录
-        List<ActiveGatheringVo> agVOList=ags.getActiveGatheringVo(userName);
+        List<ActiveGatheringVo> agVOList=ags.getActiveGatheringVo(userId);
         //查询相关提额记录
          List<ManagerTranscation> mtList=ags.getManagerTranscation(new Integer(userId));
-        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", agVOList).append("data",mtList));
+        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", agVOList).append("mtList",mtList));
     }
 
     /**
@@ -141,7 +139,6 @@ public class ActiveGatheringController {
      */
     @PostMapping("/updateManagerTranscationStatus/{transcationId}")
     public ResponseEntity<BaseResult> updateManagerTranscationStatus(@PathVariable("transcationId") String transcationId){
-        System.out.println(transcationId);
         if (NumberValid.primaryKey(transcationId)){
             //根据事务表id修改订单为取消
             boolean flag=ags.updateManagerTranscationStatus(transcationId);
