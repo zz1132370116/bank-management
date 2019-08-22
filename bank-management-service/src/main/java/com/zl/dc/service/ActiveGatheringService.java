@@ -159,6 +159,7 @@ public class ActiveGatheringService {
         Example example = new Example(BankUser.class);
         Example.Criteria criteria = example.createCriteria();
         criteria.andEqualTo("userPhone",agvo.getOutUserPhone());
+        criteria.andEqualTo("userName",agvo.getOutUserName());
         BankUser bankUser = userMapper.selectOneByExample(example);
         if (bankUser==null){
             return false;
