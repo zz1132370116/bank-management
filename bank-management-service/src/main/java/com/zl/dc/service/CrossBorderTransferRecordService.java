@@ -112,7 +112,7 @@ public class CrossBorderTransferRecordService {
                 //条件查询银行卡
                 BankCard bankCard = bankCardMapper.selectOneByExample(example);
                 //判断银行卡不为空并且银行卡可用
-                if (bankCard != null && bankCard.getBankCardStatus() == 0) {
+                if (bankCard != null && bankCard.getBankCardStatus() == 100) {
                     int i = bankCard.getBankCardBalance().compareTo(BigDecimal.ZERO);
                     //银行卡余额不为空 并且 银行卡余额大于转账金额
                     if (i != 0 && bankCard.getBankCardBalance().compareTo(crossBorderTransferRecord.getTransferRecordAmountFrom()) == 1) {
