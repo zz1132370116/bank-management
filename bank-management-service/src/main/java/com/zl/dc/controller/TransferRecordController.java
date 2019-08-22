@@ -1,5 +1,6 @@
 package com.zl.dc.controller;
 
+import com.zl.dc.pojo.CrossBorderTransferRecord;
 import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.service.TransferRecordService;
 import com.zl.dc.vo.BaseResult;
@@ -37,11 +38,28 @@ public class TransferRecordController {
             return ResponseEntity.ok(new BaseResult(1, "参数错误"));
         }
         List<TransferRecord> transferRecordList = transferRecordService.getTransferRecordList(page, month, userId, bankCardId);
-        if (transferRecordList.size()==0) {
+        if (transferRecordList.size() == 0) {
             return ResponseEntity.ok(new BaseResult(1, "没有更多数据啦"));
         } else {
             return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", transferRecordList));
         }
     }
+
+    @GetMapping("/getCrossTransferRecordList")
+    public ResponseEntity<BaseResult> getCrossTransferRecordList(@RequestParam("page") Integer page,
+                                                                 @RequestParam("month") Integer month,
+                                                                 @RequestParam("userId") Integer userId,
+                                                                 @RequestParam("bankCardId") Integer bankCardId) {
+        if (page == null || userId == null || month == null || bankCardId == null) {
+            return ResponseEntity.ok(new BaseResult(1, "参数错误"));
+        }
+        List<CrossBorderTransferRecord> transferRecordList = transferRecordService.getCrossBorderTransferRecordList(page, month, userId, bankCardId);
+        if (transferRecordList.size() == 0) {
+            return ResponseEntity.ok(new BaseResult(1, "没有更多数据啦"));
+        } else {
+            return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", transferRecordList));
+        }
+    }
+
 
 }

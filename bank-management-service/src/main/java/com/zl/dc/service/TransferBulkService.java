@@ -32,8 +32,6 @@ public class TransferBulkService {
     @Resource
     private TransferRecord transferRecord;
     @Resource
-    private TransferRecordService insertTransferRecord;
-    @Resource
     private BankCardService bankCardService;
     @Resource
     private TransferRecordService transferRecordService;
@@ -62,8 +60,8 @@ public class TransferBulkService {
             transferRecord.setTransferRecordAmount(newPayeeVo.getMuchMoney());
 
             //新增转账记录
-            insertTransferRecord.insertTransferRecord(transferRecord);
-            insertTransferRecord.selectTransferRecordByUuid(transferRecord.getTransferRecordUuid());
+            transferRecordService.insertTransferRecord(transferRecord);
+            TransferRecord selectTransferRecord = transferRecordService.selectTransferRecordByUuid(this.transferRecord.getTransferRecordUuid());
             //做收款人姓名校验，如果失败，将转账设定为失败
             boolean nameCheck = bankCardService.checkNameAndBankCard(newPayeeVo.getPayeeName(), newPayeeVo.getPayeeBankCard());
             if (nameCheck) {
@@ -71,17 +69,15 @@ public class TransferBulkService {
                 boolean transferStatus = bankCardService.bankCardTransferBusines(bankCard.getBankCardId(), newPayeeVo.getPayeeBankCard(), newPayeeVo.getMuchMoney());
                 if (transferStatus) {
                     //                转账记录添加成功操作
-                    transferRecordService.transferSuccessfulOperation(transferRecord);
+                    transferRecordService.transferSuccessfulOperation(selectTransferRecord);
                 } else {
                     //                转账记录添加失败操作
-                    transferRecordService.transferFailedOperation(transferRecord);
+                    transferRecordService.transferFailedOperation(selectTransferRecord);
                 }
             } else {
                 //                转账记录添加失败操作
-                transferRecordService.transferFailedOperation(transferRecord);
+                transferRecordService.transferFailedOperation(selectTransferRecord);
             }
         }
     }
-
-
 }

@@ -1,10 +1,8 @@
 package com.zl.dc.service;
 
-import com.zl.dc.mapper.BankCardDOMapper;
-import com.zl.dc.mapper.TransferRecordDOMapper;
-import com.zl.dc.mapper.TransferRecordMapper;
-import com.zl.dc.mapper.UserMapper;
+import com.zl.dc.mapper.*;
 import com.zl.dc.pojo.BankEnterprise;
+import com.zl.dc.pojo.CrossBorderTransferRecord;
 import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.EnterpriseEmployee;
@@ -42,6 +40,8 @@ public class TransferRecordService {
     private UserMapper userMapper;
     @Resource
     private BankCardService bankCardService;
+    @Resource
+    private CrossBorderTransferRecordDOMapper crossBorderTransferRecordDOMapper;
 
     /**
      * @author: lu
@@ -223,14 +223,14 @@ public class TransferRecordService {
     }
 
     /**
-     * @author pds
      * @param enterpriseEmployees
      * @param bankEnterprise
      * @return java.util.List<com.zl.dc.vo.EnterpriseEmployee>
+     * @author pds
      * @description 企业批量转账
      * @date 2019/8/20 13:42
      */
-    public List<EnterpriseEmployee> addTransferRecordDueToBankEnterprise(List<EnterpriseEmployee> enterpriseEmployees, BankEnterprise bankEnterprise){
+    public List<EnterpriseEmployee> addTransferRecordDueToBankEnterprise(List<EnterpriseEmployee> enterpriseEmployees, BankEnterprise bankEnterprise) {
         List<EnterpriseEmployee> enterpriseEmployeeList = new ArrayList<>();
         TransferRecord transferRecord = new TransferRecord();
 
@@ -349,5 +349,81 @@ public class TransferRecordService {
         }
     }
 
+    private String changeCurrentType(String current) {
+        switch (current) {
+            case "USD":
+                return "美元";
+            case "HKD":
+                return "港元";
+            case "EUR":
+                return "欧元";
+            case "JPY":
+                return "日元";
+            case "GBP":
+                return "英镑";
+            default:
+                return "未知";
+        }
+    }
 
+    /**
+     * @author: Redsheep
+     * @Param page 页数
+     * @Param month 月份
+     * @Param userId 用户id
+     * @Param bankCardId 银行卡id
+     * @return: java.util.List<com.zl.dc.pojo.TransferRecord>
+     * @description: 查询跨境转账记录
+     * @data: 2019/8/22 16:42
+     */
+    public List<CrossBorderTransferRecord> getCrossBorderTransferRecordList(Integer page, Integer month, Integer userId, Integer bankCardId) {
+        // 查询银行卡号
+        String bankCard;
+        if (bankCardId == 0) {
+            bankCard = "";
+        } else {
+            bankCard = bankCardDOMapper.selectBankCardNumberById(bankCardId);
+        }
+        // 分页封装处理
+        pageBean.setPage(page);
+        pageBean.setPageSize(5);
+        pageBean.setIndex((pageBean.getPage() - 1) * pageBean.getPageSize());
+        // 日期字符串的处理
+        StringBuilder startDay = new StringBuilder("2019");
+        StringBuilder endDay = new StringBuilder("2019");
+        if (month <= 9) {
+            startDay.append("0").append(month).append("01");
+            if (month == 9) {
+                endDay.append(month + 1).append("01");
+            } else {
+                endDay.append("0").append(month + 1).append("01");
+            }
+        } else {
+            startDay.append(month).append("01");
+            endDay.append(month + 1).append("01");
+        }
+        // 查询语句
+        List<CrossBorderTransferRecord> transferRecordList = crossBorderTransferRecordDOMapper.selectByUserIdAndMonthAndCard(userId, startDay.toString(), endDay.toString(), pageBean.getIndex(), pageBean.getPageSize(), bankCard);
+
+        /**
+         * 查询结果的处理
+         * 1.收款银行卡加*
+         * 2.状态和外币类型显意
+         */
+        ListIterator<CrossBorderTransferRecord> iterator = transferRecordList.listIterator();
+        CrossBorderTransferRecord transferRecord;
+        String status;
+        String currentType;
+        String bankOutCard;
+        while (iterator.hasNext()) {
+            transferRecord = iterator.next();
+            status = changeTransferStatus(transferRecord.getTransferStatus().toString());
+            transferRecord.setTransferStringStatus(status);
+            currentType = changeCurrentType(transferRecord.getCurrencyType());
+            transferRecord.setCurrencyType(currentType);
+            bankOutCard = transferRecord.getBankOutCard();
+            transferRecord.setBankOutCard(StarUtil.StringAddStar(bankOutCard, 4, 4));
+        }
+        return transferRecordList;
+    }
 }

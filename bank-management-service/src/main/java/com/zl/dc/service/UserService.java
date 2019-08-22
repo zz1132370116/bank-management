@@ -180,7 +180,7 @@ public class UserService {
         JSONObject wordsResult = frontJsonObject.getJSONObject("words_result");
         String userName = (String) wordsResult.getJSONObject("姓名").get("words");
         String idCard = (String) wordsResult.getJSONObject("公民身份号码").get("words");
-        if (!StringUtils.isNoneBlank(userName,idCard)){
+        if (StringUtils.isNoneBlank(userName,idCard)){
             return 0;
         }
 
