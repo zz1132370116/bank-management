@@ -2,6 +2,7 @@ package com.zl.dc.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.zl.dc.api.AccessBank;
+import com.zl.dc.config.RedisInsertUtil;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankEnterprise;
 import com.zl.dc.pojo.OtherBankCard;
@@ -72,21 +73,12 @@ public class BankEnterpriseController {
             String password = MD5.GetMD5Code(bankEnterprise.getEnterpriseLoginPassword());
             if (password.equals(enterpriseBankCard.getEnterpriseLoginPassword())){
                 stringRedisTemplate.opsForValue().set(enterpriseBankCard.getEnterpriseName(), JSON.toJSONString(bankEnterprise));
+                stringRedisTemplate.opsForValue().set("enterprise-"+enterpriseBankCard.getEnterpriseId()+"-enterpriseInfo", JSON.toJSONString(bankEnterprise));
                 enterpriseBankCard.setGmtCreate(null);
                 enterpriseBankCard.setGmtModified(null);
                 return new BaseResult(0,"登录成功").append("enterprise",enterpriseBankCard);
             } else {
-                //密码错误
-                //获取当前的小时
-                Calendar calendar = Calendar.getInstance();
-                Integer hour = calendar.get(Calendar.HOUR_OF_DAY);
-                Integer times = 0;
-
-                if(timesStr != null && !"".equals(timesStr)){
-                    times = Integer.parseInt(timesStr);
-                }
-                times += 1;
-                stringRedisTemplate.opsForValue().set(enterpriseBankCard.getEnterpriseName()+"-"+enterpriseBankCard.getEnterpriseId(),times.toString(),24-hour, TimeUnit.HOURS);
+                Integer times = RedisInsertUtil.addingData(stringRedisTemplate, enterpriseBankCard.getEnterpriseName() + "-" + enterpriseBankCard.getEnterpriseId(), timesStr);
                 return new BaseResult(1,"输错密码"+times+"次，只有"+(3-times)+"次机会了");
             }
         }
@@ -95,6 +87,13 @@ public class BankEnterpriseController {
 
     @PostMapping("/batchImport")
     public ResponseEntity<BaseResult> batchImport(@RequestParam("file") MultipartFile file,@RequestParam("enterpriseId") Integer enterpriseId) throws IOException {
+        if (!StringUtils.isNotBlank(file.getOriginalFilename())){
+            return ResponseEntity.ok(new BaseResult(1,"请选择.xls文件"));
+        }
+        if (enterpriseId == null || enterpriseId <= 0){
+            return ResponseEntity.ok(new BaseResult(1,"文件解析失败"));
+        }
+
         long currentTimeMillis = System.currentTimeMillis();
         BankEnterprise bankEnterprise = bankEnterpriseService.getBankEnterpriseById(enterpriseId);
         if (bankEnterprise == null){

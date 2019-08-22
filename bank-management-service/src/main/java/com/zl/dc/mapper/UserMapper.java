@@ -23,6 +23,7 @@ public interface UserMapper extends Mapper<BankUser> {
      * @data: 2019/8/7 14:39
      */
     @Select("SELECT * FROM bank_user WHERE user_name = #{user_name} and id_card = #{id_card} and user_id > (#{pageNum}-1)*10 LIMIT 10; ")
+    @ResultMap(value="userMap")
     List<BankUser> getUserListByParams(@Param("user_name")String userName,@Param("id_card")String idCard,@Param("pageNum")Integer pageNum);
     /**
      * @author: zhanglei
