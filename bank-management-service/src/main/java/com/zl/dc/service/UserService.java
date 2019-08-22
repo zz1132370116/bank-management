@@ -11,6 +11,7 @@ import com.zl.dc.pojo.OtherBankCard;
 import com.zl.dc.util.MD5;
 import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.BaseResult;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -164,10 +165,13 @@ public class UserService {
         frontMul.transferTo(frontFile);
         File backFile = File.createTempFile(UUID.randomUUID().toString().replaceAll("-", ""), backPrefix);
         backMul.transferTo(backFile);
-        //校验身份证背面，并判断身份证是否过期
+        //先校验身份证背面，并判断身份证是否过期
         String backJson = VerifyIdCard.back(backFile);
         JSONObject backJsonObject = JSONObject.parseObject(backJson);
         String expirationDateStr = (String) backJsonObject.getJSONObject("words_result").getJSONObject("失效日期").get("words");
+        if (!StringUtils.isNotBlank(expirationDateStr)){
+            return 0;
+        }
         String expiration = expirationDateStr.substring(0,4)+"-"+expirationDateStr.substring(4,6)+"-"+expirationDateStr.substring(6);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date expirationDate = simpleDateFormat.parse(expiration);
@@ -181,6 +185,9 @@ public class UserService {
         JSONObject wordsResult = frontJsonObject.getJSONObject("words_result");
         String userName = (String) wordsResult.getJSONObject("姓名").get("words");
         String idCard = (String) wordsResult.getJSONObject("公民身份号码").get("words");
+        if (!StringUtils.isNoneBlank(userName,idCard)){
+            return 0;
+        }
 
         BankUser user = new BankUser();
         user.setUserId(userId);
@@ -199,6 +206,10 @@ public class UserService {
         user = userMapper.selectByPrimaryKey(userId);
         redisTemplate.opsForValue().set("user-"+user.getUserId().toString()+"-userInfo", JSON.toJSONString(user));
         redisTemplate.opsForValue().set(user.getUserPhone(), JSON.toJSONString(user));
+        redisTemplate.opsForValue().set(user.getUserId().toString(), JSON.toJSONString(user));
+
+        //将产生的临时文件删除
+        VerifyIdCard.deleteFile(frontFile,backFile);
 
         return i;
     }
