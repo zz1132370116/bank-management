@@ -2,22 +2,17 @@ package com.zl.dc.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import com.zl.dc.api.VerifyIdCard;
 import com.zl.dc.mapper.UserMapper;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankUser;
-import com.zl.dc.pojo.OtherBankCard;
 import com.zl.dc.util.MD5;
 import com.zl.dc.vo.BankUserVo;
-import com.zl.dc.vo.BaseResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import tk.mybatis.mapper.entity.Example;
 
