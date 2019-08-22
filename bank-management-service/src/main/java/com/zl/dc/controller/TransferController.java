@@ -95,16 +95,16 @@ public class TransferController {
         }
         //密码错误次数达到3次之后会暂时将冻结，冻结今天的剩余时间，即在过了24:00之后就可以登录，在冻结时间之内不允许该用户登录
         //查询redies该卡是否被锁定
-        String timesStr = stringRedisTemplate.opsForValue().get("BankCard"+bankCard.getBankCardId());
-        if (timesStr != null && timesStr.equals("3")){
+        String timesStr = stringRedisTemplate.opsForValue().get("BankCard" + bankCard.getBankCardId());
+        if (timesStr != null && timesStr.equals("3")) {
             return ResponseEntity.ok(new BaseResult(1, "您今天的输错密码达到上限，请明天再试，或者选择忘记密码"));
         }
 
         boolean passwordStatus = bankCardService.BankCardPasswordCheck(bankCard, transferValueVo.getPassword());
 //       当输错密码时
-        if(!passwordStatus){
+        if (!passwordStatus) {
             //调用方法在redis缓存中存入错误信息
-            RedisInsertUtil.addingData(stringRedisTemplate,"BankCard"+bankCard.getBankCardId(),timesStr);
+            RedisInsertUtil.addingData(stringRedisTemplate, "BankCard" + bankCard.getBankCardId(), timesStr);
             return ResponseEntity.ok(new BaseResult(1, "密码输入错误，每日限制3次"));
         }
         if (!"100".equals(bankCard.getBankCardStatus().toString())) {
@@ -119,24 +119,7 @@ public class TransferController {
 
         //设置转出卡号
         transferValueVo.setOutBankCard(bankCard.getBankCardNumber());
-        //如果手机为为空，银行卡号不为空
-        if (StringUtils.isBlank(transferValueVo.getBankPhone()) && StringUtils.isNotBlank(transferValueVo.getInBankCard())) {
-            if ("BOWR".equals(transferValueVo.getInBank())) {
-                //本行卡查询用户进行校验
-                BankCard bankCard1 = bankCardService.selectBankCardByNum(transferValueVo.getInBankCard());
-                BankUser bankUser = userService.selectBankUserByUid(bankCard1.getUserId());
-                if (!bankUser.getUserName().equals(transferValueVo.getInBankName())) {
-                    return ResponseEntity.ok(new BaseResult(1, "转账失败，收款人与银行卡不符合"));
-                }
-            } else {
-                //模拟调用接口，传输数据给他行，返回他行用户信息
-                OtherBankCard otherBankCard = bankCardService.getBankNameByBankNum(transferValueVo.getInBankCard());
-                BankUser bankUser = userService.selectBankUserByUid(otherBankCard.getUserId());
-                if (!bankUser.getUserName().equals(transferValueVo.getInBankName())) {
-                    return ResponseEntity.ok(new BaseResult(1, "转账失败，收款人与银行卡不符合"));
-                }
-            }
-        }
+
         //如果手机为不为空，银行卡号为空
         if (StringUtils.isNotBlank(transferValueVo.getBankPhone()) && StringUtils.isBlank(transferValueVo.getInBankCard())) {
             //根据手机查询用户
@@ -146,7 +129,7 @@ public class TransferController {
                 return ResponseEntity.ok(new BaseResult(1, "转账失败，收款手机号未绑定银行卡"));
             }
             if (!bankUser.getUserName().equals(transferValueVo.getInBankName())) {
-                return ResponseEntity.ok(new BaseResult(1, "转账失败，收款人与银行卡不符合"));
+                return ResponseEntity.ok(new BaseResult(1, "转账失败，收款人姓名不符合不符合"));
             }
             //添加收款银行卡号
             transferValueVo.setInBankCard(bankUser.getDefaultBankCard());
@@ -159,23 +142,53 @@ public class TransferController {
         if (transferRecord == null) {
             return ResponseEntity.ok(new BaseResult(1, "转账记录生成异常请通知管理员"));
         }
-        //操作银行卡扣款 转账状态
-        boolean transferStatus = bankCardService.bankCardTransferBusines(transferValueVo.getOutBankCardID(), transferValueVo.getInBankCard(), transferValueVo.getMuchMoney());
-//          如果转账失败
-        if (!transferStatus) {
-            boolean transferFailedStatus = transferRecordService.transferFailedOperation(transferRecord);
-            if (transferFailedStatus) {
-                return ResponseEntity.ok(new BaseResult(0, "转账失败"));
+        //如果手机为为空，银行卡号不为空
+        if (StringUtils.isBlank(transferValueVo.getBankPhone()) && StringUtils.isNotBlank(transferValueVo.getInBankCard())) {
+            //银行卡姓名校验
+            boolean nameCheck = bankCardService.checkNameAndBankCard(transferValueVo.getInBankName(), transferValueVo.getInBankCard());
+            if (nameCheck) {
+                //操作银行卡扣款 转账状态
+                boolean transferStatus = bankCardService.bankCardTransferBusines(transferValueVo.getOutBankCardID(), transferValueVo.getInBankCard(), transferValueVo.getMuchMoney());
+                if (transferStatus) {
+                    //设置转账记录为成功状态
+                    boolean transferSuccessfulStatus = transferRecordService.transferSuccessfulOperation(transferRecord);
+                    if (transferSuccessfulStatus) {
+                        return ResponseEntity.ok(new BaseResult(0, "转账提交成功，请稍后查询"));
+                    } else {
+                        return ResponseEntity.ok(new BaseResult(1, "操作异常请通知管理员"));
+                    }
+                } else {
+                    return ResponseEntity.ok(new BaseResult(1, "银行卡转账异常，请通知管理员"));
+                }
             } else {
-                return ResponseEntity.ok(new BaseResult(1, "操作异常请通知管理员"));
+                //设置转账记录为失败状态
+                boolean transferFailedStatus = transferRecordService.transferFailedOperation(transferRecord);
+                if (transferFailedStatus) {
+                    return ResponseEntity.ok(new BaseResult(0, "转账提交成功，请稍后查询"));
+                } else {
+                    return ResponseEntity.ok(new BaseResult(1, "操作异常请通知管理员"));
+                }
             }
-        }
-        //如果转账成功
-        boolean transferSuccessfulStatus = transferRecordService.transferSuccessfulOperation(transferRecord);
-        if (transferSuccessfulStatus) {
-            return ResponseEntity.ok(new BaseResult(0, "转账成功"));
         } else {
-            return ResponseEntity.ok(new BaseResult(1, "转账记录生成异常请通知管理员"));
+            //操作银行卡扣款 转账状态
+            boolean transferStatus = bankCardService.bankCardTransferBusines(transferValueVo.getOutBankCardID(), transferValueVo.getInBankCard(), transferValueVo.getMuchMoney());
+            if (transferStatus) {
+                //设置转账记录为成功状态
+                boolean transferSuccessfulStatus = transferRecordService.transferSuccessfulOperation(transferRecord);
+                if (transferSuccessfulStatus) {
+                    return ResponseEntity.ok(new BaseResult(0, "转账提交成功，请稍后查询"));
+                } else {
+                    return ResponseEntity.ok(new BaseResult(1, "操作异常请通知管理员"));
+                }
+            } else {
+                //设置转账记录为失败状态
+                boolean transferFailedStatus = transferRecordService.transferFailedOperation(transferRecord);
+                if (transferFailedStatus) {
+                    return ResponseEntity.ok(new BaseResult(0, "转账提交成功，请稍后查询"));
+                } else {
+                    return ResponseEntity.ok(new BaseResult(1, "操作异常请通知管理员"));
+                }
+            }
         }
     }
 

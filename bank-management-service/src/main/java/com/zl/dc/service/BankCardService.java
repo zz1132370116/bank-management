@@ -10,8 +10,11 @@ import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.OtherBankCard;
 import com.zl.dc.util.MD5;
 import com.zl.dc.util.StarUtil;
+import com.zl.dc.vo.BaseResult;
 import com.zl.dc.vo.TransferValueVo;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
@@ -41,6 +44,8 @@ public class BankCardService {
     private OtherBankCardMapper otherBankCardMapper;
     @Resource
     private ManagerTranscationMapper managerTranscationMapper;
+    @Resource
+    private UserService userService;
 
     /**
      * @author: lu
@@ -115,6 +120,46 @@ public class BankCardService {
         bankCardMapper.updateByPrimaryKeySelective(outBankCard);
         return true;
 
+    }
+
+    /**
+     * @author: lu
+     * @Param String username 用户名
+     * @Param String bankCardNumber 银行卡号
+     * @return: null
+     * @description: 校验收款卡和收款人
+     * @data: 2019/8/22 13:57
+     */
+    public boolean checkNameAndBankCard(String username, String bankCardNumber) {
+        //校验是否是本行卡
+        if ("9999".equals(bankCardNumber.substring(0, 4))) {
+            BankCard bankCard = selectBankCardByNum(bankCardNumber);
+            if (bankCard==null){
+                return false;
+            }
+            BankUser bankUser = userService.selectBankUserByUid(bankCard.getUserId());
+            if (bankUser==null){
+                return false;
+            }
+            if (username.equals(bankUser.getUserName())){
+                return true;
+            }
+            return false;
+        }else {
+            //模拟调用接口，传输数据给他行，返回他行用户信息
+            OtherBankCard otherBankCard =getBankNameByBankNum(bankCardNumber);
+            if (otherBankCard==null){
+                return false;
+            }
+            BankUser bankUser = userService.selectBankUserByUid(otherBankCard.getUserId());
+            if (bankUser==null){
+                return false;
+            }
+            if (username.equals(bankUser.getUserName())){
+                return true;
+            }
+            return false;
+        }
     }
 
     /**
@@ -269,13 +314,13 @@ public class BankCardService {
     }
 
     /**
-     * @author pds
      * @param otherBankCard
      * @return java.lang.Integer
+     * @author pds
      * @description 插入他行银行卡
      * @date 2019/8/16 20:53
      */
-    public Integer addOtherBankCard(OtherBankCard otherBankCard){
+    public Integer addOtherBankCard(OtherBankCard otherBankCard) {
         Integer insert = otherBankCardMapper.insert(otherBankCard);
         return insert;
     }
