@@ -94,6 +94,10 @@ public class BankCardController {
         if (StringUtils.isNotBlank(bankCardId)) {
             //调用service
             BankCard bankCard = bankCardService.getBankCardByBankCardId(bankCardId);
+            //将银行卡号变成*
+            bankCard.setBankCardNumber(StarUtil.StringAddStar(bankCard.getBankCardNumber(), 4, 4));
+            //将预留手机号变成*
+            bankCard.setBankCardPhone(StarUtil.StringAddStar(bankCard.getBankCardPhone(), 3, 4));
             if (bankCard != null) {
                 //返回
                 return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", bankCard));
@@ -150,7 +154,8 @@ public class BankCardController {
     public ResponseEntity<BaseResult> UpgradeCard(@RequestBody BankCard bankCard) {
         if (bankCard != null) {
             //从redis获取验证码
-            String code = redisTemplate.opsForValue().get(bankCard.getBankCardPhone() + bankCard.getCode());
+            BankCard bankCard1 = bankCardService.selectBankCardByid(bankCard.getBankCardId());
+            String code = redisTemplate.opsForValue().get(bankCard1.getBankCardPhone() + bankCard.getCode());
             if (StringUtils.isNotBlank(code)) {
                 //申请
                 String s = bankCardService.UpgradeCard(bankCard);

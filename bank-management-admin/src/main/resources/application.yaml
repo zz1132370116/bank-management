@@ -28,5 +28,5 @@ sc:
 
 web-service:
   ribbon:
-    listOfServers: http://10.1.12.184:8081
+    listOfServers: http://10.1.12.182:8081
 

@@ -26,7 +26,7 @@ public interface ManagerTranscationMapper extends Mapper<ManagerTranscation> {
      * @data: 2019/8/9 15:03
      */
     @Select("SELECT transcation_id,manager_id,bank_card,user_id,transcation_status,transcation_type,transcation_msg,gmt_create,gmt_modified\n" +
-            "\tFROM manager_transcation WHERE transcation_status=0 and transcation_id> (#{pageNum}-1)*10 LIMIT 10;")
+            "\tFROM manager_transcation WHERE transcation_status=0 and transcation_id> (#{pageNum}-1)*10 LIMIT 20;")
     @Results(id="transferRecordMap", value={
             @Result(column = "transcation_id",property = "transcationId"),
             @Result(column = "manager_id",property = "managerId"),
