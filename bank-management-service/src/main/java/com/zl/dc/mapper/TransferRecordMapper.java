@@ -34,8 +34,31 @@ public interface TransferRecordMapper extends Mapper<TransferRecord> {
      * @description: 查询所有记录(分页)
      * @data: 2019/8/6 19:18
      */
-    @Select("SELECT transfer_record_id,transfer_record_uuid,transfer_record_amount,transfer_record_time,transfer_note,transfer_status,\n" +
-            "\ttransfer_type,user_id,bank_out_card,in_card_user_name,bank_in_card,gmt_create,gmt_modified\n" +
-            "\tFROM transfer_record WHERE  transfer_record_uuid > (#{pageNum}-1)*10 LIMIT 10;")
+    @Select("\tSELECT transfer_record_id,transfer_record_uuid,transfer_record_amount,transfer_record_time,transfer_note,transfer_status,transfer_type,user_id,bank_out_card,in_card_user_name,bank_in_card,gmt_create,gmt_modified ,bank_in_identification FROM transfer_record WHERE  transfer_record_uuid > (#{pageNum}-1)*10 LIMIT 10;")
+    @Results(id="transferRecordMap", value={
+            @Result(column = "transfer_record_id",property = "transferRecordId"),
+            @Result(column = "transfer_record_uuid",property = "transferRecordUuid"),
+            @Result(column = "transfer_record_amount",property = "transferRecordAmount"),
+            @Result(column = "transfer_record_time",property = "transferRecordTime"),
+            @Result(column = "transfer_note",property = "transferNote"),
+            @Result(column = "transfer_status",property = "transferStatus"),
+            @Result(column = "transfer_type",property = "transferType"),
+            @Result(column = "user_id",property = "userId"),
+            @Result(column = "bank_out_card",property = "bankOutCard"),
+            @Result(column = "in_card_user_name",property = "inCardUserName"),
+            @Result(column = "bank_in_identification",property = "bankInIdentification"),
+            @Result(column = "bank_in_card",property = "bankInCard"),
+            @Result(column = "gmt_create",property = "gmtCreate"),
+            @Result(column = "gmt_modified",property = "gmtModified")
+    })
     List<TransferRecord> GetRecords(@Param("pageNum") Integer pageNum);
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 查询记录数量
+      * @data: 2019/8/21 14:35
+      */
+    @Select(" EXPLAIN SELECT * FROM transfer_record")
+    Integer selectcount();
 }

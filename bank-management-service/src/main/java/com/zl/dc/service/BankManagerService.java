@@ -47,13 +47,14 @@ public class BankManagerService {
      */
     public List<BankUser> GetUserList(Integer pageNum) {
         List<BankUser> users = bankUserMapper.GetUserList(pageNum);
-        List<BankUser> users1 = bankUserMapper.selectAll();
 
         for (BankUser user : users) {
-            String s = handlingIdCards(user.getIdCard());
-            user.setIdCard(s);
+            if (user.getIdCard()!=null && !user.getIdCard().equals("")) {
 
+                String s = handlingIdCards(user.getIdCard());
+                user.setIdCard(s);
 
+            }
         }
         return users;
     }
@@ -62,23 +63,28 @@ public class BankManagerService {
      * @author: zhanglei
      * @param: []
      * @return:java.util.List<com.zl.dc.pojo.TransferRecord>
-     * @description: 查询记录数
+     * @description: 查询记录
      * @data: 2019/8/6 14:03
      */
     public List<TransferRecord> GetRecords(Integer pageNum) {
-
+        Example example3 = new Example(SubordinateBank.class);
+        Example.Criteria criteria3 = example3.createCriteria();
         List<TransferRecord> transferRecords = transferRecordMapper.GetRecords(pageNum);
         for (TransferRecord transferRecord : transferRecords) {
             //通过用户id查询当前用户信息
             BankUser bankUser = bankUserMapper.selectByPrimaryKey(transferRecord.getUserId());
             //处理身份证号
-            String idCards = handlingIdCards(bankUser.getIdCard());
-            bankUser.setIdCard(idCards);
+            if (bankUser.getIdCard()!=null && !bankUser.getIdCard().equals("")){
+                String idCards = handlingIdCards(bankUser.getIdCard());
+                bankUser.setIdCard(idCards);
+            }
+
             transferRecord.setUserName(bankUser.getUserName());
-            Example example3 = new Example(SubordinateBank.class);
-            Example.Criteria criteria3 = example3.createCriteria();
-            criteria3.andEqualTo("bankIdentification", transferRecord.getBankInIdentification());
-            transferRecord.setBankOutCardName("五仁银行");
+    if (transferRecord.getBankInIdentification() !=null && !transferRecord.getBankInIdentification().equals("")){
+
+        criteria3.andEqualTo("bankIdentification", transferRecord.getBankInIdentification());
+        transferRecord.setBankOutCardName("五仁银行");
+    }
             //获取转入卡所属银行
             transferRecord.setBankInCardName(subordinateBankMapper.selectOneByExample(example3).getBankName());
         }
@@ -139,8 +145,10 @@ public class BankManagerService {
             for (TransferRecord record : transferRecords) {
                 BankUser bankUser = bankUserMapper.selectByPrimaryKey(record.getUserId());
                 //赋值
+                record.setBankOutCard(StarUtil.StringAddStar(record.getBankOutCard(),6,4));
+                record.setBankInCard(StarUtil.StringAddStar(record.getBankInCard(),6,4));
                 record.setUserName(bankUser.getUserName());
-                //获取转出卡所属银行
+                //获取转入卡所属银行
                 criteria3.andEqualTo("bankIdentification", record.getBankInIdentification());
                 record.setBankOutCardName("五仁银行");
                 //获取转入卡所属银行
@@ -159,7 +167,7 @@ public class BankManagerService {
      * @description: 处理身份证号码
      * @data: 2019/8/7 11:25
      */
-    public String handlingIdCards(String idcard) {
+    public static String handlingIdCards(String idcard) {
         //处理身份证号
         StringBuilder sb = new StringBuilder(idcard);
         sb.replace(6, 14, "****");
@@ -176,12 +184,27 @@ public class BankManagerService {
     public List<BankUser> getUserListByParams(String userName, String idCard,Integer pageNum) {
         if (StringUtils.isNotBlank(idCard) && StringUtils.isNotBlank(userName)){
             List<BankUser> userListByParams = bankUserMapper.getUserListByParams(userName, idCard, pageNum);
+            for (BankUser userListByParam : userListByParams) {
+
+                userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
+            }
             return userListByParams;
         }else if (StringUtils.isNotBlank(userName)){
             List<BankUser> bankUsers =bankUserMapper.getUserListByUserName(userName,pageNum);
+            for (BankUser userListByParam : bankUsers) {
+                if (userListByParam.getIdCard()!=null &&!userListByParam.getIdCard().equals("")  ){
+                    userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
+                }
+
+            }
             return bankUsers;
         }else if(StringUtils.isNotBlank(idCard)){
             List<BankUser> bankUsers =bankUserMapper.getUserListByIDCARD(idCard,pageNum);
+            for (BankUser userListByParam : bankUsers) {
+                if (userListByParam.getIdCard()!=null &&!userListByParam.getIdCard().equals("")  ){
+                    userListByParam.setIdCard( handlingIdCards(userListByParam.getIdCard()));
+                }
+            }
             return bankUsers;
         }
 
@@ -225,8 +248,20 @@ public class BankManagerService {
      * @description: 查询用户申请中的提卡信息
      * @data: 2019/8/9 15:03
      */
-    public List<ManagerTranscation> getManagerTranscations(ManagerTranscation managerTranscation) {
-        List<ManagerTranscation> list =  managerTranscationMapper.getManagerTranscations(managerTranscation.getPageNum());
+    public List<ManagerTranscation> getManagerTranscations(Integer pageNum) {
+        List<ManagerTranscation> list =  managerTranscationMapper.getManagerTranscations(pageNum);
+        if (list !=null){
+            for (ManagerTranscation managerTranscation : list) {
+                if (managerTranscation.getUserId() !=null){
+                    BankUser bankUser = bankUserMapper.selectByPrimaryKey(managerTranscation.getUserId());
+                            managerTranscation.setBankUser(bankUser);
+                    if (bankUser.getIdCard()!=null && !bankUser.getIdCard().equals("")){
+                        managerTranscation.getBankUser().setIdCard(handlingIdCards(managerTranscation.getBankUser().getIdCard()));
+                    }
+                }
+            }
+        }
+
         return list;
     }
 
@@ -260,13 +295,7 @@ public class BankManagerService {
 
         bankCardMapper.updateByPrimaryKeySelective(bankCard);
 
-        //
-        try {
-            SendSmsResponse sendSmsResponse = SendUpgradeCardOK.sendSms(bankCard.getBankCardPhone(), StarUtil.StringAddStar(bankCard.getBankCardNumber(), 6, 4), managerTranscation1.getGmtModified());
-            System.out.println("Message=" + sendSmsResponse.getMessage());
-        } catch (ClientException e) {
-            e.printStackTrace();
-        }
+
     }
 
     /**
@@ -287,26 +316,40 @@ public class BankManagerService {
         managerTranscation1.setGmtModified(new Date());
         managerTranscation1.setManagerId(2);
         managerTranscationMapper.updateByPrimaryKeySelective(managerTranscation1);
-        criteria.andEqualTo("bankCardNumber",managerTranscation1.getBankCard());
-        BankCard bankCard = bankCardMapper.selectOneByExample(example);
-        try {
-            SendUpgradeCardOK.sendSms(bankCard.getBankCardPhone(), StarUtil.StringAddStar(bankCard.getBankCardNumber(),6,4),managerTranscation1.getGmtModified());
-        } catch (ClientException e) {
-            e.printStackTrace();
-        }
+
     }
 
-
-    public List<ManagerTranscation> selectManagerTranscationAll() {
-        List<ManagerTranscation> managerTranscations = managerTranscationMapper.selectAll();
-        return managerTranscations;
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 查询事务数量
+      * @data: 2019/8/21 14:35
+      */
+    public String selectManagerTranscationAll() {
+        Integer selectcount = managerTranscationMapper.selectcount();
+        return selectcount.toString();
     }
-
-    public List<TransferRecord> selectTransferRecordAll() {
-        return transferRecordMapper.selectAll();
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 查询转账记录数量
+      * @data: 2019/8/21 14:35
+      */
+    public String selectTransferRecordAll() {
+        Integer selectcount = transferRecordMapper.selectcount();
+        return selectcount .toString();
     }
-
-    public List<BankUser> selectBankUserAll() {
-        return bankUserMapper.selectAll();
+     /**
+      * @author: zhanglei
+      * @param:
+      * @return:
+      * @description: 查询用户数量
+      * @data: 2019/8/21 14:35
+      */
+    public String  selectBankUserAll() {
+        Integer i = bankUserMapper.selectcount();
+        return i.toString();
     }
 }

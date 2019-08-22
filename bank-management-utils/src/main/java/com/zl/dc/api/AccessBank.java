@@ -60,7 +60,9 @@ public class AccessBank {
     public static String getSubordinateBank(String cardNo) {
         String cardDetail = getCardDetail(cardNo);
         JSONObject json = JSONObject.parseObject(cardDetail);
-        System.out.println(json.toJSONString());
+        if (json.get("bank") == null) {
+            return null;
+        }
         return json.get("bank").toString();
     }
 

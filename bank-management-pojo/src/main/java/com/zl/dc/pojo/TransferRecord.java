@@ -67,6 +67,7 @@ public class TransferRecord {
      * 104 手机转账
      * 105 企业转个人
      * 106 个人转企业
+     * 107 资金归集
      */
     @Column(name = "transfer_type")
     private Byte transferType;
@@ -167,5 +168,8 @@ public class TransferRecord {
     //总页数
     @Transient
     private Integer totalPageNum;
+
+    @Transient
+    private String rows;
 
 }

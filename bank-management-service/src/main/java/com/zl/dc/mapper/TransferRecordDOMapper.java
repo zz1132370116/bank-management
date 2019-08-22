@@ -10,19 +10,23 @@ import java.util.List;
 public interface TransferRecordDOMapper {
 
     /**
+    * @author: Redsheep
+    * @Param planId 归集计划id
+    * @return: List<TransferRecord>
+    * @description: 选择归集计划id查出归集计划记录
+    * @data: 2019/8/19 9:17
+    */
+    List<TransferRecord> selectFundCollectionRecord(Integer planId);
+
+    /**
      * @version: V1.0
      * @author: redsheep
      * @className: TransferRecordDOMapper
      * @description: 根据月份查转账记录
      * @data: 2019/8/13 13:56
      */
-    List<TransferRecord> selectByUserIdAndMonthAndCard(@Param("userId") Integer userId,
-                                                       @Param("startDay") String startDay,
-                                                       @Param("endDay") String endDay,
-                                                       @Param("index") Integer index,
-                                                       @Param("limit") Integer limit,
-                                                       @Param("bankCard") String bankCard);
-
+    List<TransferRecord> selectByUserIdAndMonthAndCard(Integer userId,String startDay,String endDay,
+                                                       Integer index,Integer limit,String bankCard);
 
     int deleteByPrimaryKey(Integer transferRecordId);
 

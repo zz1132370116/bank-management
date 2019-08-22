@@ -24,13 +24,25 @@
         bank_card_status, bank_card_phone, bank_card_transfer_limit, gmt_create, gmt_modified
     </sql>
     <sql id="View_Column_List">
-        bank_card_id, bank_card_number, bank_card_type
+        bank_card_id, bank_card_number, bank_card_type, bank_card_balance
     </sql>
 
+    <update id="updateBankCardStatus">
+        UPDATE bank_card
+        SET bank_card_status = #{status}
+        WHERE bank_card_id = #{bankCardId}
+    </update>
+
+    <select id="selectByBankCardIdAndPassword" resultType="java.lang.Integer">
+        SELECT bank_card_id FROM `bank_card`
+        WHERE bank_card_id = #{bankCardId}
+        AND bank_card_password = #{password}
+        AND user_id = #{userId}
+    </select>
 
     <select id="selectBankCardNumberById" parameterType="java.lang.Integer" resultType="java.lang.String">
         SELECT bank_card_number
-        FROM bank_card
+        FROM `bank_card`
         WHERE bank_card_id = #{bankCardId}
     </select>
 

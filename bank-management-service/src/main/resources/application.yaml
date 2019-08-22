@@ -5,7 +5,7 @@ spring:
   application:
     name: web-service
   datasource:
-    url: jdbc:mysql://10.1.12.77/bank_management?useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true
+    url: jdbc:mysql://10.1.12.77/bank_management?useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull
     username: root
     password: 123
     driver-class-name: com.mysql.jdbc.Driver
@@ -21,7 +21,7 @@ spring:
   redis:
     host: 10.1.12.77
     port: 6379
-    timeout: 20000
+    timeout: 60000
     password: 123
 ribbon:
   ConnectTimeout: 60000
@@ -47,8 +47,8 @@ eureka:
       defaultZone: http://10.1.12.77:10081/eureka
   instance:
     prefer-ip-address: true
-    ip-address: 127.0.0.1
-    instance-id: ${eureka.instance.ip-address}.${server.port}
+    ip-address: 10.1.12.182
+    instance-id: ${spring.application.name}:${server.port}
     lease-renewal-interval-in-seconds: 3
     lease-expiration-duration-in-seconds: 10
 

@@ -50,11 +50,11 @@ public class AuthController {
 
 
     /**
-     * @author: zhanglei
-     * @param: [bankUser]
-     * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
-     * @description: 根据密码登录
-     * @data: 2019/8/5 20:12
+     * @author pds
+     * @param bankUser
+     * @return org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description 登录----密码登录
+     * @date 2019/8/20 11:09
      */
     @PostMapping("/login")
     public ResponseEntity<BaseResult> login(@RequestBody BankUser bankUser) {
@@ -86,11 +86,11 @@ public class AuthController {
     }
 
     /**
-     * @author: zhanglei
-     * @param: [bankUser]
-     * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
-     * @description: 根据验证码登录
-     * @data: 2019/8/5 19:14
+     * @author pds
+     * @param bankUser
+     * @return org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description 登录----验证码登录
+     * @date 2019/8/20 11:08
      */
     @PostMapping("/loginBySendSms")
     public ResponseEntity<BaseResult> loginBySendSms(@RequestBody BankUserVo bankUser) {
@@ -103,7 +103,7 @@ public class AuthController {
                 }
             }
             //判断验证码是否为空
-            if (StringUtils.isNotBlank(bankUser.getCode())) {
+            if (!StringUtils.isNotBlank(bankUser.getCode())) {
                 return ResponseEntity.ok(new BaseResult(3, "验证码不能为空"));
             }
 

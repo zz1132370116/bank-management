@@ -69,8 +69,8 @@ public class AdminController {
      */
     @GetMapping("/selectBankUserAll")
     public ResponseEntity<BaseResult> GetUserList() {
-        List<BankUser> bankUsers = adminService.selectBankUserAll();
-        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", bankUsers.size()));
+        Integer integer = adminService.selectBankUserAll();
+        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data",integer));
     }
 
     /**
@@ -82,8 +82,8 @@ public class AdminController {
      */
     @GetMapping("/selectTransferRecordAll")
     public ResponseEntity<BaseResult> GetRecords() {
-        List<TransferRecord> transferRecords = adminService.selectTransferRecordAll();
-        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", transferRecords.size()));
+       Integer transferRecords = adminService.selectTransferRecordAll();
+        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", transferRecords));
     }
 
     /**
@@ -95,8 +95,8 @@ public class AdminController {
      */
     @GetMapping("/selectManagerTranscationAll")
     public ResponseEntity<BaseResult> GetAbnormals() {
-        List<ManagerTranscation> managerTranscations = adminService.selectManagerTranscationAll();
-        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", managerTranscations.size()));
+        Integer integer = adminService.selectManagerTranscationAll();
+        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", integer));
     }
 
     /**
@@ -114,7 +114,8 @@ public class AdminController {
                 //进行条件查询
                 List<TransferRecord> transferRecords = adminService.getRecordsByParams(transferRecord);
                 if (transferRecords !=null){
-                    int totalPageNum = (transferRecords.size() +10 - 1) / 10;
+                    Integer integer = adminService.selectTransferRecordAll();
+                    int totalPageNum = (integer +10 - 1) / 10;
                     return ResponseEntity.ok(new BaseResult(0, "条件查询成功").append("data", transferRecords).append("data",totalPageNum));
                 }
                 return ResponseEntity.ok(new BaseResult(0, "数据为空"));
@@ -122,8 +123,9 @@ public class AdminController {
 
         //查询所有记录
         List<TransferRecord> transferRecords = adminService.GetRecords(transferRecord.getPageNum());
-        int totalPageNum = (transferRecords.size() +10 - 1) / 10;
-        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", transferRecords).append("data",totalPageNum));
+        Integer integer = adminService.selectTransferRecordAll();
+        int totalPageNum = (integer +10 - 1) / 10;
+        return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", transferRecords).append("totalPageNum",totalPageNum));
 
     }
     /**
@@ -139,15 +141,18 @@ public class AdminController {
         if ((bankUser.getUserName()!=null && !bankUser.getUserName().equals("")) ||(bankUser.getIdCard()!=null && !bankUser.getIdCard().equals(""))){
            List<BankUser> users = adminService.getUserListByParams(bankUser);
            if (users !=null){
-               int totalPageNum = (users.size() +10 - 1) / 10;
-               return ResponseEntity.ok(new BaseResult(0,"条件查询成功").append("data",users).append("data",totalPageNum));
+               Integer integer = adminService.selectBankUserAll();
+
+               int totalPageNum = (integer +10 - 1) / 10;
+               return ResponseEntity.ok(new BaseResult(0,"条件查询成功").append("data",users).append("totalPageNum",totalPageNum));
            }
             return ResponseEntity.ok(new BaseResult(0,"数据为空"));
         }
         //查询所有
         List<BankUser> users = adminService.GetUserList(bankUser.getPageNum());
-        int totalPageNum = (users.size() +10 - 1) / 10;
-        return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",users).append("data",totalPageNum));
+        Integer integer = adminService.selectBankUserAll();
+        int totalPageNum = (integer +10 - 1) / 10;
+        return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",users).append("totalPageNum",totalPageNum));
     }
     /**
      * @author: zhanglei
@@ -188,7 +193,7 @@ public class AdminController {
      */
     @GetMapping("/loginOut/{userName}")
     public ResponseEntity<BaseResult>loginOut(@PathVariable("userName")String userName){
-        if (userName !=null && userName.equals("")){
+        if (userName !=null && !userName.equals("")){
             adminService.loginOut(userName);
             return ResponseEntity.ok(new BaseResult(0,"成功"));
         }
@@ -201,12 +206,13 @@ public class AdminController {
      * @description: 查询申请中的提卡信息
      * @data: 2019/8/9 14:55
      */
-    @GetMapping("/getManagerTranscations")
-    public ResponseEntity<BaseResult> getManagerTranscations(@RequestBody ManagerTranscation managerTranscation){
-        List<ManagerTranscation> managerTranscations =adminService.getManagerTranscations(managerTranscation);
+    @GetMapping("/getManagerTranscations/{pageNum}")
+    public ResponseEntity<BaseResult> getManagerTranscations(@PathVariable("pageNum") Integer pageNum){
+        List<ManagerTranscation> managerTranscations =adminService.getManagerTranscations(pageNum);
         if (managerTranscations != null){
-            int totalPageNum = (managerTranscations.size() +10 - 1) / 10;
-            return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",managerTranscations).append("data",totalPageNum));
+            Integer integer = adminService.selectManagerTranscationAll();
+            int totalPageNum = (integer +10 - 1) / 10;
+            return ResponseEntity.ok(new BaseResult(0,"查询成功").append("data",managerTranscations).append("totalPageNum",totalPageNum));
         }
         return ResponseEntity.ok(new BaseResult(1,"查询失败"));
     }

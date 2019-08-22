@@ -52,18 +52,28 @@ public class LoginFilter extends ZuulFilter {
         String requestURI = request.getRequestURI();
         //  /v1/auth-service/login  --> ["","v1","auth-service","login"]
         String[] pathArr = requestURI.split("/");
-        String[] notVerifiedPath = {"loginBySendSms","sendSms","login","registrySms","registry","bankEnterpriseLogin"};
-        //3.2 如果路径是 /auth-service/login ，当前拦截不执行
-        for (String path  : notVerifiedPath) {
+        String[] notVerifiedPath = {"loginBySendSms","sendSms","login","registrySms","registry","bankEnterpriseLogin","getAllSubordinateBank"};
+        String[] adminPermission = {"getLogin","selectBankUserAll","selectTransferRecordAll",
+                "selectManagerTranscationAll","getTransferRecords","getBankUserList","memberStart",
+                "memberStop","loginOut","getManagerTranscations","adopt","NoPassage"};
 
-            if(path.equals(pathArr[3])){
-                return false;
-            }
-
+        //如果是管理员的就不拦截
+        String server = "admin-service";
+        if (server.equals(pathArr[2])){
+            return false;
         }
 
+        //3.2 如果路径是 /auth-service/login ，当前拦截不执行
+//        for (String path  : notVerifiedPath) {
+//
+//            if(path.equals(pathArr[3])){
+//                return false;
+//            }
+//
+//        }
+
         //3.3 其他都执行
-        return true;
+        return false;
     }
 
     @Override

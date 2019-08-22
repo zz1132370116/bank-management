@@ -92,8 +92,6 @@ public class TransferRecordService {
         insertTransferRecord(transferRecord);
         //拼接查询条件
         return selectTransferRecordByUuid(transferRecord.getTransferRecordUuid());
-
-
     }
 
     /**
@@ -201,6 +199,7 @@ public class TransferRecordService {
         }
         // 查询语句
         List<TransferRecord> transferRecordList = transferRecordDOMapper.selectByUserIdAndMonthAndCard(userId, startDay.toString(), endDay.toString(), pageBean.getIndex(), pageBean.getPageSize(), bankCard);
+
         /**
          * 查询结果的处理
          * 1.收款银行卡加*
@@ -226,9 +225,10 @@ public class TransferRecordService {
     /**
      * @author pds
      * @param enterpriseEmployees
+     * @param bankEnterprise
      * @return java.util.List<com.zl.dc.vo.EnterpriseEmployee>
      * @description 企业批量转账
-     * @date 2019/8/16 20:23
+     * @date 2019/8/20 13:42
      */
     public List<EnterpriseEmployee> addTransferRecordDueToBankEnterprise(List<EnterpriseEmployee> enterpriseEmployees, BankEnterprise bankEnterprise){
         List<EnterpriseEmployee> enterpriseEmployeeList = new ArrayList<>();
@@ -238,11 +238,12 @@ public class TransferRecordService {
         transferRecord.setTransferType(Byte.parseByte("105"));
         transferRecord.setUserId(bankEnterprise.getEnterpriseId());
         transferRecord.setBankOutCard(bankEnterprise.getEnterpriseBankCard());
+        transferRecord.setTransferNote("企业转账");
 
         for (EnterpriseEmployee enterpriseEmployee : enterpriseEmployees) {
             transferRecord.setTransferRecordUuid(UUID.randomUUID().toString().replaceAll("-", ""));
             transferRecord.setInCardUserName(enterpriseEmployee.getUserName());
-            transferRecord.setBankInIdentification("");
+            transferRecord.setBankInIdentification(enterpriseEmployee.getBankInIdentification());
             transferRecord.setBankInCard(enterpriseEmployee.getUserBankCardNumber());
             transferRecord.setGmtModified(new Date());
             transferRecord.setGmtCreate(new Date());
@@ -252,7 +253,12 @@ public class TransferRecordService {
             //新增转账记录
             this.selectTransferRecordByUuid(transferRecord.getTransferRecordUuid());
             //扣款
-            boolean transferStatus = bankCardService.bankCardTransferBusines(bankEnterprise.getEnterpriseBankCardId(), enterpriseEmployee.getUserBankCardNumber(), enterpriseEmployee.getMoney());
+            boolean transferStatus = bankCardService.enterpriseTransfer(
+                    bankEnterprise.getEnterpriseBankCard(),
+                    enterpriseEmployee.getUserBankCardNumber(),
+                    enterpriseEmployee.getBankInIdentification(),
+                    enterpriseEmployee.getMoney()
+            );
 
             if (transferStatus) {
                 //成功
@@ -268,6 +274,29 @@ public class TransferRecordService {
         }
 
         return enterpriseEmployeeList;
+    }
+
+    /**
+     * @author: Redsheep
+     * @Param planId 归集计划id
+     * @return: java.util.List<com.zl.dc.pojo.TransferRecord>
+     * @description: 归集计划记录
+     * @data: 2019/8/19 9:36
+     */
+    public List<TransferRecord> getFundCollectionRecordList(Integer planId) {
+        List<TransferRecord> transferRecordList = transferRecordDOMapper.selectFundCollectionRecord(planId);
+        if (transferRecordList == null) {
+            return null;
+        }
+        ListIterator<TransferRecord> transferRecordListIterator = transferRecordList.listIterator();
+        TransferRecord transferRecord;
+        String type;
+        while (transferRecordListIterator.hasNext()) {
+            transferRecord = transferRecordListIterator.next();
+            type = changeTransferStatus(transferRecord.getTransferStatus().toString());
+            transferRecord.setTransferStringStatus(type);
+        }
+        return transferRecordList;
     }
 
     /**
@@ -293,6 +322,8 @@ public class TransferRecordService {
                 return "企业转个人";
             case "106":
                 return "个人转企业";
+            case "107":
+                return "资金归集";
             default:
                 return "未知";
         }
@@ -317,4 +348,6 @@ public class TransferRecordService {
                 return "未知";
         }
     }
+
+
 }

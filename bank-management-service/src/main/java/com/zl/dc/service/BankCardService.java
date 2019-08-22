@@ -1,16 +1,13 @@
 package com.zl.dc.service;
 
-import com.zl.dc.mapper.BankCardDOMapper;
-import com.zl.dc.mapper.BankCardMapper;
-import com.zl.dc.mapper.ManagerTranscationMapper;
-import com.zl.dc.mapper.OtherBankCardMapper;
+import com.zl.dc.mapper.*;
 import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.ManagerTranscation;
 import com.zl.dc.pojo.OtherBankCard;
 import com.zl.dc.util.MD5;
 import com.zl.dc.util.StarUtil;
-import com.zl.dc.vo.BaseResult;
+import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.TransferValueVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +42,8 @@ public class BankCardService {
     @Resource
     private ManagerTranscationMapper managerTranscationMapper;
     @Resource
+    private OtherBankCardDOMapper otherBankCardDOMapper;
+    @Resource
     private UserService userService;
 
     /**
@@ -56,8 +55,8 @@ public class BankCardService {
      */
     public boolean BankCardPasswordCheck(BankCard bankCard, String password) {
 //            将传入密码加密处理
-//        String BankCardPasswod = MD5.GetMD5Code(password);
-        return password.equals(bankCard.getBankCardPassword());
+        String BankCardPasswod = MD5.GetMD5Code(password);
+        return BankCardPasswod.equals(bankCard.getBankCardPassword());
     }
 
     /**
@@ -88,7 +87,9 @@ public class BankCardService {
 
     /**
      * @author: lu
-     * @param: Integer outBankCardId, Integer inBankCardId, BigDecimal muchMoney
+     * @param: Integer outBankCardId
+     * @param: String inBankCardId
+     * @param: BigDecimal muchMoney
      * @return: * boolean
      * @description: 银行卡转账业务
      * @data: 2019/8/12 16:19
@@ -271,7 +272,7 @@ public class BankCardService {
     public BankCard getBankCardByBankCardId(String bankCardId) {
         BankCard bankCard = bankCardMapper.selectByPrimaryKey(Integer.parseInt(bankCardId));
         //将银行卡号变成*
-        bankCard.setBankCardNumber(StarUtil.StringAddStar(bankCard.getBankCardNumber(), 6, 4));
+        bankCard.setBankCardNumber(StarUtil.StringAddStar(bankCard.getBankCardNumber(), 4, 4));
         //将预留手机号变成*
         bankCard.setBankCardPhone(StarUtil.StringAddStar(bankCard.getBankCardPhone(), 3, 4));
         return bankCard;
@@ -314,14 +315,141 @@ public class BankCardService {
     }
 
     /**
-     * @param otherBankCard
-     * @return java.lang.Integer
-     * @author pds
-     * @description 插入他行银行卡
-     * @date 2019/8/16 20:53
+     * @author: Redsheep
+     * @Param otherBankCard
+     * @return: boolean
+     * @description: 绑定他行卡
+     * @data: 2019/8/14 16:16
      */
-    public Integer addOtherBankCard(OtherBankCard otherBankCard) {
-        Integer insert = otherBankCardMapper.insert(otherBankCard);
-        return insert;
+    public boolean addOtherBankCard(OtherBankCard otherBankCard) {
+        Date now = new Date();
+        otherBankCard.setGmtModified(now);
+        otherBankCard.setGmtCreate(now);
+        if (otherBankCardDOMapper.insertSelective(otherBankCard) == 1) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @author: Redsheep
+     * @Param otherBankCard
+     * @return: boolean
+     * @description: 查看该银行卡是否已存在数据库中
+     * @data: 2019/8/14 16:24
+     */
+    public boolean selectByUserIdAndCardNumber(OtherBankCard otherBankCard) {
+        return otherBankCardDOMapper.selectByUserIdAndCardNumber(otherBankCard) != null;
+    }
+
+    /**
+     * @author: Redsheep
+     * @Param otherBankCardId
+     * @return: boolean
+     * @description: 解绑他行卡
+     * @data: 2019/8/15 19:14
+     */
+    public boolean deleteByOtherBankCardId(Integer otherBankCardId) {
+        return otherBankCardDOMapper.deleteByOtherBankCardId(otherBankCardId) != null;
+    }
+
+    /**
+     * @author: Redsheep
+     * @Param bankCardId
+     * @return: boolean
+     * @description: 挂失本行卡
+     * @data: 2019/8/15 19:25
+     */
+    public boolean reportBankCardLoss(Integer bankCardId) {
+        return bankCardDOMapper.updateBankCardStatus(bankCardId, Byte.parseByte("101")) != null;
+    }
+
+    /**
+     * @author: Redsheep
+     * @Param bankCardId
+     * @Param password
+     * @return: boolean
+     * @description: 验证银行卡密码是否正确
+     * @data: 2019/8/15 19:27
+     */
+    public boolean verifyBankCardPassword(Integer bankCardId, String password, Integer userId) {
+        return bankCardDOMapper.selectByBankCardIdAndPassword(bankCardId, password, userId) != null;
+    }
+
+    /**
+     * @author: Redsheep
+     * @Param otherBankCardId
+     * @Param userId
+     * @return: boolean
+     * @description: 验证他行卡密码是否正确
+     * @data: 2019/8/15 20:01
+     */
+    public boolean verifyOtherBankCardPassword(Integer otherBankCardId, Integer userId) {
+        return otherBankCardDOMapper.selectByOtherBankCardIdAndPassword(otherBankCardId, userId) != null;
+    }
+
+    /**
+     * @author: Redsheep
+     * @Param bankCardId
+     * @return: java.lang.String
+     * @description: 根据银行卡id获得银行卡
+     * @data: 2019/8/19 16:32
+     */
+    public String selectBankCardNumberById(Integer bankCardId) {
+        return bankCardDOMapper.selectBankCardNumberById(bankCardId);
+    }
+
+
+    /**
+     * @author pds
+     * @param enterpriseBankCardNumber
+     * @param userBankCardNumber
+     * @param bankInIdentification
+     * @param money
+     * @return java.lang.Boolean
+     * @description 企业批量转账
+     * @date 2019/8/20 13:43
+     */
+    public Boolean enterpriseTransfer(String enterpriseBankCardNumber, String userBankCardNumber, String bankInIdentification, BigDecimal money){
+        BankCard enterpriseBankCard = selectBankCardByNum(enterpriseBankCardNumber);
+        if (enterpriseBankCard == null){
+            return false;
+        }
+        //本行卡
+        if ("999999".equals(userBankCardNumber.substring(0,6))){
+            BankCard bankCard = selectBankCardByNum(userBankCardNumber);
+            if (bankCard == null){
+                return false;
+            }
+            BigDecimal balance = bankCard.getBankCardBalance().add(money);
+            bankCard.setBankCardBalance(balance);
+            Integer user = bankCardMapper.updateByPrimaryKeySelective(bankCard);
+            if (user == 0){
+                return false;
+            }
+        }
+        //非本行卡
+        else {
+            switch (bankInIdentification){
+                case "PSBC":{
+                    //调用中国邮政储蓄银行的转账接口
+                    break;
+                }
+                case "ABC":{
+                    //调用中国农业银行的转账接口
+                    break;
+                }
+                default:{
+
+                }
+            }
+        }
+        BigDecimal enterpriseBalance = enterpriseBankCard.getBankCardBalance().subtract(money);
+        enterpriseBankCard.setBankCardBalance(enterpriseBalance);
+        Integer enterprise = bankCardMapper.updateByPrimaryKeySelective(enterpriseBankCard);
+        if (enterprise == 0){
+            return false;
+        }
+        return true;
     }
 }

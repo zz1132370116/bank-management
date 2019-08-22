@@ -23,7 +23,7 @@ public class RedisInsertUtil {
      * @description: 添加错误信息到redis，0点删除
      * @data: 2019/8/19 11:10
      */
-    public static void addingData(StringRedisTemplate stringRedisTemplate, String key, String value) {
+    public static Integer addingData(StringRedisTemplate stringRedisTemplate, String key, String value) {
         stringRedisTemplate.afterPropertiesSet();
         Calendar calendar = Calendar.getInstance();
         Integer hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -34,5 +34,6 @@ public class RedisInsertUtil {
         }
         times += 1;
         stringRedisTemplate.opsForValue().set(key, times.toString(), 24 - hour, TimeUnit.HOURS);
+        return times;
     }
 }

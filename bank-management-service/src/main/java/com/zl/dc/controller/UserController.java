@@ -1,17 +1,15 @@
 package com.zl.dc.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
-import com.zl.dc.api.VerifyIdCard;
-import com.zl.dc.config.SmsChangePassword;
-import com.zl.dc.config.SmsChangePhone;
-import com.zl.dc.config.SmsLogin;
-import com.zl.dc.config.SmsRegistry;
+import com.zl.dc.config.*;
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.service.UserService;
 import com.zl.dc.util.BankUserPasswordUtil;
 import com.zl.dc.util.NumberValid;
+import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.BaseResult;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -22,14 +20,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -61,9 +56,6 @@ public class UserController {
                 return ResponseEntity.ok(new BaseResult(1,"手机号不正确"));
             }
             String code = RandomStringUtils.randomNumeric(6);
-            /*System.out.println(code);
-            redisTemplate.opsForValue().set(phone+code,code,5,TimeUnit.MINUTES);
-            return ResponseEntity.ok(new BaseResult(0, "发送成功"));*/
 
             SendSmsResponse smsResponse;
             try {
@@ -94,29 +86,31 @@ public class UserController {
      */
     @PostMapping("/register")
     public BaseResult register(@RequestBody BankUserVo bankUserVo){
-        //通过手机号+验证码从redis中获取验证码
-        String code = redisTemplate.opsForValue().get(bankUserVo.getUserPhone()+bankUserVo.getCode());
-        //判断传过来的验证码是否正确
-        if (code != null){
-            //通过手机号查询用户信息
-            BankUser bankUserByUserPhone = userService.getBankUserByUserPhone(bankUserVo.getUserPhone());
-            if(bankUserByUserPhone != null){
-                userService.updateBankUserPhoneToNull(bankUserByUserPhone);
+        if(StringUtils.isNoneBlank(bankUserVo.getUserPhone(),bankUserVo.getCode())){
+            //通过手机号+验证码从redis中获取验证码
+            String code = redisTemplate.opsForValue().get(bankUserVo.getUserPhone()+bankUserVo.getCode());
+            //判断传过来的验证码是否正确
+            if (code != null){
+                //通过手机号查询用户信息
+                BankUser bankUserByUserPhone = userService.getBankUserByUserPhone(bankUserVo.getUserPhone());
+                if(bankUserByUserPhone != null){
+                    userService.updateBankUserPhoneToNull(bankUserByUserPhone);
+                }
+                BankUser bankUser = new BankUser();
+                bankUser.setUserPhone(bankUserVo.getUserPhone());
+                bankUser.setUserPassword(BankUserPasswordUtil.generate(bankUserVo.getUserPassword()));
+                bankUser.setUserName("");
+                Byte status = 100;
+                bankUser.setUserStatus(status);
+                bankUser.setDefaultBankCard("");
+                bankUser.setGmtCreate(new Date());
+                bankUser.setGmtModified(new Date());
+                userService.addBankUser(bankUser);
+                return new BaseResult(0,"注册成功");
             }
-            BankUser bankUser = new BankUser();
-            bankUser.setUserPhone(bankUserVo.getUserPhone());
-            bankUser.setUserPassword(BankUserPasswordUtil.generate(bankUserVo.getUserPassword()));
-            bankUser.setUserName("");
-            Byte status = 0;
-            bankUser.setUserStatus(status);
-            bankUser.setDefaultBankCard("");
-            bankUser.setGmtCreate(new Date());
-            bankUser.setGmtModified(new Date());
-            userService.addBankUser(bankUser);
-            return new BaseResult(0,"注册成功");
-        }else{
             return new BaseResult(1,"对不起，验证码错误或已过期");
         }
+        return new BaseResult(1,"注册失败");
     }
 
     /**
@@ -129,8 +123,8 @@ public class UserController {
     @PostMapping("/query")
     public BaseResult queryUser(@RequestBody BankUserVo bankUser) {
         BankUser user;
-        //1 通过手机号查询用户
-        if (bankUser.getUserPhone().equals("")) {
+
+        if (!StringUtils.isNotBlank(bankUser.getUserPhone())) {
             //通过身份证号查询用户信息
             user = this.userService.getBankUserByIdCard(bankUser.getIdCard());
         } else {
@@ -152,23 +146,13 @@ public class UserController {
             if (verifyPassword) {
                 //登录成功，移除登录失败次数
                 redisTemplate.delete(user.getUserPhone()+user.getIdCard());
-                //将修改手机号之后的用户的信息保存到redis中，使用手机号作为key
+                redisTemplate.opsForValue().set("user-"+user.getUserId().toString()+"-userInfo", JSON.toJSONString(user));
                 redisTemplate.opsForValue().set(user.getUserPhone(),JSONObject.toJSONString(user));
-                //将修改手机号之后的用户的信息保存到redis中，使用用户id作为key
                 redisTemplate.opsForValue().set(user.getUserId().toString(),JSONObject.toJSONString(user));
                 return new BaseResult(0,"登录成功").append("user",user);
-            }else{
-                //密码错误
-                //获取当前的小时
-                Calendar calendar = Calendar.getInstance();
-                Integer hour = calendar.get(Calendar.HOUR_OF_DAY);
-                Integer times = 0;
-
-                if(timesStr != null && !"".equals(timesStr)){
-                    times = Integer.parseInt(timesStr);
-                }
-                times += 1;
-                redisTemplate.opsForValue().set(user.getUserPhone()+user.getIdCard(),times.toString(),24-hour,TimeUnit.HOURS);
+            }
+            else{
+                Integer times = RedisInsertUtil.addingData(redisTemplate, user.getUserPhone() + user.getIdCard(), timesStr);
                 return new BaseResult(2,"输错密码"+times+"次，只有"+(3-times)+"次机会了");
             }
         }
@@ -189,10 +173,9 @@ public class UserController {
         //判断传过来的验证码是否正确
         if (code != null){
             BankUser bankUserByUserPhone = userService.getBankUserByUserPhone(bankUser.getUserPhone());
-
-            //将修改手机号之后的用户的信息保存到redis中，使用手机号作为key
+            redisTemplate.delete(bankUser.getUserPhone()+bankUser.getCode());
+            redisTemplate.opsForValue().set("user-"+bankUserByUserPhone.getUserId().toString()+"-userInfo", JSON.toJSONString(bankUserByUserPhone));
             redisTemplate.opsForValue().set(bankUserByUserPhone.getUserPhone(),JSONObject.toJSONString(bankUserByUserPhone));
-            //将修改手机号之后的用户的信息保存到redis中，使用用户id作为key
             redisTemplate.opsForValue().set(bankUserByUserPhone.getUserId().toString(),JSONObject.toJSONString(bankUserByUserPhone));
             return new BaseResult(0,"登录成功").append("user",bankUserByUserPhone);
         }else{
@@ -201,14 +184,15 @@ public class UserController {
     }
 
     /**
-     * @author: zhanglei
-     * @param: []
-     * @return:org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
-     * @description: 通过验证码登录----获取验证码
-     * @data: 2019/8/5 19:21
+     * @author pds
+     * @param bankUser
+     * @return org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description 通过验证码登录----获取验证码
+     * @date 2019/8/21 20:03
      */
     @PostMapping("/sendSms")
     public ResponseEntity<BaseResult> sendSms(@RequestBody BankUser bankUser) {
+
         try {
             if (StringUtils.isNotBlank(bankUser.getUserPhone())) {
                 //验证手机号是否正确
@@ -226,7 +210,7 @@ public class UserController {
                 //密码错误次数达到3次之后会暂时将账号冻结，在冻结时间之内不允许该用户登录
                 // 这里先从redis里查该用户是否被禁止登录
                 String timesStr = redisTemplate.opsForValue().get(user.getUserPhone()+user.getIdCard());
-                if (timesStr.equals("3")){
+                if (StringUtils.isNotBlank(timesStr) && timesStr.equals("3")){
                     return ResponseEntity.ok(new BaseResult(3,"您今天的输错密码的次数为3次，请明天再试，或者选择忘记密码"));
                 }
 
@@ -236,7 +220,6 @@ public class UserController {
                 //存redis5分钟，因为用户的信息是使用手机号为key存放到redis中的，为了防止将用户信息覆盖，
                 // 因此将这里的key设置为手机号+验证码
                 redisTemplate.opsForValue().set(bankUser.getUserPhone()+code, code, 5, TimeUnit.MINUTES);
-                System.out.println("手机验证码为:" + code);
                 //3 发送短信
                 SendSmsResponse smsResponse = SmsLogin.sendSms(bankUser.getUserPhone(), code);
                 if ("OK".equalsIgnoreCase(smsResponse.getCode())) {
@@ -279,7 +262,6 @@ public class UserController {
             //发送短信
             //1、生成验证码
             String code = RandomStringUtils.randomNumeric(6);
-            System.out.println("手机验证码为:" + code);
             //存redis5分钟，因为用户的信息是使用手机号为key存放到redis中的，为了防止将用户信息覆盖，
             // 因此将这里的key设置为手机号+验证码
             redisTemplate.opsForValue().set(user.getUserPhone()+code,code,5,TimeUnit.MINUTES);
@@ -321,6 +303,7 @@ public class UserController {
             String code = redisTemplate.opsForValue().get(user.getUserPhone()+user.getCode());
             //判断传过来的验证码和从redis中获取的验证码是否一致
             if(code != null && !"".equals(code)){
+                redisTemplate.delete(user.getUserPhone()+user.getCode());
                 return ResponseEntity.ok(new BaseResult(0, "验证码正确"));
             }
             return ResponseEntity.ok(new BaseResult(1, "验证码错误或验证码已经过时"));
@@ -355,6 +338,7 @@ public class UserController {
                 BankUser bankUser = userService.updateBankUserPassword(bankUser1);
                 redisTemplate.delete(bankUser.getUserPhone()+bankUser.getIdCard());
                 //将修改手机号之后的用户的信息保存到redis中，使用手机号作为key
+                redisTemplate.opsForValue().set("user-"+user.getUserId().toString()+"-userInfo", JSON.toJSONString(user));
                 redisTemplate.opsForValue().set(bankUser.getUserPhone(),JSONObject.toJSONString(bankUser));
                 //将修改手机号之后的用户的信息保存到redis中，使用用户id作为key
                 redisTemplate.opsForValue().set(bankUser.getUserId().toString(),JSONObject.toJSONString(bankUser));
@@ -377,14 +361,14 @@ public class UserController {
      */
     @PostMapping("/updatePhoneSms")
     public ResponseEntity<BaseResult> updatePhoneSms(@RequestBody BankUserVo user){
-        boolean isOldPhone = user.getOldPhone() != null && !"".equals(user.getOldPhone());
+        boolean isOldPhone = StringUtils.isNotBlank(user.getOldPhone());
         if (isOldPhone){
             //验证旧手机号是否正确
             if (!NumberValid.verifyPhone(user.getOldPhone())){
                 return ResponseEntity.ok(new BaseResult(1, "该手机号不正确"));
             }
         }
-        boolean isUserPhone = user.getUserPhone() != null && !"".equals(user.getUserPhone());
+        boolean isUserPhone = StringUtils.isNotBlank(user.getUserPhone());
         if (isUserPhone){
             //验证新手机号是否正确
             if (!NumberValid.verifyPhone(user.getUserPhone())){
@@ -399,7 +383,7 @@ public class UserController {
             if(isOldPhone && !isUserPhone){
                 //从redis中根据手机号获取对应的用户信息
                 String bankUserStr = redisTemplate.opsForValue().get(user.getOldPhone());
-                if (bankUserStr == null || "".equals(bankUserStr)){
+                if (!StringUtils.isNotBlank(bankUserStr)){
                     return ResponseEntity.ok(new BaseResult(1, "该手机未注册账号，请重新输入"));
                 }
 
@@ -431,7 +415,6 @@ public class UserController {
         //存redis5分钟，因为用户的信息是使用手机号为key存放到redis中的，为了防止将用户信息覆盖，
         // 因此将这里的key设置为手机号+验证码
         redisTemplate.opsForValue().set(phone+code,code,5,TimeUnit.MINUTES);
-        System.out.println("手机验证码为:" + code);
         //3、发送短信
         SendSmsResponse smsResponse;
         try {
@@ -468,6 +451,7 @@ public class UserController {
             String code = redisTemplate.opsForValue().get(user.getOldPhone()+user.getCode());
             //判断传过来的验证码和从redis中获取的验证码是否一致
             if(code != null && !"".equals(code)){
+                redisTemplate.delete(user.getOldPhone()+user.getCode());
                 return ResponseEntity.ok(new BaseResult(0, "验证码正确"));
             }
             return ResponseEntity.ok(new BaseResult(1, "验证码错误或验证码已经过时"));
@@ -483,7 +467,7 @@ public class UserController {
      * @date 2019/8/11 20:26
      */
     @PostMapping("/updatePhone")
-    public ResponseEntity<BaseResult> updatePhone(BankUserVo bankUser){
+    public ResponseEntity<BaseResult> updatePhone(@RequestBody BankUserVo bankUser){
         if (StringUtils.isNoneBlank(bankUser.getUserPhone(),bankUser.getCode())){
             //验证手机号是否正确
             if (!NumberValid.verifyPhone(bankUser.getUserPhone())){
@@ -491,7 +475,7 @@ public class UserController {
             }
 
             String code = redisTemplate.opsForValue().get(bankUser.getUserPhone()+bankUser.getCode());
-            if(code != null && !"".equals(code)){
+            if(StringUtils.isNotBlank(code)){
                 //修改手机号之前先查询是否已经存在
                 BankUser bankUserByUserPhone = userService.getBankUserByUserPhone(bankUser.getUserPhone());
                 if (bankUserByUserPhone != null){
@@ -499,9 +483,11 @@ public class UserController {
                 }
                 //修改手机号
                 BankUser user = userService.updateBankUserPhone(bankUser);
+                redisTemplate.delete(bankUser.getUserPhone()+bankUser.getCode());
                 //将修改手机号之后的用户的信息保存到redis中，使用手机号作为key
                 redisTemplate.opsForValue().set(user.getUserPhone(),JSONObject.toJSONString(user));
                 //将修改手机号之后的用户的信息保存到redis中，使用用户id作为key
+                redisTemplate.opsForValue().set("user-"+user.getUserId().toString()+"-userInfo", JSON.toJSONString(user));
                 redisTemplate.opsForValue().set(user.getUserId().toString(),JSONObject.toJSONString(user));
                 return ResponseEntity.ok(new BaseResult(0, "修改成功"));
             }
@@ -526,6 +512,8 @@ public class UserController {
                     return ResponseEntity.ok(new BaseResult(2, "身份证已过期，认证失败"));
                 }else if (identity == 0){
                     return ResponseEntity.ok(new BaseResult(1, "认证失败，请稍后重试"));
+                }else if(identity == -3){
+                    return ResponseEntity.ok(new BaseResult(3, "该身份证已被实名，请使用身份证登录旧账号，如不是您本人认证的，请到银行柜台进行解绑业务"));
                 }
                 return ResponseEntity.ok(new BaseResult(0, "认证成功"));
             } catch (IOException e) {
@@ -540,14 +528,51 @@ public class UserController {
         return ResponseEntity.ok(new BaseResult(1, "认证失败，请稍后重试"));
     }
 
+    /**
+     * @author pds
+     * @param userId
+     * @return com.zl.dc.vo.BaseResult
+     * @description 退出登录
+     * @date 2019/8/19 19:52
+     */
     @GetMapping("/signOut")
     public BaseResult signOut(@RequestParam("userId") Integer userId){
-        BankUser user = userService.selectBankUserByUid(userId);
-        Boolean phoneDelete = redisTemplate.delete(user.getUserPhone());
-        Boolean userIdDelete = redisTemplate.delete(userId.toString());
-        if (userIdDelete && phoneDelete){
-            return new BaseResult(0, "退出登录成功");
+        if (userId != null && userId > 0){
+            BankUser user = userService.selectBankUserByUid(userId);
+            Boolean phoneDelete = redisTemplate.delete(user.getUserPhone());
+            Boolean userIdDelete = redisTemplate.delete(userId.toString());
+            Boolean userIdUserInfo = redisTemplate.delete("user-" + user.getUserId().toString() + "-userInfo");
+            if (userIdDelete && phoneDelete && userIdUserInfo){
+                return new BaseResult(0, "退出登录成功");
+            }
         }
         return new BaseResult(1, "退出登录失败");
+    }
+
+    /**
+     * @author pds
+     * @param bankUserVo
+     * @return org.springframework.http.ResponseEntity<com.zl.dc.vo.BaseResult>
+     * @description 设置默认银行卡
+     * @date 2019/8/19 19:53
+     */
+    @PostMapping("/setDefaultBankCard")
+    public ResponseEntity<BaseResult> setDefaultBankCard(@RequestBody BankUserVo bankUserVo){
+        if (StringUtils.isNotBlank(bankUserVo.getPassword())){
+            Boolean set = userService.setDefaultBankCard(bankUserVo);
+            if (set){
+                BankUser user = userService.selectBankUserByUid(bankUserVo.getUserId());
+                bankUserVo.setDefaultBankCard(StarUtil.StringAddStar(user.getDefaultBankCard(),6,4));
+                bankUserVo.setBankCardId(null);
+                bankUserVo.setPassword(null);
+                redisTemplate.opsForValue().set("user-"+user.getUserId().toString()+"-userInfo", JSON.toJSONString(user));
+                redisTemplate.opsForValue().set(user.getUserId().toString(), JSON.toJSONString(user));
+                redisTemplate.opsForValue().set(user.getUserPhone(), JSON.toJSONString(user));
+                return ResponseEntity.ok(new BaseResult(0, "设置成功").append("data",bankUserVo));
+            }else {
+                return ResponseEntity.ok(new BaseResult(1, "设置失败"));
+            }
+        }
+        return ResponseEntity.ok(new BaseResult(1, "设置失败"));
     }
 }

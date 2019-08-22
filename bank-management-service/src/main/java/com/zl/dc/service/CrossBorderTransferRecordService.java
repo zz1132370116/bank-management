@@ -95,8 +95,7 @@ public class CrossBorderTransferRecordService {
      * @data: 2019/8/13 10:15
      */
     public String CrossBorderTransfer(CrossBorderTransferRecord crossBorderTransferRecord) {
-        Example example = new Example(BankCard.class);
-        Example.Criteria criteria = example.createCriteria();
+
         //非空判断
         if (StringUtils.isNotBlank(crossBorderTransferRecord.getBankOutCard())
                 && StringUtils.isNotBlank(crossBorderTransferRecord.getBankInCard())
@@ -105,14 +104,13 @@ public class CrossBorderTransferRecordService {
             int from = crossBorderTransferRecord.getTransferRecordAmountFrom().compareTo(BigDecimal.ZERO);
             int to = crossBorderTransferRecord.getTransferRecordAmountTo().compareTo(BigDecimal.ZERO);
             //非0判断
+
             if (from != 0 && from != -1 && to != 0 && to != -1) {
                 //转账
-                //修改银行卡金额
-                criteria.andEqualTo("bankCardNumber", crossBorderTransferRecord.getBankOutCard());
                 //条件查询银行卡
-                BankCard bankCard = bankCardMapper.selectOneByExample(example);
+                BankCard bankCard = bankCardMapper.selectByPrimaryKey(crossBorderTransferRecord.getBankCardId());
                 //判断银行卡不为空并且银行卡可用
-                if (bankCard != null && bankCard.getBankCardStatus() == 0) {
+                if (bankCard != null && bankCard.getBankCardStatus() == 100) {
                     int i = bankCard.getBankCardBalance().compareTo(BigDecimal.ZERO);
                     //银行卡余额不为空 并且 银行卡余额大于转账金额
                     if (i != 0 && bankCard.getBankCardBalance().compareTo(crossBorderTransferRecord.getTransferRecordAmountFrom()) == 1) {

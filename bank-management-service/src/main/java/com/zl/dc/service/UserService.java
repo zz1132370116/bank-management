@@ -2,11 +2,17 @@ package com.zl.dc.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import com.zl.dc.api.VerifyIdCard;
 import com.zl.dc.mapper.UserMapper;
+import com.zl.dc.pojo.BankCard;
 import com.zl.dc.pojo.BankUser;
+import com.zl.dc.pojo.OtherBankCard;
+import com.zl.dc.util.MD5;
 import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.BaseResult;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -38,6 +44,8 @@ public class UserService {
      private UserMapper userMapper;
      @Resource
      private StringRedisTemplate redisTemplate;
+     @Autowired
+     private BankCardService bankCardService;
 
     /**
      * @author: zhanglei
@@ -157,10 +165,13 @@ public class UserService {
         frontMul.transferTo(frontFile);
         File backFile = File.createTempFile(UUID.randomUUID().toString().replaceAll("-", ""), backPrefix);
         backMul.transferTo(backFile);
-        //校验身份证背面，并判断身份证是否过期
+        //先校验身份证背面，并判断身份证是否过期
         String backJson = VerifyIdCard.back(backFile);
         JSONObject backJsonObject = JSONObject.parseObject(backJson);
         String expirationDateStr = (String) backJsonObject.getJSONObject("words_result").getJSONObject("失效日期").get("words");
+        if (!StringUtils.isNotBlank(expirationDateStr)){
+            return 0;
+        }
         String expiration = expirationDateStr.substring(0,4)+"-"+expirationDateStr.substring(4,6)+"-"+expirationDateStr.substring(6);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date expirationDate = simpleDateFormat.parse(expiration);
@@ -174,17 +185,54 @@ public class UserService {
         JSONObject wordsResult = frontJsonObject.getJSONObject("words_result");
         String userName = (String) wordsResult.getJSONObject("姓名").get("words");
         String idCard = (String) wordsResult.getJSONObject("公民身份号码").get("words");
+        if (!StringUtils.isNoneBlank(userName,idCard)){
+            return 0;
+        }
 
         BankUser user = new BankUser();
         user.setUserId(userId);
         user.setUserName(userName);
         user.setIdCard(idCard);
-        Integer i = userMapper.updateByPrimaryKeySelective(user);
+        Byte status = 101;
+        user.setUserStatus(status);
+        Integer i = 0;
+        try{
+            i = userMapper.updateByPrimaryKeySelective(user);
+        } catch (Exception exception){
+            exception.printStackTrace();
+            return -3;
+        }
 
         user = userMapper.selectByPrimaryKey(userId);
-        System.out.println(user);
+        redisTemplate.opsForValue().set("user-"+user.getUserId().toString()+"-userInfo", JSON.toJSONString(user));
+        redisTemplate.opsForValue().set(user.getUserPhone(), JSON.toJSONString(user));
         redisTemplate.opsForValue().set(user.getUserId().toString(), JSON.toJSONString(user));
 
+        //将产生的临时文件删除
+        VerifyIdCard.deleteFile(frontFile,backFile);
+
         return i;
+    }
+
+    /**
+     * @author pds
+     * @param bankUserVo
+     * @return java.lang.Boolean
+     * @description 设置默认银行卡
+     * @date 2019/8/20 9:13
+     */
+    public Boolean setDefaultBankCard(BankUserVo bankUserVo) {
+        BankCard bankCard = bankCardService.selectBankCardByid(bankUserVo.getBankCardId());
+        if (bankCard != null){
+            String password = MD5.GetMD5Code(bankUserVo.getPassword());
+            if (password.equals(bankCard.getBankCardPassword())){
+                BankUser user = new BankUser();
+                user.setUserId(bankUserVo.getUserId());
+                user.setDefaultBankCard(bankCard.getBankCardNumber());
+                userMapper.updateByPrimaryKeySelective(user);
+                return true;
+            }
+        }
+        return false;
     }
 }

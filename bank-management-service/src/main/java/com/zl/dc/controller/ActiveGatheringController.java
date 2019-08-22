@@ -42,6 +42,7 @@ public class ActiveGatheringController {
     @GetMapping("/getActiveCollection/{userId}")
     //ResponseEntity<BaseResult>
      public ResponseEntity<BaseResult> getActiveCollection(@PathVariable("userId") String userId){
+        //
         if (!NumberValid.primaryKey(userId)){
             return ResponseEntity.ok(new BaseResult(1, "失败"));
         }
@@ -60,7 +61,7 @@ public class ActiveGatheringController {
      */
     @PostMapping("/updateGatheringType/{activeId}")
     public ResponseEntity<BaseResult>  updateGatheringStatus(@PathVariable("activeId") String activeId){
-        if (!NumberValid.primaryKey(activeId)){
+        if (NumberValid.primaryKey(activeId)){
             boolean flag=ags.updateGatheringStatus(activeId);
             if (flag){
                 return ResponseEntity.ok(new BaseResult(0, "操作成功"));
@@ -81,16 +82,11 @@ public class ActiveGatheringController {
         //agvo 收款订单基本信息
         //userPhone 付款人电话
         //userBankId 收款卡id
-        if( NumberValid.verifyPhone(agvo.getOutUserPhone())){
+        if( !NumberValid.verifyPhone(agvo.getOutUserPhone())){
             return ResponseEntity.ok(new BaseResult(1, "失败"));
-        }
-        if(agvo.getInBankId()==null){
+        }else if(agvo.getInBankId()==null){
             return ResponseEntity.ok(new BaseResult(1, "失败"));
-        }
-        if(NumberValid.moneyValid(agvo.getMuchMoney().toString())){
-            return ResponseEntity.ok(new BaseResult(1, "失败"));
-        }
-        if(agvo.getTransferRemarks()==null || "".equals(agvo.getTransferRemarks())){
+        }else if(!NumberValid.moneyValid(agvo.getMuchMoney().toString())){
             return ResponseEntity.ok(new BaseResult(1, "失败"));
         }
         return ResponseEntity.ok(new BaseResult(0, "查询成功").append("data", ags.addTransactionTecord(agvo)));
@@ -145,7 +141,8 @@ public class ActiveGatheringController {
      */
     @PostMapping("/updateManagerTranscationStatus/{transcationId}")
     public ResponseEntity<BaseResult> updateManagerTranscationStatus(@PathVariable("transcationId") String transcationId){
-        if (!NumberValid.primaryKey(transcationId)){
+        System.out.println(transcationId);
+        if (NumberValid.primaryKey(transcationId)){
             //根据事务表id修改订单为取消
             boolean flag=ags.updateManagerTranscationStatus(transcationId);
             if (flag){

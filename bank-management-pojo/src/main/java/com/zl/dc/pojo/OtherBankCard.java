@@ -19,25 +19,37 @@ import java.util.Date;
 @ToString
 @Table(name = "other_bank_card")
 public class OtherBankCard {
-    //    主键
+    /**
+     * 主键
+     */
     @Id
     @Column(name = "bank_card_id")
     private Integer bankCardId;
-    //    银行卡号
+    /**
+     * 银行卡号
+     */
     @Column(name = "bank_card_number")
     private String bankCardNumber;
-    //    用户id
+    /**
+     * 用户id
+     */
     @Column(name = "user_id")
     private Integer userId;
-    //    银行标识码
+    /**
+     * 银行标识码
+     */
     @Column(name = "subordinate_banks_identification")
     private String subordinateBanksIdentification;
-    //    行创建时间
+    /**
+     * 行创建时间
+     */
     @Column(name = "gmt_create")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date gmtCreate;
-    //    行修改时间
+    /**
+     * 行修改时间
+     */
     @Column(name = "gmt_modified")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -48,5 +60,15 @@ public class OtherBankCard {
      */
     @Transient
     private String bankCardName;
+    /**
+     * 支付密码
+     */
+    @Transient
+    private String payPassword;
+    /**
+     * 银行卡预留手机
+     */
+    @Transient
+    private String bankCardPhone;
 }
 

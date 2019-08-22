@@ -1,9 +1,6 @@
 package com.zl.dc.controller;
 
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-import com.zl.dc.config.SendUpgradeCardOK;
 import com.zl.dc.pojo.BankManager;
 import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.ManagerTranscation;
@@ -48,6 +45,7 @@ public class BankManagerController {
         BankManager bankManager1 = bankManagerService.getLogin(managerName);
         if (bankManager1 != null) {
             //比较用户密码
+            //加密校验
             managerPassword= MD5.GetMD5Code(managerPassword);
             if (managerPassword.equals(bankManager1.getManagerPassword())) {
                 redisTemplate.opsForValue().set(bankManager1.getManagerName(), bankManager1.getManagerPassword());
@@ -88,9 +86,9 @@ public class BankManagerController {
      * @data: 2019/8/6 13:53
      */
     @GetMapping("/selectBankUserAll")
-    public List<BankUser> selectBankUserAll() {
-        List<BankUser> list = bankManagerService.selectBankUserAll();
-        return list;
+    public String  selectBankUserAll() {
+        String s = bankManagerService.selectBankUserAll();
+        return s;
     }
 
     /**
@@ -101,34 +99,33 @@ public class BankManagerController {
      * @data: 2019/8/6 13:53
      */
     @GetMapping("/selectTransferRecordAll")
-    public List<TransferRecord> selectTransferRecordAll() {
-        List<TransferRecord> list = bankManagerService.selectTransferRecordAll();
-        return list;
+    public String selectTransferRecordAll() {
+        String s = bankManagerService.selectTransferRecordAll();
+        return s;
     }
 
     /**
      * @author: zhanglei
      * @param: []
      * @return:java.util.List<com.zl.dc.pojo.BankManager>
-     * @description: 查询管理员异常数
+     * @description: 查询管理员事务数
      * @data: 2019/8/6 13:53
      */
     @GetMapping("/selectManagerTranscationAll")
-    public List<ManagerTranscation> selectManagerTranscationAll() {
-        List<ManagerTranscation> list = bankManagerService.selectManagerTranscationAll();
-        return list;
+    public String selectManagerTranscationAll() {
+        String s = bankManagerService.selectManagerTranscationAll();
+        return s;
     }
     /**
      * @author: zhanglei
      * @param: []
      * @return:java.util.List<com.zl.dc.pojo.BankManager>
-     * @description: 查询管理员会员数
+     * @description: 分页查询所有用户
      * @data: 2019/8/6 13:53
      */
     @GetMapping("/GetUserList")
     public List<BankUser> GetUserList(@RequestParam("pageNum")Integer pageNum) {
         List<BankUser> list = bankManagerService.GetUserList(pageNum);
-
         return list;
     }
 
@@ -136,7 +133,7 @@ public class BankManagerController {
      * @author: zhanglei
      * @param: []
      * @return:java.util.List<com.zl.dc.pojo.BankManager>
-     * @description: 查询管理员记录数
+     * @description: 分页查询转账记录
      * @data: 2019/8/6 13:53
      */
     @GetMapping("/GetRecords")
@@ -149,7 +146,7 @@ public class BankManagerController {
      * @author: zhanglei
      * @param: []
      * @return:java.util.List<com.zl.dc.pojo.BankManager>
-     * @description: 查询管理员异常数
+     * @description: 分页查询事务
      * @data: 2019/8/6 13:53
      */
     @GetMapping("/GetAbnormals")
@@ -229,9 +226,9 @@ public class BankManagerController {
      * @data: 2019/8/10 14:35
      */
     @GetMapping("/getManagerTranscations")
-    public List<ManagerTranscation> getManagerTranscations(@RequestBody ManagerTranscation managerTranscation){
-        if (managerTranscation.getPageNum() !=null){
-            List<ManagerTranscation> managerTranscations = bankManagerService.getManagerTranscations(managerTranscation);
+    public List<ManagerTranscation> getManagerTranscations(@RequestParam("pageNum") Integer pageNum){
+        if (pageNum !=null){
+            List<ManagerTranscation> managerTranscations = bankManagerService.getManagerTranscations(pageNum);
             return managerTranscations;
         }
         return null;

@@ -79,4 +79,43 @@ public class NumberValid {
         return true;
     }
 
+    /**
+     * @author: Redsheep
+     * @Param month
+     * @Param day
+     * @return: boolean
+     * @description: 校验日期是否正常
+     * @data: 2019/8/20 15:13
+     */
+    public static boolean verifyDate(int month, int day) {
+        if (day <= 0 || month < 0 || month > 12 || day > 31) {
+            return false;
+        }
+        switch (month) {
+            case 1:
+            case 3:
+            case 5:
+            case 7:
+            case 8:
+            case 10:
+            case 12:
+                return true;
+            case 0:
+            case 2:
+                if (day <= 28) {
+                    return true;
+                }
+                return false;
+            case 4:
+            case 6:
+            case 9:
+            case 11:
+                if (day <= 30) {
+                    return true;
+                }
+                return false;
+            default:
+                return false;
+        }
+    }
 }
