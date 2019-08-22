@@ -322,6 +322,9 @@ public class ActiveGatheringService {
     public  boolean updateManagerTranscationStatus(String transcationId){
         //根据事务表id取消
         ManagerTranscation managerTranscation=managerTranscationMapper.selectByPrimaryKey(transcationId);
+        if(managerTranscation==null){
+            return false;
+        }
         managerTranscation.setTranscationStatus(Byte.parseByte("2"));
         managerTranscation.setGmtModified(new Date());
        int status=managerTranscationMapper.updateByPrimaryKeySelective(managerTranscation);
@@ -364,7 +367,7 @@ public class ActiveGatheringService {
         public String getBankName(String bankCardNumber){
             String subordinateBanksIdentification=AccessBank.getSubordinateBank(bankCardNumber);
             if (subordinateBanksIdentification==null ||"".equals(subordinateBanksIdentification)){
-                return "";
+                return "五仁银行";
             }
             Example example2 =new Example(SubordinateBank.class);
             Example.Criteria criteria2 = example2.createCriteria();
