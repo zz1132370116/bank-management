@@ -67,7 +67,7 @@ public class PayeeGroupController {
         for (UserPayee userPayee : userPayees) {
             //查询所属银行进行回显
             String bankCarkForName = subordinateBankService.selectBankNameByBankCardIdentification(userPayee.getPayeeBankIdentification());
-            userPayee.setPayeeBankIdentification(bankCarkForName);
+            userPayee.setBankCardName(bankCarkForName);
         }
         return ResponseEntity.ok(new BaseResult(0, "成功").append("data", userPayees));
     }

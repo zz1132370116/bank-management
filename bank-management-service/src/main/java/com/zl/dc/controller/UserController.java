@@ -10,6 +10,7 @@ import com.zl.dc.service.UserService;
 import com.zl.dc.util.BankUserPasswordUtil;
 import com.zl.dc.util.NumberValid;
 import com.zl.dc.util.StarUtil;
+import com.zl.dc.util.StringValid;
 import com.zl.dc.vo.BankUserVo;
 import com.zl.dc.vo.BaseResult;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -22,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -86,7 +86,7 @@ public class UserController {
      */
     @PostMapping("/register")
     public BaseResult register(@RequestBody BankUserVo bankUserVo){
-        if(StringUtils.isNoneBlank(bankUserVo.getUserPhone(),bankUserVo.getCode())){
+        if(StringValid.isBlank(bankUserVo.getUserPhone(),bankUserVo.getCode())){
             //通过手机号+验证码从redis中获取验证码
             String code = redisTemplate.opsForValue().get(bankUserVo.getUserPhone()+bankUserVo.getCode());
             //判断传过来的验证码是否正确
@@ -293,7 +293,7 @@ public class UserController {
      */
     @PostMapping("/updatePasswordVerify")
     public ResponseEntity<BaseResult> updatePasswordVerify(@RequestBody BankUserVo user){
-        if (StringUtils.isNoneBlank(user.getUserPhone(),user.getCode())){
+        if (StringValid.isBlank(user.getUserPhone(),user.getCode())){
             //验证手机号是否正确
             if (!NumberValid.verifyPhone(user.getUserPhone())){
                 return ResponseEntity.ok(new BaseResult(1, "该手机号不正确"));
@@ -320,7 +320,7 @@ public class UserController {
      */
     @PostMapping("/updateBankUserPassword")
     public ResponseEntity<BaseResult> updateBankUserPassword(@RequestBody BankUserVo user){
-        if (StringUtils.isNoneBlank(user.getUserPhone(),user.getUserPassword(),user.getPasswordConfig())){
+        if (StringValid.isBlank(user.getUserPhone(),user.getUserPassword(),user.getPasswordConfig())){
             //验证手机号是否正确
             if (!NumberValid.verifyPhone(user.getUserPhone())){
                 return ResponseEntity.ok(new BaseResult(1, "该手机号不正确"));
@@ -442,7 +442,7 @@ public class UserController {
      */
     @PostMapping("/updatePhoneVerify")
     public ResponseEntity<BaseResult> updatePhoneVerify(@RequestBody BankUserVo user){
-        if (StringUtils.isNoneBlank(user.getOldPhone(),user.getCode())){
+        if (StringValid.isBlank(user.getOldPhone(),user.getCode())){
             //验证手机号是否正确
             if (!NumberValid.verifyPhone(user.getOldPhone())){
                 return ResponseEntity.ok(new BaseResult(1, "该手机号不正确"));
@@ -468,7 +468,7 @@ public class UserController {
      */
     @PostMapping("/updatePhone")
     public ResponseEntity<BaseResult> updatePhone(@RequestBody BankUserVo bankUser){
-        if (StringUtils.isNoneBlank(bankUser.getUserPhone(),bankUser.getCode())){
+        if (StringValid.isBlank(bankUser.getUserPhone(),bankUser.getCode())){
             //验证手机号是否正确
             if (!NumberValid.verifyPhone(bankUser.getUserPhone())){
                 return ResponseEntity.ok(new BaseResult(1, "该手机号不正确"));
