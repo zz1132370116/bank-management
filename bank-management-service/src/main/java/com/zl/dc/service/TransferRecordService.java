@@ -199,6 +199,7 @@ public class TransferRecordService {
         }
         // 查询语句
         List<TransferRecord> transferRecordList = transferRecordDOMapper.selectByUserIdAndMonthAndCard(userId, startDay.toString(), endDay.toString(), pageBean.getIndex(), pageBean.getPageSize(), bankCard);
+
         /**
          * 查询结果的处理
          * 1.收款银行卡加*

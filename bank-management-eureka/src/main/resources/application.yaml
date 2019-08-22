@@ -1,5 +1,6 @@
 server:
   port: 10081 #eureka端口号
+  address: 0.0.0.0
 
 spring:
   application:
@@ -13,4 +14,6 @@ eureka:
     fetch-registry: false # 定期的更新客户端的服务清单，以保证服务访问的正确性
     register-with-eureka: false # 是否将自己注册为服务
     service-url:
-      defaultZone: http://127.0.0.1:${server.port}/eureka # eureka服务的开放地址
+      defaultZone: http://10.1.12.77:${server.port}/eureka # eureka服务的开放地址
+  instance:
+    prefer-ip-address: true

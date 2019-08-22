@@ -51,8 +51,8 @@ public class BankCardService {
      */
     public boolean BankCardPasswordCheck(BankCard bankCard, String password) {
 //            将传入密码加密处理
-//        String BankCardPasswod = MD5.GetMD5Code(password);
-        return password.equals(bankCard.getBankCardPassword());
+        String BankCardPasswod = MD5.GetMD5Code(password);
+        return BankCardPasswod.equals(bankCard.getBankCardPassword());
     }
 
     /**
