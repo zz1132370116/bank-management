@@ -79,4 +79,8 @@ public class CrossBorderTransferRecord {
     @Transient
     private String rate;
 
+    //转出卡id
+    @Transient
+    private Integer bankCardId;
+
 }
