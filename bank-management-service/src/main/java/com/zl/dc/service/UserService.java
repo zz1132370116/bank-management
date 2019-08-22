@@ -2,6 +2,7 @@ package com.zl.dc.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import com.zl.dc.api.VerifyIdCard;
 import com.zl.dc.mapper.UserMapper;
 import com.zl.dc.pojo.BankCard;
@@ -185,11 +186,19 @@ public class UserService {
         user.setUserId(userId);
         user.setUserName(userName);
         user.setIdCard(idCard);
-        Integer i = userMapper.updateByPrimaryKeySelective(user);
+        Byte status = 101;
+        user.setUserStatus(status);
+        Integer i = 0;
+        try{
+            i = userMapper.updateByPrimaryKeySelective(user);
+        } catch (Exception exception){
+            exception.printStackTrace();
+            return -3;
+        }
 
         user = userMapper.selectByPrimaryKey(userId);
-        System.out.println(user);
-        redisTemplate.opsForValue().set(user.getUserId().toString(), JSON.toJSONString(user));
+        redisTemplate.opsForValue().set("user-"+user.getUserId().toString()+"-userInfo", JSON.toJSONString(user));
+        redisTemplate.opsForValue().set(user.getUserPhone(), JSON.toJSONString(user));
 
         return i;
     }

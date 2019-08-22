@@ -5,6 +5,7 @@ import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.service.BankCardService;
 import com.zl.dc.service.FundCollectionService;
 import com.zl.dc.service.TransferRecordService;
+import com.zl.dc.util.NumberValid;
 import com.zl.dc.vo.AuthVO;
 import com.zl.dc.vo.BaseResult;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,9 @@ import java.util.List;
 @RestController
 @RequestMapping
 public class FundCollectionController {
+
+    private static int MAX_PLAN_NAME = 32;
+    private static int PASSWORD_LENGTH = 6;
 
     @Resource
     FundCollectionService fundCollectionService;
@@ -66,7 +70,10 @@ public class FundCollectionController {
                 || fundCollectionPlan.getCollectionAmount() == null
                 || fundCollectionPlan.getCollectionMonth() == null
                 || fundCollectionPlan.getCollectionDay() == null
-                || fundCollectionPlan.getPlanName() == null) {
+                || fundCollectionPlan.getPlanName() == null
+                || NumberValid.moneyValid(fundCollectionPlan.getCollectionAmount().toString())
+                || NumberValid.verifyDate(fundCollectionPlan.getCollectionMonth(), fundCollectionPlan.getCollectionDay())
+                || fundCollectionPlan.getPlanName().length() > MAX_PLAN_NAME) {
             return ResponseEntity.ok(new BaseResult(1, "参数错误"));
         }
         if (fundCollectionService.addFundCollectionPlan(fundCollectionPlan)) {
@@ -88,7 +95,8 @@ public class FundCollectionController {
                 || authVO.getUserId() == null
                 || authVO.getBankCardId() == null
                 || authVO.getPassword() == null
-                || authVO.getData() == null) {
+                || authVO.getData() == null
+                || authVO.getPassword().length() != PASSWORD_LENGTH) {
             return ResponseEntity.ok(new BaseResult(1, "参数错误"));
         }
         if (!bankCardService.verifyBankCardPassword(authVO.getBankCardId(), authVO.getPassword(), authVO.getUserId())) {
