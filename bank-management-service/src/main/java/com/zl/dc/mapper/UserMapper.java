@@ -22,7 +22,7 @@ public interface UserMapper extends Mapper<BankUser> {
      * @description: 条件查询所有用户
      * @data: 2019/8/7 14:39
      */
-    @Select("SELECT * FROM bank_user WHERE user_name = #{user_name} and id_card = #{id_card} and user_id > (#{pageNum}-1)*10 LIMIT 10; ")
+    @Select("SELECT * FROM bank_user WHERE user_name = #{user_name} and id_card = #{id_card} and user_id > (#{pageNum}-1)*10 LIMIT 20; ")
     @ResultMap(value="userMap")
     List<BankUser> getUserListByParams(@Param("user_name")String userName,@Param("id_card")String idCard,@Param("pageNum")Integer pageNum);
     /**
@@ -32,7 +32,7 @@ public interface UserMapper extends Mapper<BankUser> {
      * @description: 根据用户名分页查询用户
      * @data: 2019/8/7 14:39
      */
-    @Select("SELECT user_id,user_name,user_phone,user_password,user_status,default_bank_card,id_card,gmt_create,gmt_modified FROM bank_user WHERE user_name = #{user_name} and user_id > (#{pageNum}-1)*10 LIMIT 10;")
+    @Select("SELECT user_id,user_name,user_phone,user_password,user_status,default_bank_card,id_card,gmt_create,gmt_modified FROM bank_user WHERE user_name = #{user_name} and user_id > (#{pageNum}-1)*10 LIMIT 20;")
     @ResultMap(value="userMap")
     List<BankUser> getUserListByUserName(@Param("user_name") String userName,@Param("pageNum") Integer pageNum);
     /**
@@ -42,7 +42,7 @@ public interface UserMapper extends Mapper<BankUser> {
      * @description: 根据银行卡号分页查询用户
      * @data: 2019/8/7 14:39
      */
-    @Select("SELECT user_id,user_name,user_phone,user_password,user_status,default_bank_card,id_card,gmt_create,gmt_modified FROM bank_user WHERE id_card = #{id_card} and user_id > (#{pageNum}-1)*10 LIMIT 10;")
+    @Select("SELECT user_id,user_name,user_phone,user_password,user_status,default_bank_card,id_card,gmt_create,gmt_modified FROM bank_user WHERE id_card = #{id_card} and user_id > (#{pageNum}-1)*10 LIMIT 20;")
     @ResultMap(value="userMap")
     List<BankUser> getUserListByIDCARD(@Param("id_card")String idCard, @Param("pageNum")Integer pageNum);
     /**
@@ -52,7 +52,7 @@ public interface UserMapper extends Mapper<BankUser> {
      * @description: 查询会员数
      * @data: 2019/8/6 14:04
      */
-    @Select("select user_id,user_name,user_phone,user_password,user_status,default_bank_card,id_card,gmt_create,gmt_modified FROM bank_user where user_id > (#{pageNum}-1)*10 LIMIT 10; ")
+    @Select("select user_id,user_name,user_phone,user_password,user_status,default_bank_card,id_card,gmt_create,gmt_modified FROM bank_user where user_id > (#{pageNum}-1)*10 LIMIT 20; ")
     @Results(id="userMap", value={
             @Result(column = "user_id",property = "userId"),
             @Result(column = "user_name",property = "userName"),
