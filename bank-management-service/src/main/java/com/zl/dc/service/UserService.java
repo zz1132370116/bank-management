@@ -230,4 +230,9 @@ public class UserService {
         }
         return false;
     }
+
+    public BankUser getBankUserByUserId(Integer userId){
+        BankUser user = userMapper.selectByPrimaryKey(userId);
+        return user;
+    }
 }

@@ -483,13 +483,17 @@ public class UserController {
                 }
                 //修改手机号
                 BankUser user = userService.updateBankUserPhone(bankUser);
+                BankUserVo bankUserVo = new BankUserVo();
+                String phone = bankUser.getUserPhone();
+                bankUserVo.setUserPhone(StarUtil.StringAddStar(phone,3,4));
                 redisTemplate.delete(bankUser.getUserPhone()+bankUser.getCode());
+                redisTemplate.delete(bankUser.getOldPhone());
                 //将修改手机号之后的用户的信息保存到redis中，使用手机号作为key
                 redisTemplate.opsForValue().set(user.getUserPhone(),JSONObject.toJSONString(user));
                 //将修改手机号之后的用户的信息保存到redis中，使用用户id作为key
                 redisTemplate.opsForValue().set("user-"+user.getUserId().toString()+"-userInfo", JSON.toJSONString(user));
                 redisTemplate.opsForValue().set(user.getUserId().toString(),JSONObject.toJSONString(user));
-                return ResponseEntity.ok(new BaseResult(0, "修改成功"));
+                return ResponseEntity.ok(new BaseResult(0, "修改成功").append("user",bankUserVo));
             }
             return ResponseEntity.ok(new BaseResult(1, "验证码错误或验证码已经过时"));
         }
@@ -515,7 +519,28 @@ public class UserController {
                 }else if(identity == -3){
                     return ResponseEntity.ok(new BaseResult(3, "该身份证已被实名，请使用身份证登录旧账号，如不是您本人认证的，请到银行柜台进行解绑业务"));
                 }
-                return ResponseEntity.ok(new BaseResult(0, "认证成功"));
+                BankUser bankUser = userService.getBankUserByUserId(userId);
+                BankUserVo bankUserVo = new BankUserVo();
+                String userName = bankUser.getUserName();
+                if (StringUtils.isNotBlank(userName) && userName.length() > 1){
+                    String first = userName.substring(0,1);
+                    String end = userName.substring(userName.length()-1);
+                    if (userName.length() == 2){
+                        bankUserVo.setUserName(first+"*");
+                    }else if(userName.length() >= 3){
+                        StringBuffer stringBuffer = new StringBuffer();
+                        for (int i = 0;i < userName.length()-2;i++){
+                            stringBuffer.append("*");
+                        }
+                        bankUserVo.setUserName(first+stringBuffer.toString()+end);
+                    }
+                }
+                if (StringUtils.isNotBlank(bankUser.getDefaultBankCard())){
+                    bankUserVo.setDefaultBankCard(StarUtil.StringAddStar(bankUser.getDefaultBankCard(),6,4));
+                } else {
+                    bankUserVo.setDefaultBankCard("");
+                }
+                return ResponseEntity.ok(new BaseResult(0, "认证成功").append("user",bankUserVo));
             } catch (IOException e) {
                 e.printStackTrace();
                 return ResponseEntity.ok(new BaseResult(1, "认证失败，请稍后重试"));
@@ -568,7 +593,7 @@ public class UserController {
                 redisTemplate.opsForValue().set("user-"+user.getUserId().toString()+"-userInfo", JSON.toJSONString(user));
                 redisTemplate.opsForValue().set(user.getUserId().toString(), JSON.toJSONString(user));
                 redisTemplate.opsForValue().set(user.getUserPhone(), JSON.toJSONString(user));
-                return ResponseEntity.ok(new BaseResult(0, "设置成功").append("data",bankUserVo));
+                return ResponseEntity.ok(new BaseResult(0, "设置成功").append("user",bankUserVo));
             }else {
                 return ResponseEntity.ok(new BaseResult(1, "设置失败"));
             }
