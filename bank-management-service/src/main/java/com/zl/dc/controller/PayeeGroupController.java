@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.persistence.Transient;
 import java.util.List;
 
 /**
@@ -67,7 +68,7 @@ public class PayeeGroupController {
         for (UserPayee userPayee : userPayees) {
             //查询所属银行进行回显
             String bankCarkForName = subordinateBankService.selectBankNameByBankCardIdentification(userPayee.getPayeeBankIdentification());
-            userPayee.setPayeeBankIdentification(bankCarkForName);
+            userPayee.setBankCardName(bankCarkForName);
         }
         return ResponseEntity.ok(new BaseResult(0, "成功").append("data", userPayees));
     }

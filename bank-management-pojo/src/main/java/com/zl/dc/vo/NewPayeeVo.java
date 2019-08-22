@@ -35,5 +35,9 @@ public class NewPayeeVo {
      * 转账金额
      */
     private BigDecimal muchMoney;
+    /**
+     * 所属银行名
+     */
+    private String bankCardName;
 
 }
