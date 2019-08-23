@@ -125,7 +125,7 @@ public class AuthService {
             bankUserVo.setUserStatus(bankUser.getUserStatus());
             String phone = bankUser.getUserPhone();
             bankUserVo.setUserPhone(StarUtil.StringAddStar(phone,3,4));
-
+            bankUserVo.setUserStatus(bankUser.getUserStatus());
             if (StringUtils.isNotBlank(bankUser.getDefaultBankCard())){
                 bankUserVo.setDefaultBankCard(StarUtil.StringAddStar(bankUser.getDefaultBankCard(),6,4));
             } else {
