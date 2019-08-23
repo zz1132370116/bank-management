@@ -208,7 +208,7 @@ public class ActiveGatheringService {
         Example example = new Example(TransferRecord.class);
         Example.Criteria criteria = example.createCriteria();
         criteriaGathering.andEqualTo("paymentUserId",userId);
-        criteriaGathering.andEqualTo("gatheringStatus",100);
+        //criteriaGathering.andEqualTo("gatheringStatus",100);
         List<Gathering> gatheringList=gatheringMapper.selectByExample(exampleGathering);
         //查询转账记录表
         TransferRecord transferRecord;
@@ -245,6 +245,9 @@ public class ActiveGatheringService {
             activeGatheringVo.setMuchMoney(transfer.getTransferRecordAmount());
             //收款备注
             activeGatheringVo.setTransferRemarks(transfer.getTransferNote());
+            //收款订单状态
+            activeGatheringVo.setActivestate(new Integer(transfer.getTransferStatus()));
+            activeGatheringVo.setOutBankCard(StarUtil.StringAddStar(transfer.getBankInCard(),4,4));
             activeGatheringVoList.add(activeGatheringVo);
         }
         return  activeGatheringVoList;
@@ -353,7 +356,7 @@ public class ActiveGatheringService {
         //根据当前登录用户id查询
         managerTranscation.setUserId(userId);
         //查询类型是升级卡申请的
-        criteria.andEqualTo("transcationStatus","0");
+        criteria.andEqualTo("transcationType","0");
         criteria.andEqualTo("userId",managerTranscation.getUserId());
         List<ManagerTranscation> managerTranscations = managerTranscationMapper.selectByExample(example);
             for (ManagerTranscation manager: managerTranscations){
@@ -376,7 +379,7 @@ public class ActiveGatheringService {
         if(managerTranscation==null){
             return false;
         }
-        managerTranscation.setTranscationStatus(Byte.parseByte("2"));
+        managerTranscation.setTranscationStatus(Byte.parseByte("1"));
         managerTranscation.setGmtModified(new Date());
        int status=managerTranscationMapper.updateByPrimaryKeySelective(managerTranscation);
         if (status > 0) {

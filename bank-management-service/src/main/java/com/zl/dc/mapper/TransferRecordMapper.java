@@ -62,7 +62,9 @@ public interface TransferRecordMapper extends Mapper<TransferRecord> {
     @Select(" EXPLAIN SELECT * FROM transfer_record")
     Integer selectcount();
 
-    @Select("select transfer_record_id,transfer_record_uuid,transfer_record_amount,transfer_record_time,transfer_note,transfer_status,transfer_type,user_id,bank_out_card,in_card_user_name,bank_in_card,gmt_create,gmt_modified ,bank_in_identification from transfer_record WHERE  transfer_record_uuid =#{transfer_record_uuid} and transfer_status = 100")
+
+    /*and transfer_status = 100*/
+    @Select("select transfer_record_id,transfer_record_uuid,transfer_record_amount,transfer_record_time,transfer_note,transfer_status,transfer_type,user_id,bank_out_card,in_card_user_name,bank_in_card,gmt_create,gmt_modified ,bank_in_identification from transfer_record WHERE  transfer_record_uuid =#{transfer_record_uuid} ")
     @Results( value={
             @Result(column = "transfer_record_id",property = "transferRecordId"),
             @Result(column = "transfer_record_uuid",property = "transferRecordUuid"),
