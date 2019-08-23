@@ -288,9 +288,11 @@ public class BankManagerService {
         //如果类型是普通卡则升级为钻石卡
         if (bankCard.getBankCardType().equals("普通卡")) {
             bankCard.setBankCardType("钻石卡");
+            bankCard.setBankCardTransferLimit(1000000);
         }else if ("钻石卡".equals(bankCard.getBankCardType())) {
             //如果类型是钻石卡则升级为黑卡
             bankCard.setBankCardType("黑卡");
+            bankCard.setBankCardTransferLimit(10000000);
         }
 
         bankCardMapper.updateByPrimaryKeySelective(bankCard);

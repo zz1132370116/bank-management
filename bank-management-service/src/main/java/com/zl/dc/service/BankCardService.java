@@ -135,28 +135,28 @@ public class BankCardService {
         //校验是否是本行卡
         if ("9999".equals(bankCardNumber.substring(0, 4))) {
             BankCard bankCard = selectBankCardByNum(bankCardNumber);
-            if (bankCard==null){
+            if (bankCard == null) {
                 return false;
             }
             BankUser bankUser = userService.selectBankUserByUid(bankCard.getUserId());
-            if (bankUser==null){
+            if (bankUser == null) {
                 return false;
             }
-            if (username.equals(bankUser.getUserName())){
+            if (username.equals(bankUser.getUserName())) {
                 return true;
             }
             return false;
-        }else {
+        } else {
             //模拟调用接口，传输数据给他行，返回他行用户信息
-            OtherBankCard otherBankCard =getBankNameByBankNum(bankCardNumber);
-            if (otherBankCard==null){
+            OtherBankCard otherBankCard = getBankNameByBankNum(bankCardNumber);
+            if (otherBankCard == null) {
                 return false;
             }
             BankUser bankUser = userService.selectBankUserByUid(otherBankCard.getUserId());
-            if (bankUser==null){
+            if (bankUser == null) {
                 return false;
             }
-            if (username.equals(bankUser.getUserName())){
+            if (username.equals(bankUser.getUserName())) {
                 return true;
             }
             return false;
@@ -369,6 +369,9 @@ public class BankCardService {
      * @data: 2019/8/15 19:27
      */
     public boolean verifyBankCardPassword(Integer bankCardId, String password, Integer userId) {
+        if (otherBankCardDOMapper.selectOtherBankCardById(bankCardId) != null) {
+            return true;
+        }
         return bankCardDOMapper.selectByBankCardIdAndPassword(bankCardId, password, userId) != null;
     }
 
@@ -392,50 +395,55 @@ public class BankCardService {
      * @data: 2019/8/19 16:32
      */
     public String selectBankCardNumberById(Integer bankCardId) {
-        return bankCardDOMapper.selectBankCardNumberById(bankCardId);
+        String bankCard;
+        bankCard = bankCardDOMapper.selectBankCardNumberById(bankCardId);
+        if (bankCard == null) {
+            return otherBankCardDOMapper.selectOtherBankCardById(bankCardId);
+        }
+        return bankCard;
     }
 
 
     /**
-     * @author pds
      * @param enterpriseBankCardNumber
      * @param userBankCardNumber
      * @param bankInIdentification
      * @param money
      * @return java.lang.Boolean
+     * @author pds
      * @description 企业批量转账
      * @date 2019/8/20 13:43
      */
-    public Boolean enterpriseTransfer(String enterpriseBankCardNumber, String userBankCardNumber, String bankInIdentification, BigDecimal money){
+    public Boolean enterpriseTransfer(String enterpriseBankCardNumber, String userBankCardNumber, String bankInIdentification, BigDecimal money) {
         BankCard enterpriseBankCard = selectBankCardByNum(enterpriseBankCardNumber);
-        if (enterpriseBankCard == null){
+        if (enterpriseBankCard == null) {
             return false;
         }
         //本行卡
-        if ("999999".equals(userBankCardNumber.substring(0,6))){
+        if ("999999".equals(userBankCardNumber.substring(0, 6))) {
             BankCard bankCard = selectBankCardByNum(userBankCardNumber);
-            if (bankCard == null){
+            if (bankCard == null) {
                 return false;
             }
             BigDecimal balance = bankCard.getBankCardBalance().add(money);
             bankCard.setBankCardBalance(balance);
             Integer user = bankCardMapper.updateByPrimaryKeySelective(bankCard);
-            if (user == 0){
+            if (user == 0) {
                 return false;
             }
         }
         //非本行卡
         else {
-            switch (bankInIdentification){
-                case "PSBC":{
+            switch (bankInIdentification) {
+                case "PSBC": {
                     //调用中国邮政储蓄银行的转账接口
                     break;
                 }
-                case "ABC":{
+                case "ABC": {
                     //调用中国农业银行的转账接口
                     break;
                 }
-                default:{
+                default: {
 
                 }
             }
@@ -443,7 +451,7 @@ public class BankCardService {
         BigDecimal enterpriseBalance = enterpriseBankCard.getBankCardBalance().subtract(money);
         enterpriseBankCard.setBankCardBalance(enterpriseBalance);
         Integer enterprise = bankCardMapper.updateByPrimaryKeySelective(enterpriseBankCard);
-        if (enterprise == 0){
+        if (enterprise == 0) {
             return false;
         }
         return true;

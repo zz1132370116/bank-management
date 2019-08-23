@@ -18,6 +18,7 @@ public interface OtherBankCardDOMapper {
      */
     Integer selectByOtherBankCardIdAndPassword(Integer otherBankCardId, Integer userId);
 
+    String selectOtherBankCardById(Integer id);
 
     /**
     * @author: Redsheep

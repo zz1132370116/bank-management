@@ -122,6 +122,10 @@ public class CrossBorderTransferRecordService {
                         crossBorderTransferRecord.setGmtCreate(new Date());
                         //交易时间
                         crossBorderTransferRecord.setTransferRecordTime(new Date());
+                        // 交易状态
+                        crossBorderTransferRecord.setTransferStatus(Byte.parseByte("101"));
+                        //转出卡号
+                        crossBorderTransferRecord.setBankOutCard(bankCard.getBankCardNumber());
                         //生成转账记录
                         crossBorderTransferRecordMapper.insertSelective(crossBorderTransferRecord);
                         return "转账成功";
