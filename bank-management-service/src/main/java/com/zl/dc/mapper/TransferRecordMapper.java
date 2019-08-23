@@ -61,4 +61,23 @@ public interface TransferRecordMapper extends Mapper<TransferRecord> {
       */
     @Select(" EXPLAIN SELECT * FROM transfer_record")
     Integer selectcount();
+
+    @Select("select transfer_record_id,transfer_record_uuid,transfer_record_amount,transfer_record_time,transfer_note,transfer_status,transfer_type,user_id,bank_out_card,in_card_user_name,bank_in_card,gmt_create,gmt_modified ,bank_in_identification from transfer_record WHERE  transfer_record_uuid =#{transfer_record_uuid} and transfer_status = 100")
+    @Results( value={
+            @Result(column = "transfer_record_id",property = "transferRecordId"),
+            @Result(column = "transfer_record_uuid",property = "transferRecordUuid"),
+            @Result(column = "transfer_record_amount",property = "transferRecordAmount"),
+            @Result(column = "transfer_record_time",property = "transferRecordTime"),
+            @Result(column = "transfer_note",property = "transferNote"),
+            @Result(column = "transfer_status",property = "transferStatus"),
+            @Result(column = "transfer_type",property = "transferType"),
+            @Result(column = "user_id",property = "userId"),
+            @Result(column = "bank_out_card",property = "bankOutCard"),
+            @Result(column = "in_card_user_name",property = "inCardUserName"),
+            @Result(column = "bank_in_identification",property = "bankInIdentification"),
+            @Result(column = "bank_in_card",property = "bankInCard"),
+            @Result(column = "gmt_create",property = "gmtCreate"),
+            @Result(column = "gmt_modified",property = "gmtModified")
+    })
+    TransferRecord selectTransferRecordByTransferRecordUuid(@Param("transfer_record_uuid") String transactionRecordUUID);
 }

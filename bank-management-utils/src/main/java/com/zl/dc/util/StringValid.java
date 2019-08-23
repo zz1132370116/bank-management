@@ -10,15 +10,15 @@ package com.zl.dc.util;
 public class StringValid {
 
     /**
-    * @author: lu
-    * @param: string
-    * @return:  boolean
-    * @description: 功能描述
-    * @data: 2019/8/13 11:53
-    */
+     * @author: lu
+     * @param: string
+     * @return: boolean
+     * @description: 功能描述
+     * @data: 2019/8/13 11:53
+     */
     public static boolean isBlank(String... str) {
-        for (int i =0 ;i<str.length;i++){
-            if ("".equals(str[i]) && str[i] == null) {
+        for (int i = 0; i < str.length; i++) {
+            if ("".equals(str[i]) || str[i] == null) {
                 return false;
             }
         }

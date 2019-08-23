@@ -176,12 +176,16 @@ public class ActiveGatheringService {
         int status=transferRecordMapper.insertSelective(transferRecord);
 
         //添加收款记录
+        Example exampleGathering = new Example(Gathering.class);
         Gathering gathering=new Gathering();
         gathering.setTransactionRecordUUID(uuid);
         gathering.setPaymentUserId(bankUser.getUserId());
         gathering.setGatheringStatus(100);
         gathering.setCreationTime(date);
         gathering.setModificationTime(date);
+
+
+        gatheringMapper.insertSelective(gathering);
         if (status > 0) {
             return true;
         } else {
@@ -201,25 +205,29 @@ public class ActiveGatheringService {
         //查询收款记录表
         Example exampleGathering = new Example(Gathering.class);
         Example.Criteria criteriaGathering = exampleGathering.createCriteria();
+        Example example = new Example(TransferRecord.class);
+        Example.Criteria criteria = example.createCriteria();
         criteriaGathering.andEqualTo("paymentUserId",userId);
         criteriaGathering.andEqualTo("gatheringStatus",100);
         List<Gathering> gatheringList=gatheringMapper.selectByExample(exampleGathering);
         //查询转账记录表
-        TransferRecord transferRecord=new TransferRecord();
-        Example example = new Example(TransferRecord.class);
+        TransferRecord transferRecord;
 
         List<TransferRecord> transferRecordList=new ArrayList<>();
         for(Gathering gathering:gatheringList){
-            Example.Criteria criteria = example.createCriteria();
-            criteria.andEqualTo("transferRecordUuid",gathering.getTransactionRecordUUID());
-            criteria.andEqualTo("transferStatus","100");
-            transferRecord=transferRecordMapper.selectOneByExample(example);
-            transferRecordList.add(transferRecord);
-        }
+            if (!gathering.getTransactionRecordUUID().equals("") && gathering.getTransactionRecordUUID() !=null) {
+                transferRecord=transferRecordMapper.selectTransferRecordByTransferRecordUuid(gathering.getTransactionRecordUUID());
+                if (transferRecord !=null){
+                    transferRecordList.add(transferRecord);
+                }
+            }
 
+
+        }
 
         //拼接到ActiveGatheringVo
         List<ActiveGatheringVo> activeGatheringVoList=new ArrayList<ActiveGatheringVo>();
+
         for (TransferRecord transfer :transferRecordList){
             ActiveGatheringVo activeGatheringVo = new ActiveGatheringVo();
             //收款订单id
@@ -261,7 +269,7 @@ public class ActiveGatheringService {
             return false;
         }
         //校验付款卡密码 /未加密
-        if(bankCardService.BankCardPasswordCheck(outCard,agvo.getOutBankPassword())){
+        if(!bankCardService.BankCardPasswordCheck(outCard,agvo.getOutBankPassword())){
             return false;
         }
         TransferRecord transferRecord=new TransferRecord();

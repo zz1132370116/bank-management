@@ -173,7 +173,7 @@ public class TransferController {
                 //设置转账记录为失败状态
                 boolean transferFailedStatus = transferRecordService.transferFailedOperation(transferRecord);
                 if (transferFailedStatus) {
-                    return ResponseEntity.ok(new BaseResult(0, "转账失败，收款人姓名不一致"));
+                    return ResponseEntity.ok(new BaseResult(1, "转账失败，收款人姓名不一致"));
                 } else {
                     return ResponseEntity.ok(new BaseResult(1, "操作异常请通知管理员"));
                 }
