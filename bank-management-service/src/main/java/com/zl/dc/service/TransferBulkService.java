@@ -64,6 +64,9 @@ public class TransferBulkService {
             TransferRecord selectTransferRecord = transferRecordService.selectTransferRecordByUuid(this.transferRecord.getTransferRecordUuid());
             //做收款人姓名校验，如果失败，将转账设定为失败
             boolean nameCheck = bankCardService.checkNameAndBankCard(newPayeeVo.getPayeeName(), newPayeeVo.getPayeeBankCard());
+            if (newPayeeVo.getPayeeBankCard().equals(bankCard.getBankCardNumber())) {
+                nameCheck = false;
+            }
             if (nameCheck) {
                 //扣款
                 boolean transferStatus = bankCardService.bankCardTransferBusines(bankCard.getBankCardId(), newPayeeVo.getPayeeBankCard(), newPayeeVo.getMuchMoney());

@@ -159,6 +159,7 @@ public class ActiveGatheringService {
         Example example = new Example(BankUser.class);
         Example.Criteria criteria = example.createCriteria();
         criteria.andEqualTo("userPhone",agvo.getOutUserPhone());
+        criteria.andEqualTo("userName",agvo.getOutUserName());
         BankUser bankUser = userMapper.selectOneByExample(example);
         if (bankUser==null){
             return false;
@@ -181,7 +182,6 @@ public class ActiveGatheringService {
         gathering.setGatheringStatus(100);
         gathering.setCreationTime(date);
         gathering.setModificationTime(date);
-        System.out.println(gatheringMapper.insertSelective(gathering));
         if (status > 0) {
             return true;
         } else {
@@ -198,13 +198,12 @@ public class ActiveGatheringService {
      */
     public List<ActiveGatheringVo> getActiveGatheringVo(String userId){
         //获取当前登录用户ID userID
-        System.out.println("\n"+userId);
         //查询收款记录表
         Example exampleGathering = new Example(Gathering.class);
         Example.Criteria criteriaGathering = exampleGathering.createCriteria();
         criteriaGathering.andEqualTo("paymentUserId",userId);
+        criteriaGathering.andEqualTo("gatheringStatus",100);
         List<Gathering> gatheringList=gatheringMapper.selectByExample(exampleGathering);
-        System.out.println("\n"+gatheringList);
         //查询转账记录表
         TransferRecord transferRecord=new TransferRecord();
         Example example = new Example(TransferRecord.class);
@@ -213,10 +212,10 @@ public class ActiveGatheringService {
         for(Gathering gathering:gatheringList){
             Example.Criteria criteria = example.createCriteria();
             criteria.andEqualTo("transferRecordUuid",gathering.getTransactionRecordUUID());
+            criteria.andEqualTo("transferStatus","100");
             transferRecord=transferRecordMapper.selectOneByExample(example);
             transferRecordList.add(transferRecord);
         }
-        System.out.println("\n"+transferRecordList);
 
 
         //拼接到ActiveGatheringVo
@@ -240,7 +239,6 @@ public class ActiveGatheringService {
             activeGatheringVo.setTransferRemarks(transfer.getTransferNote());
             activeGatheringVoList.add(activeGatheringVo);
         }
-        System.out.println("\n"+activeGatheringVoList);
         return  activeGatheringVoList;
     }
     /**
@@ -313,7 +311,6 @@ public class ActiveGatheringService {
             bankInIdentification="BOWR";
         }
          transferRecord.setBankInIdentification(bankInIdentification);
-        System.out.println(transferRecord);
         int transferFlag=transferRecordMapper.updateByPrimaryKey(transferRecord);
         if (transferFlag<0){
             return false;

@@ -124,16 +124,25 @@ public class TransferController {
         if (StringUtils.isNotBlank(transferValueVo.getBankPhone()) && StringUtils.isBlank(transferValueVo.getInBankCard())) {
             //根据手机查询用户
             BankUser bankUser = userService.getBankUserByUserPhone(transferValueVo.getBankPhone());
-
+            //默认收款卡校验
             if (StringUtils.isBlank(bankUser.getDefaultBankCard())) {
                 return ResponseEntity.ok(new BaseResult(1, "转账失败，收款手机号未绑定银行卡"));
             }
+            //同卡校验
+            if (transferValueVo.getOutBankCard().equals(bankUser.getDefaultBankCard())) {
+                return ResponseEntity.ok(new BaseResult(1, "不能进行同卡转账操作"));
+            }
+            // 收款人姓名校验
             if (!bankUser.getUserName().equals(transferValueVo.getInBankName())) {
                 return ResponseEntity.ok(new BaseResult(1, "转账失败，收款人姓名不符合不符合"));
             }
             //添加收款银行卡号
             transferValueVo.setInBankCard(bankUser.getDefaultBankCard());
             transferValueVo.setInBank("BOWR");
+        }
+        //同卡校验
+        if (transferValueVo.getOutBankCard().equals(transferValueVo.getInBankCard())) {
+            return ResponseEntity.ok(new BaseResult(1, "不能进行同卡转账操作"));
         }
 
 
@@ -164,7 +173,7 @@ public class TransferController {
                 //设置转账记录为失败状态
                 boolean transferFailedStatus = transferRecordService.transferFailedOperation(transferRecord);
                 if (transferFailedStatus) {
-                    return ResponseEntity.ok(new BaseResult(0, "转账提交成功，请稍后查询"));
+                    return ResponseEntity.ok(new BaseResult(0, "转账失败，收款人姓名不一致"));
                 } else {
                     return ResponseEntity.ok(new BaseResult(1, "操作异常请通知管理员"));
                 }

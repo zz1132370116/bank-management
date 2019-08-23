@@ -139,7 +139,6 @@ public class ActiveGatheringController {
      */
     @PostMapping("/updateManagerTranscationStatus/{transcationId}")
     public ResponseEntity<BaseResult> updateManagerTranscationStatus(@PathVariable("transcationId") String transcationId){
-        System.out.println(transcationId);
         if (NumberValid.primaryKey(transcationId)){
             //根据事务表id修改订单为取消
             boolean flag=ags.updateManagerTranscationStatus(transcationId);
