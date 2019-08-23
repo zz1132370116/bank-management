@@ -122,7 +122,7 @@ public class AuthService {
                     bankUserVo.setUserName(first+stringBuffer.toString()+end);
                 }
             }
-
+            bankUserVo.setUserStatus(bankUser.getUserStatus());
             String phone = bankUser.getUserPhone();
             bankUserVo.setUserPhone(StarUtil.StringAddStar(phone,3,4));
 

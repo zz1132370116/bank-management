@@ -24,6 +24,12 @@
         AND user_id = #{userId}
     </select>
 
+    <select id="selectOtherBankCardById" resultType="java.lang.String" parameterType="java.lang.Integer">
+        select bank_card_number
+        from other_bank_card
+        where bank_card_id = #{id}
+    </select>
+
     <delete id="deleteByOtherBankCardId" parameterType="java.lang.Integer">
         DELETE FROM other_bank_card
         WHERE bank_card_id = #{otherBankCardId}

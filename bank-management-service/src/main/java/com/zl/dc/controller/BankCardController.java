@@ -10,6 +10,7 @@ import com.zl.dc.pojo.BankUser;
 import com.zl.dc.pojo.OtherBankCard;
 import com.zl.dc.pojo.SubordinateBank;
 import com.zl.dc.service.BankCardService;
+import com.zl.dc.util.MD5;
 import com.zl.dc.util.StarUtil;
 import com.zl.dc.vo.BaseResult;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -297,10 +298,11 @@ public class BankCardController {
         }
         Integer bankCardId = bankCard.getBankCardId();
         Integer userId = bankCard.getUserId();
-        String password = bankCard.getBankCardPassword();
+        String password = MD5.GetMD5Code(bankCard.getBankCardPassword());
         if (password == null || bankCardId == null || userId == null) {
             return ResponseEntity.ok(new BaseResult(1, "参数错误"));
         }
+
         // 验证用户、银行卡号、密码是否匹配
         if (!bankCardService.verifyBankCardPassword(bankCardId, password, userId)) {
             return ResponseEntity.ok(new BaseResult(1, "密码错误"));

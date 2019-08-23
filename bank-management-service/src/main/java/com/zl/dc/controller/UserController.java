@@ -336,9 +336,9 @@ public class UserController {
                 bankUser1.setUserPassword(BankUserPasswordUtil.generate(user.getUserPassword()));
                 //执行修改密码操作
                 BankUser bankUser = userService.updateBankUserPassword(bankUser1);
-                redisTemplate.delete(bankUser.getUserPhone()+bankUser.getIdCard());
+                //redisTemplate.delete(bankUser.getUserPhone()+bankUser.getIdCard());
                 //将修改手机号之后的用户的信息保存到redis中，使用手机号作为key
-                redisTemplate.opsForValue().set("user-"+user.getUserId().toString()+"-userInfo", JSON.toJSONString(user));
+                redisTemplate.opsForValue().set("user-"+bankUser.getUserId().toString()+"-userInfo", JSON.toJSONString(bankUser));
                 redisTemplate.opsForValue().set(bankUser.getUserPhone(),JSONObject.toJSONString(bankUser));
                 //将修改手机号之后的用户的信息保存到redis中，使用用户id作为key
                 redisTemplate.opsForValue().set(bankUser.getUserId().toString(),JSONObject.toJSONString(bankUser));
@@ -540,6 +540,7 @@ public class UserController {
                 } else {
                     bankUserVo.setDefaultBankCard("");
                 }
+                bankUserVo.setUserStatus(bankUser.getUserStatus());
                 return ResponseEntity.ok(new BaseResult(0, "认证成功").append("user",bankUserVo));
             } catch (IOException e) {
                 e.printStackTrace();

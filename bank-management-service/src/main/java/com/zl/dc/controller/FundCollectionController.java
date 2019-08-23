@@ -5,6 +5,7 @@ import com.zl.dc.pojo.TransferRecord;
 import com.zl.dc.service.BankCardService;
 import com.zl.dc.service.FundCollectionService;
 import com.zl.dc.service.TransferRecordService;
+import com.zl.dc.util.MD5;
 import com.zl.dc.util.NumberValid;
 import com.zl.dc.vo.AuthVO;
 import com.zl.dc.vo.BaseResult;
@@ -71,8 +72,8 @@ public class FundCollectionController {
                 || fundCollectionPlan.getCollectionMonth() == null
                 || fundCollectionPlan.getCollectionDay() == null
                 || fundCollectionPlan.getPlanName() == null
-                || NumberValid.moneyValid(fundCollectionPlan.getCollectionAmount().toString())
-                || NumberValid.verifyDate(fundCollectionPlan.getCollectionMonth(), fundCollectionPlan.getCollectionDay())
+                || !NumberValid.moneyValid(fundCollectionPlan.getCollectionAmount().toString())
+                || !NumberValid.verifyDate(fundCollectionPlan.getCollectionMonth(), fundCollectionPlan.getCollectionDay())
                 || fundCollectionPlan.getPlanName().length() > MAX_PLAN_NAME) {
             return ResponseEntity.ok(new BaseResult(1, "参数错误"));
         }
@@ -99,7 +100,8 @@ public class FundCollectionController {
                 || authVO.getPassword().length() != PASSWORD_LENGTH) {
             return ResponseEntity.ok(new BaseResult(1, "参数错误"));
         }
-        if (!bankCardService.verifyBankCardPassword(authVO.getBankCardId(), authVO.getPassword(), authVO.getUserId())) {
+        String password= MD5.GetMD5Code(authVO.getPassword());
+        if (!bankCardService.verifyBankCardPassword(authVO.getBankCardId(), password, authVO.getUserId())) {
             return ResponseEntity.ok(new BaseResult(1, "密码错误"));
         }
         if (authVO.getData() instanceof Integer) {
